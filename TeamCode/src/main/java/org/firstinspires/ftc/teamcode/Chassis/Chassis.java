@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 public class Chassis extends SubsystemBase {
     private MecanumDrive drive;
-    private final Encoder m_lf, m_lb, m_rf, m_rb;
+    private final Encoder m_lf, m_rf, m_lb, m_rb;
 
     private final double WHEEL_DIAMETER;
 
@@ -26,10 +26,8 @@ public class Chassis extends SubsystemBase {
     public void drive(double str, double fwd, double rot, double gyr, boolean isRobotOriented){
         if (isRobotOriented){
             drive.driveRobotCentric(str, fwd, rot);
-        }
-        else {
+        } else {
             drive.driveFieldCentric(str, fwd, rot, gyr);
         }
-
     }
 }

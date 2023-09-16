@@ -11,14 +11,15 @@ public class LiftSubsystem extends SubsystemBase {
     public LiftSubsystem(final HardwareMap hMap, String name) {
         lift = hMap.get(DcMotorEx.class, name);
         lift.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lift.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     public void drive(double sup, boolean limitEnabled) {
         if (!limitEnabled) {
             lift.setPower(sup);
         } else {
-            if (getEncoderValue() >= 4000 || getEncoderValue() <= -10){
+            if (getEncoderValue() <= -3000 || getEncoderValue() >= 10){
                 lift.setPower(0);
             } else lift.setPower(sup);
         }
@@ -29,7 +30,7 @@ public class LiftSubsystem extends SubsystemBase {
     }
 
     public void resetLimit() {
-        lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        lift.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        lift.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
     }
 }
