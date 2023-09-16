@@ -11,20 +11,30 @@ public class DriveCommand extends CommandBase {
     private final DoubleSupplier strafe, forward, rotation, gyro;
     private final BooleanSupplier isRobotOriented;
 
-    public DriveCommand(Chassis subsystem, DoubleSupplier str, DoubleSupplier fwd, DoubleSupplier rot, DoubleSupplier gyr, BooleanSupplier isro){
+    public DriveCommand(
+            Chassis subsystem,
+            DoubleSupplier str,
+            DoubleSupplier fwd,
+            DoubleSupplier rot,
+            DoubleSupplier gyr,
+            BooleanSupplier isRO
+    ) {
         chassis = subsystem;
         strafe = str;
         forward = fwd;
         rotation = rot;
         gyro = gyr;
-        isRobotOriented = isro;
+        isRobotOriented = isRO;
 
         addRequirements(chassis);
     }
     @Override
-    public void execute(){
-        chassis.drive(strafe.getAsDouble(), forward.getAsDouble(), rotation.getAsDouble(), gyro.getAsDouble(), isRobotOriented.getAsBoolean());
+    public void execute() {
+        chassis.drive (
+                strafe.getAsDouble(),
+                forward.getAsDouble(),
+                rotation.getAsDouble(),
+                gyro.getAsDouble(),
+                isRobotOriented.getAsBoolean());
     }
-
-
 }
