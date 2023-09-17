@@ -74,6 +74,7 @@ public class Tele extends CommandOpMode {
         );
         liftResetButton = (new GamepadButton(manipOp, GamepadKeys.Button.Y)).whenPressed(liftReset);
 
+        rf.setInverted(true);
         rb.setInverted(true);
         lf.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         rf.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
