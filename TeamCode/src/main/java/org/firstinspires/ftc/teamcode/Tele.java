@@ -9,10 +9,8 @@ import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.Chassis.Chassis;
-import org.firstinspires.ftc.teamcode.Chassis.DriveCommand;
-import org.firstinspires.ftc.teamcode.Lift.GetLiftValue;
+import org.firstinspires.ftc.teamcode.Chassis.MecanumDrive;
+import org.firstinspires.ftc.teamcode.Chassis.MecanumDriveCommand;
 import org.firstinspires.ftc.teamcode.Lift.LiftCommand;
 import org.firstinspires.ftc.teamcode.Lift.LiftSubsystem;
 import org.firstinspires.ftc.teamcode.Lift.ResetLimit;
@@ -24,12 +22,10 @@ public class Tele extends CommandOpMode {
     static final double WHEEL_DIAMETER = 96; //millimeters
 
     private MotorEx lf, rf, lb, rb;
-
-    private Chassis drive;
-    private DriveCommand driveCommand;
+    private MecanumDrive drive;
+    private MecanumDriveCommand driveCommand;
     private LiftSubsystem lift;
     private LiftCommand liftCommand;
-    private GetLiftValue getLiftPos;
     private ResetLimit liftReset;
 
     private Button liftResetButton;
@@ -43,7 +39,7 @@ public class Tele extends CommandOpMode {
         rf = new MotorEx(hardwareMap, "rightFront");
         lb = new MotorEx(hardwareMap, "leftBack");
         rb = new MotorEx(hardwareMap, "rightBack");
-        drive = new Chassis(lf, rf, lb, rb, WHEEL_DIAMETER);
+        drive = new MecanumDrive(hardwareMap, telemetry, false);
 
         lift = new LiftSubsystem(hardwareMap, "lift");
 
@@ -52,19 +48,18 @@ public class Tele extends CommandOpMode {
         driverOp = new GamepadEx(gamepad1);
         manipOp = new GamepadEx(gamepad2);
 
-        driveCommand = new DriveCommand(
+        driveCommand = new MecanumDriveCommand(
                 drive,
-                () -> driverOp.getLeftX()*.50,
-                () -> driverOp.getLeftY()*.50,
-                () -> driverOp.getRightX()*.50,
-                () -> 0,
-                () -> true
+                () -> -driverOp.getLeftY(),
+                () -> driverOp.getLeftX(),
+                () -> driverOp.getRightX()
         );
 
         liftCommand = new LiftCommand(
                 lift,
                 () -> -manipOp.getLeftY(),
-                () -> true
+                () -> true,
+                () -> manipOp.getButton(GamepadKeys.Button.X)
         );
         liftReset = new ResetLimit(lift);
 
@@ -72,10 +67,10 @@ public class Tele extends CommandOpMode {
                 m_telemetry,
                 () -> lift.getEncoderValue()
         );
-        liftResetButton = (new GamepadButton(manipOp, GamepadKeys.Button.Y)).whenPressed(liftReset);
 
-        rf.setInverted(true);
-        rb.setInverted(true);
+        liftResetButton = (new GamepadButton(manipOp, GamepadKeys.Button.Y))
+                .whenPressed(liftReset);
+
         lf.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         rf.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         lb.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);

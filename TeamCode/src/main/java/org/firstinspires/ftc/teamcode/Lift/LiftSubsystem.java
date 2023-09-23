@@ -15,11 +15,11 @@ public class LiftSubsystem extends SubsystemBase {
         lift.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
     }
 
-    public void drive(double sup, boolean limitEnabled) {
-        if (!limitEnabled) {
+    public void drive(double sup, boolean limitEnabled, boolean limitBypass) {
+        if (!limitEnabled || limitBypass) {
             lift.setPower(sup);
         } else {
-            if (getEncoderValue() <= -3000 || getEncoderValue() >= 10){
+            if (getEncoderValue() <= -2020 || getEncoderValue() >= 5){
                 lift.setPower(0);
             } else lift.setPower(sup);
         }
