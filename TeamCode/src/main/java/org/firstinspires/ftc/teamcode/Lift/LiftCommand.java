@@ -8,12 +8,13 @@ import java.util.function.DoubleSupplier;
 public class LiftCommand extends CommandBase {
     private final LiftSubsystem lift;
     private final DoubleSupplier velocity;
-    private final BooleanSupplier limitEnabled;
+    private final BooleanSupplier limitEnabled, limitBypass;
 
-    public LiftCommand (LiftSubsystem subsystem, DoubleSupplier vel, BooleanSupplier limE) {
+    public LiftCommand (LiftSubsystem subsystem, DoubleSupplier vel, BooleanSupplier limitOn, BooleanSupplier limitBP) {
         lift = subsystem;
         velocity = vel;
-        limitEnabled = limE;
+        limitEnabled = limitOn;
+        limitBypass = limitBP;
         addRequirements(lift);
     }
 
@@ -21,7 +22,8 @@ public class LiftCommand extends CommandBase {
     public void execute() {
         lift.drive(
                 velocity.getAsDouble(),
-                limitEnabled.getAsBoolean()
+                limitEnabled.getAsBoolean(),
+                limitBypass.getAsBoolean()
         );
     }
 }
