@@ -1,9 +1,11 @@
-package org.firstinspires.ftc.teamcode.Lift;
+package org.firstinspires.ftc.teamcode.Arm.Lift;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+
+import org.firstinspires.ftc.teamcode.Constants;
 
 public class LiftSubsystem extends SubsystemBase {
     private final DcMotorEx lift;
@@ -16,13 +18,24 @@ public class LiftSubsystem extends SubsystemBase {
     }
 
     public void drive(double sup, boolean limitEnabled, boolean limitBypass) {
+        lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         if (!limitEnabled || limitBypass) {
             lift.setPower(sup);
         } else {
-            if (getEncoderValue() <= -2020 || getEncoderValue() >= 5){
+            if (getEncoderValue() <= Constants.LIFT_LIMIT_TOP || getEncoderValue() >= Constants.LIFT_LIMIT_BOTTOM){
                 lift.setPower(0);
             } else lift.setPower(sup);
         }
+    }
+
+    public void moveToPos(int target, double vel) {
+        lift.setTargetPosition(target);
+        lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        lift.setVelocity(vel);
+    }
+
+    public boolean isRunningEnc() {
+        return lift.isBusy();
     }
 
     public double getEncoderValue() {

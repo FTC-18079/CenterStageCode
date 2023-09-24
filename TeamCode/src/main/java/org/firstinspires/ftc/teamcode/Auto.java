@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.Chassis.MecanumDrive;
 import org.firstinspires.ftc.teamcode.RRCommands.RunCommand;
-import org.firstinspires.ftc.teamcode.Lift.LiftSubsystem;
+import org.firstinspires.ftc.teamcode.Arm.Lift.LiftSubsystem;
 import org.firstinspires.ftc.teamcode.Roadrunner.drive.SampleMecanumDrive;
 
 @Autonomous(name = "Auto", group = "Tests")
