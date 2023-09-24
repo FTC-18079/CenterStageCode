@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Lift;
+package org.firstinspires.ftc.teamcode.Arm.Lift;
 
 import com.arcrobotics.ftclib.command.CommandBase;
 

@@ -11,8 +11,9 @@ public class TelemetrySS extends SubsystemBase {
         m_telemetry = tele;
     }
 
-    public void run(double liftValue) {
+    public void run(double liftValue, double shoulderValue) {
         m_telemetry.addData("Lift", liftValue);
+        m_telemetry.addData("Shoulder", shoulderValue);
         m_telemetry.update();
     }
 }
