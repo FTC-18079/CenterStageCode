@@ -17,10 +17,12 @@ import java.util.List;
 
 public class MecanumDrive extends SubsystemBase {
     private final SampleMecanumDrive drive;
+    Telemetry m_telemetry;
     private final boolean fieldCentric;
 
     public MecanumDrive(HardwareMap hardwareMap, Telemetry telemetry, boolean isFieldCentric) {
         this.drive = new SampleMecanumDrive(hardwareMap, telemetry);
+        m_telemetry = telemetry;
         fieldCentric = isFieldCentric;
     }
 
@@ -37,6 +39,8 @@ public class MecanumDrive extends SubsystemBase {
     }
 
     public void update() {
+        m_telemetry.addData("Robot Pose Estimate", getPoseEstimate());
+        m_telemetry.update();
         drive.update();
     }
 
@@ -47,9 +51,10 @@ public class MecanumDrive extends SubsystemBase {
     public void drive(double leftY, double leftX, double rightX) {
         Pose2d poseEstimate = getPoseEstimate();
 
-        Vector2d input = new Vector2d(-leftY, -leftX).rotated(
-                fieldCentric ? -poseEstimate.getHeading() : 0
-        );
+        Vector2d input = new Vector2d(
+                -leftY,
+                -leftX
+        ).rotated(fieldCentric ? -poseEstimate.getHeading() : 0);
 
         drive.setWeightedDrivePower(
                 new Pose2d(
@@ -58,6 +63,15 @@ public class MecanumDrive extends SubsystemBase {
                         -rightX
                 )
         );
+        drive.update();
+    }
+
+    public void resetHeading() {
+        Pose2d poseEstimate = getPoseEstimate();
+        drive.setPoseEstimate(new Pose2d(
+                poseEstimate.getX(),
+                poseEstimate.getY(),
+                0));
     }
 
     public void setDrivePower(Pose2d drivePower) {
