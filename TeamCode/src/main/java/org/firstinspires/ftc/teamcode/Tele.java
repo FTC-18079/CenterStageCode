@@ -14,12 +14,10 @@ import org.firstinspires.ftc.teamcode.Chassis.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Chassis.MecanumDriveCommand;
 import org.firstinspires.ftc.teamcode.Arm.Lift.LiftCommand;
 import org.firstinspires.ftc.teamcode.Arm.Lift.LiftSubsystem;
-import org.firstinspires.ftc.teamcode.Arm.Lift.LiftToPos;
 import org.firstinspires.ftc.teamcode.Arm.Lift.ResetLimit;
 import org.firstinspires.ftc.teamcode.Arm.Shoulder.ResetEncoder;
 import org.firstinspires.ftc.teamcode.Arm.Shoulder.ShoulderCommand;
 import org.firstinspires.ftc.teamcode.Arm.Shoulder.ShoulderSubsystem;
-import org.firstinspires.ftc.teamcode.Arm.Shoulder.ShoulderToPos;
 import org.firstinspires.ftc.teamcode.Claw.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.Claw.MoveClawOne;
 import org.firstinspires.ftc.teamcode.Claw.MoveClawTwo;
@@ -68,8 +66,8 @@ public class Tele extends CommandOpMode {
         lift = new LiftSubsystem(hardwareMap, "lift");
         shoulder = new ShoulderSubsystem(hardwareMap, "shoulder");
 
-        claw = new ClawSubsystem(hardwareMap,"ClawOne", "ClawTwo");
-        wrist = new WristSubsystem(hardwareMap, "Wrist");
+        claw = new ClawSubsystem(hardwareMap,"clawOne", "clawTwo");
+        wrist = new WristSubsystem(hardwareMap, "wrist");
 
         m_telemetry = new TelemetrySS(telemetry);
 
@@ -113,11 +111,11 @@ public class Tele extends CommandOpMode {
                 .whenPressed(shoulderReset);
 
         clawOneButton = (new GamepadButton(manipOp, GamepadKeys.Button.LEFT_BUMPER))
-                .whenPressed(moveClawOne);
+                .whenReleased(moveClawOne);
         clawTwoButton = (new GamepadButton(manipOp, GamepadKeys.Button.RIGHT_BUMPER))
-                .whenPressed(moveClawTwo);
+                .whenReleased(moveClawTwo);
         wristButton = (new GamepadButton(manipOp, GamepadKeys.Button.X))
-                .whenPressed(wristCommand);
+                .whenReleased(wristCommand);
 
         armUpButton = (new GamepadButton(manipOp, GamepadKeys.Button.DPAD_UP))
                 .whenPressed(new ArmCommand(shoulder, lift, () -> Constants.SHOULDER_POS_HIGH, () -> Constants.LIFT_POS_HIGH));

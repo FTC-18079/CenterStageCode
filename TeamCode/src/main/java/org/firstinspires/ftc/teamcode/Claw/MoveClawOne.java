@@ -14,4 +14,8 @@ public class MoveClawOne extends CommandBase {
     public void initialize(){
         claw.moveClawOne();
     }
+
+    public boolean isFinished() {
+        return true;
+    }
 }

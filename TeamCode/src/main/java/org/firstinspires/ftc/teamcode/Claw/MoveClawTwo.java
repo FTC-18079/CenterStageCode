@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.Claw;
 import com.arcrobotics.ftclib.command.CommandBase;
 
 public class MoveClawTwo extends CommandBase {
-
     private final ClawSubsystem claw;
 
     public MoveClawTwo(ClawSubsystem subsystem){
@@ -16,4 +15,7 @@ public class MoveClawTwo extends CommandBase {
         claw.moveClawTwo();
     }
 
+    public boolean isFinished() {
+        return true;
+    }
 }

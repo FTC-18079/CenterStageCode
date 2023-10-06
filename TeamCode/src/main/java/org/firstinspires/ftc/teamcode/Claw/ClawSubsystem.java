@@ -8,38 +8,22 @@ public class ClawSubsystem extends SubsystemBase {
 
     private final Servo claw1, claw2;
 
-    public ClawSubsystem(final HardwareMap hMap, String S1, String S2){
-        claw1 = hMap.get(Servo.class, S1);
-        claw2 = hMap.get(Servo.class, S2);
-
+    public ClawSubsystem(final HardwareMap hMap, String servo1, String servo2){
+        claw1 = hMap.get(Servo.class, servo1);
+        claw2 = hMap.get(Servo.class, servo2);
     }
 
     public void moveClawOne(){
-        double pose = claw1.getPosition();
-        switch ((int) pose){
-            case 1:
-                claw1.setPosition(0);
-                break;
-            case 0:
-                claw1.setPosition(1);
-                break;
-            default:
-                claw1.setPosition(0);
-                break;
-        }
-
-
+        double pos1 = claw1.getPosition();
+        if (pos1 == 1.0) {
+            claw1.setPosition(0.0);
+        } else claw1.setPosition(1.0);
     }
     public void moveClawTwo(){
-        double pose = claw2.getPosition();
-        switch ((int) pose){
-            case 1:
-                claw2.setPosition(0);
-            case 0:
-                claw2.setPosition(1);
-            default:
-                claw2.setPosition(0);
-        }
+        double pos2 = claw2.getPosition();
+        if (pos2 == 1.0) {
+            claw2.setPosition(0.0);
+        } else claw2.setPosition(1.0);
     }
 
 }

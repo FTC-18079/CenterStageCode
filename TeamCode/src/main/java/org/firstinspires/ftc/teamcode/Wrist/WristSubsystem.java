@@ -14,17 +14,9 @@ public class WristSubsystem extends SubsystemBase {
 
     public void moveWrist(){
         double pose = wrist.getPosition();
-        switch((int) pose){
-            case 1:
-                wrist.setPosition(0);
-                break;
-            case 0:
-                wrist.setPosition(1);
-                break;
-            default:
-                wrist.setPosition(0);
-
-        }
+        if (pose == 1.0) {
+            wrist.setPosition(0.0);
+        } else wrist.setPosition(1.0);
     }
 
 }

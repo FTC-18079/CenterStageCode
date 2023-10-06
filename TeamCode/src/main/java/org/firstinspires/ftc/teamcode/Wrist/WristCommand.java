@@ -14,4 +14,9 @@ public class WristCommand extends CommandBase {
      public void initialize(){
          wrist.moveWrist();
      }
+
+     @Override
+    public boolean isFinished() {
+         return true;
+     }
 }
