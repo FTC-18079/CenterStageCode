@@ -20,8 +20,13 @@ import org.firstinspires.ftc.teamcode.Arm.Shoulder.ResetEncoder;
 import org.firstinspires.ftc.teamcode.Arm.Shoulder.ShoulderCommand;
 import org.firstinspires.ftc.teamcode.Arm.Shoulder.ShoulderSubsystem;
 import org.firstinspires.ftc.teamcode.Arm.Shoulder.ShoulderToPos;
+import org.firstinspires.ftc.teamcode.Claw.ClawSubsystem;
+import org.firstinspires.ftc.teamcode.Claw.MoveClawOne;
+import org.firstinspires.ftc.teamcode.Claw.MoveClawTwo;
 import org.firstinspires.ftc.teamcode.Telemetry.TelemetryCommand;
 import org.firstinspires.ftc.teamcode.Telemetry.TelemetrySS;
+import org.firstinspires.ftc.teamcode.Wrist.WristCommand;
+import org.firstinspires.ftc.teamcode.Wrist.WristSubsystem;
 
 @TeleOp(name = "TeleOp", group = "OpModes")
 public class Tele extends CommandOpMode {
@@ -30,6 +35,13 @@ public class Tele extends CommandOpMode {
     private MotorEx lf, rf, lb, rb;
     private MecanumDrive drive;
     private MecanumDriveCommand driveCommand;
+//Claw
+    private ClawSubsystem claw;
+    private MoveClawOne moveClawOne;
+    private MoveClawTwo moveClawTwo;
+//Wrist
+    private WristSubsystem wrist;
+    private WristCommand wristCommand;
 //Lift
     private LiftSubsystem lift;
     private LiftCommand liftCommand;
@@ -39,7 +51,8 @@ public class Tele extends CommandOpMode {
     private ShoulderCommand shoulderCommand;
     private ResetEncoder shoulderReset;
 
-    private Button liftResetButton, shoulderResetButton, armUpButton, armMidButton, armLowButton, armRestButton;
+    private Button liftResetButton, shoulderResetButton, armUpButton, armMidButton, armLowButton, armRestButton,
+            clawOneButton, clawTwoButton, wristButton;
     private GamepadEx driverOp, manipOp;
     private TelemetrySS m_telemetry;
     private TelemetryCommand telemetryCommand;
@@ -54,6 +67,9 @@ public class Tele extends CommandOpMode {
 
         lift = new LiftSubsystem(hardwareMap, "lift");
         shoulder = new ShoulderSubsystem(hardwareMap, "shoulder");
+
+        claw = new ClawSubsystem(hardwareMap,"ClawOne", "ClawTwo");
+        wrist = new WristSubsystem(hardwareMap, "Wrist");
 
         m_telemetry = new TelemetrySS(telemetry);
 
@@ -81,6 +97,10 @@ public class Tele extends CommandOpMode {
         );
         shoulderReset = new ResetEncoder(shoulder);
 
+        moveClawOne = new MoveClawOne(claw);
+        moveClawTwo = new MoveClawTwo(claw);
+        wristCommand = new WristCommand(wrist);
+
         telemetryCommand = new TelemetryCommand(
                 m_telemetry,
                 () -> lift.getEncoderValue(),
@@ -91,6 +111,13 @@ public class Tele extends CommandOpMode {
                 .whenPressed(liftReset);
         shoulderResetButton = (new GamepadButton(manipOp, GamepadKeys.Button.A))
                 .whenPressed(shoulderReset);
+
+        clawOneButton = (new GamepadButton(manipOp, GamepadKeys.Button.LEFT_BUMPER))
+                .whenPressed(moveClawOne);
+        clawTwoButton = (new GamepadButton(manipOp, GamepadKeys.Button.RIGHT_BUMPER))
+                .whenPressed(moveClawTwo);
+        wristButton = (new GamepadButton(manipOp, GamepadKeys.Button.X))
+                .whenPressed(wristCommand);
 
         armUpButton = (new GamepadButton(manipOp, GamepadKeys.Button.DPAD_UP))
                 .whenPressed(new ArmCommand(shoulder, lift, () -> Constants.SHOULDER_POS_HIGH, () -> Constants.LIFT_POS_HIGH));
