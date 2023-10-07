@@ -3,41 +3,56 @@ package org.firstinspires.ftc.teamcode.Arm.Shoulder;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-import org.firstinspires.ftc.teamcode.Constants;
-
 public class ShoulderSubsystem extends SubsystemBase {
-    private final DcMotorEx shoulder;
+    private final DcMotorEx shoulder1, shoulder2;
 
-    public ShoulderSubsystem(final HardwareMap hMap, String name) {
-        shoulder = hMap.get(DcMotorEx.class, name);
-        shoulder.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        shoulder.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        shoulder.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+    public ShoulderSubsystem(final HardwareMap hMap, String motor1, String motor2) {
+        shoulder1 = hMap.get(DcMotorEx.class, motor1);
+        shoulder2 = hMap.get(DcMotorEx.class, motor2);
+
+        shoulder1.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        shoulder2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+
+        shoulder1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        shoulder2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        shoulder1.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        shoulder2.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+
+        shoulder2.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
     public void drive(double sup) {
-        shoulder.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        shoulder.setPower(sup);
+        shoulder1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        shoulder2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        shoulder1.setPower(sup);
+        shoulder2.setPower(sup);
     }
 
     public void moveToPos(int target, double vel) {
-        shoulder.setTargetPosition(target);
-        shoulder.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        shoulder.setVelocity(vel);
+        shoulder1.setTargetPosition(target);
+        shoulder2.setTargetPosition(target);
+        shoulder1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        shoulder2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        shoulder1.setVelocity(vel);
+        shoulder2.setVelocity(vel);
     }
 
     public boolean isRunningEnc() {
-        return shoulder.isBusy();
+        return shoulder1.isBusy();
     }
 
-    public double getEncoderValue() {
-        return shoulder.getCurrentPosition();
+    public int getEncoderValue() {
+        return shoulder1.getCurrentPosition();
     }
 
     public void resetLimit() {
-        shoulder.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        shoulder.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        shoulder1.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        shoulder2.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        shoulder1.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        shoulder2.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
     }
 }

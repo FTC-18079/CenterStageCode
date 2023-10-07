@@ -4,10 +4,13 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
-@TeleOp(name = "LiftTests", group = "Tests")
+@TeleOp(name = "Test OpMode", group = "Tests")
 public class LinearTele extends LinearOpMode {
-    private DcMotorEx lift;
+    private DcMotorEx lift, testMotor;
+    private Servo axon;
     private boolean limitReached = false;
     private boolean limitEnabled = true;
 
@@ -28,6 +31,10 @@ public class LinearTele extends LinearOpMode {
     @Override
     public void runOpMode() {
         lift = initMotor("lift", true, true, true);
+        testMotor = initMotor("wristEncoder", false, false, true);
+        testMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+
+        axon = hardwareMap.get(Servo.class, "wrist");
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -53,9 +60,17 @@ public class LinearTele extends LinearOpMode {
                 lift.setPower(-gamepad1.left_stick_y * 1);
             } else lift.setPower(0);
 
+            if(gamepad1.a){
+                axon.setPosition(0);
+            }
+            if(gamepad1.b){
+                axon.setPosition(1);
+            }
 
             telemetry.addData("Motor Pos", lift.getCurrentPosition());
             telemetry.addData("Motor Power", -gamepad1.left_stick_y * 100);
+            telemetry.addData("Axon encoder", testMotor.getCurrentPosition());
+            telemetry.addData("Servo", axon.getPosition());
             telemetry.update();
         }
     }
