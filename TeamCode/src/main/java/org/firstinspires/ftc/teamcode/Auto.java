@@ -5,15 +5,17 @@ import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.Chassis.MecanumDrive;
 import org.firstinspires.ftc.teamcode.RRCommands.RunCommand;
 import org.firstinspires.ftc.teamcode.Arm.Lift.LiftSubsystem;
+import org.firstinspires.ftc.teamcode.Roadrunner.PoseStorage;
 import org.firstinspires.ftc.teamcode.Roadrunner.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.Roadrunner.trajectorysequence.TrajectorySequence;
 
 @Autonomous(name = "Auto", group = "Tests")
 public class Auto extends LinearOpMode {
-    MecanumDrive drive;
     LiftSubsystem lift;
     RunCommand runCommand;
 
@@ -21,23 +23,31 @@ public class Auto extends LinearOpMode {
     public void runOpMode() {
         SampleMecanumDrive driveTrain = new SampleMecanumDrive(hardwareMap, telemetry);
 
-        Pose2d startPose = new Pose2d(36.0,-62.50, Math.toRadians(90));
+        Pose2d startPose = new Pose2d(-36, -61, Math.toRadians(90));
 
         driveTrain.setPoseEstimate(startPose);
+        driveTrain.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        PoseStorage.currentPose = driveTrain.getPoseEstimate();
 
-        Trajectory traj1 = driveTrain.trajectoryBuilder(startPose)
-                .splineTo(new Vector2d(12, -26.5), Math.toRadians(90))
-                .build();
-
-        Trajectory traj2 = driveTrain.trajectoryBuilder(traj1.end())
-                .strafeRight(12)
+        TrajectorySequence trajSeq = driveTrain.trajectorySequenceBuilder(startPose)
+                .forward(26)
+                .waitSeconds(0.25)
+                .back(26)
+                .strafeTo(new Vector2d(14, -61))
+                .lineToSplineHeading(new Pose2d(38, -38, Math.toRadians(180)))
+                .waitSeconds(0.5)
+                .strafeTo(new Vector2d(38, -12))
+                .lineToSplineHeading(new Pose2d(-56, -12, Math.toRadians(180)))
+                .waitSeconds(0.5)
+                .lineToSplineHeading(new Pose2d(38, -12, Math.toRadians(180)))
                 .build();
 
         waitForStart();
 
         if(isStopRequested()) return;
 
-        driveTrain.followTrajectory(traj1);
-        driveTrain.followTrajectory(traj2);
+        driveTrain.followTrajectorySequence(trajSeq);
+
+        PoseStorage.currentPose = driveTrain.getPoseEstimate();
     }
 }
