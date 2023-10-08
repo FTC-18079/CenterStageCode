@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp(name = "Test OpMode", group = "Tests")
 public class LinearTele extends LinearOpMode {
-    private DcMotorEx lift, testMotor;
+    private DcMotorEx lift, testMotor, shoulder;
     private Servo axon;
     private boolean limitReached = false;
     private boolean limitEnabled = true;
@@ -31,8 +31,12 @@ public class LinearTele extends LinearOpMode {
     @Override
     public void runOpMode() {
         lift = initMotor("lift", true, true, true);
+        lift.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lift.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        shoulder = initMotor("shoulder1", false, false, true);
         testMotor = initMotor("wristEncoder", false, false, true);
         testMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        testMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
 
         axon = hardwareMap.get(Servo.class, "wrist");
 
@@ -67,8 +71,11 @@ public class LinearTele extends LinearOpMode {
                 axon.setPosition(1);
             }
 
-            telemetry.addData("Motor Pos", lift.getCurrentPosition());
-            telemetry.addData("Motor Power", -gamepad1.left_stick_y * 100);
+            testMotor.setPower(gamepad1.right_stick_y);
+
+            telemetry.addData("Lift Pos", lift.getCurrentPosition());
+            telemetry.addData("Lift Power", -gamepad1.left_stick_y * 100);
+            telemetry.addData("Shoulder Pos", shoulder.getCurrentPosition());
             telemetry.addData("Axon encoder", testMotor.getCurrentPosition());
             telemetry.addData("Servo", axon.getPosition());
             telemetry.update();
