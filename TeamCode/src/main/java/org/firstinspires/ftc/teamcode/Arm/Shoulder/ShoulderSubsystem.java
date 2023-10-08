@@ -33,12 +33,15 @@ public class ShoulderSubsystem extends SubsystemBase {
     }
 
     public void moveToPos(int target, double vel) {
+        double damp;
         shoulder1.setTargetPosition(target);
         shoulder2.setTargetPosition(target);
+        if (target < getEncoderValue()) damp = 0.75;
+        else damp = 1.0;
         shoulder1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         shoulder2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        shoulder1.setVelocity(vel);
-        shoulder2.setVelocity(vel);
+        shoulder1.setVelocity(vel * damp);
+        shoulder2.setVelocity(vel * damp);
     }
 
     public boolean isRunningEnc() {

@@ -19,11 +19,14 @@ import org.firstinspires.ftc.teamcode.Arm.Lift.ResetLimit;
 import org.firstinspires.ftc.teamcode.Arm.Shoulder.ResetEncoder;
 import org.firstinspires.ftc.teamcode.Arm.Shoulder.ShoulderCommand;
 import org.firstinspires.ftc.teamcode.Arm.Shoulder.ShoulderSubsystem;
+import org.firstinspires.ftc.teamcode.Chassis.ResetHeading;
 import org.firstinspires.ftc.teamcode.Manip.Claw.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.Manip.Claw.AutoMoveClaw;
 import org.firstinspires.ftc.teamcode.Manip.Stow.Down;
 import org.firstinspires.ftc.teamcode.Manip.Stow.StowSubsystem;
 import org.firstinspires.ftc.teamcode.Manip.WristStow;
+import org.firstinspires.ftc.teamcode.Roadrunner.PoseStorage;
+import org.firstinspires.ftc.teamcode.Roadrunner.drive.StandardTrackingWheelLocalizer;
 import org.firstinspires.ftc.teamcode.Telemetry.TelemetryCommand;
 import org.firstinspires.ftc.teamcode.Telemetry.TelemetrySS;
 import org.firstinspires.ftc.teamcode.Manip.Wrist.WristCommand;
@@ -36,6 +39,7 @@ public class Tele extends CommandOpMode {
     private MotorEx lf, rf, lb, rb;
     private MecanumDrive drive;
     private MecanumDriveCommand driveCommand;
+    private ResetHeading resetHeading;
 //Claw
     private ClawSubsystem claw;
 //Wrist
@@ -53,7 +57,7 @@ public class Tele extends CommandOpMode {
     private ShoulderPos getShoulderPos;
     private ResetEncoder shoulderReset;
 
-    private Button liftResetButton, shoulderResetButton, armUpButton, armMidButton, armLowButton, armRestButton,
+    private Button headingResetButton, liftResetButton, shoulderResetButton, armUpButton, armMidButton, armLowButton, armRestButton,
             clawButton, wristButton, stowButton;
     private GamepadEx driverOp, manipOp;
     private TelemetrySS m_telemetry;
@@ -65,7 +69,8 @@ public class Tele extends CommandOpMode {
         rf = new MotorEx(hardwareMap, "rightFront");
         lb = new MotorEx(hardwareMap, "leftBack");
         rb = new MotorEx(hardwareMap, "rightBack");
-        drive = new MecanumDrive(hardwareMap, telemetry, false);
+        drive = new MecanumDrive(hardwareMap, telemetry, true);
+        drive.setPoseEstimate(PoseStorage.currentPose);
 
         lift = new LiftSubsystem(hardwareMap, "lift");
         shoulder = new ShoulderSubsystem(hardwareMap, "shoulder1", "shoulder2");
@@ -85,6 +90,7 @@ public class Tele extends CommandOpMode {
                 () -> driverOp.getLeftX() * 0.8,
                 () -> driverOp.getRightX() * 0.8
         );
+        resetHeading = new ResetHeading(drive);
 
         liftCommand = new LiftCommand(
                 lift,
@@ -112,6 +118,9 @@ public class Tele extends CommandOpMode {
                 () -> claw.getClawOnePos(),
                 () -> claw.getClawTwoPos()
         );
+
+        headingResetButton = (new GamepadButton(driverOp, GamepadKeys.Button.Y))
+                .whenReleased(resetHeading);
 
         liftResetButton = (new GamepadButton(manipOp, GamepadKeys.Button.Y))
                 .whenPressed(liftReset);

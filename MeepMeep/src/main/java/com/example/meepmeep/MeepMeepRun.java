@@ -1,5 +1,5 @@
 
-package com.example.meepmeeptesting;
+package com.example.meepmeep;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
@@ -13,7 +13,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-public class MeepMeepTesting {
+public class MeepMeepRun {
     public static void main(String[] args) {
         MeepMeep meepMeep = new MeepMeep(725);
 
