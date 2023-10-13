@@ -134,13 +134,17 @@ public class Tele extends CommandOpMode {
                 .whenReleased(new Down(stow));
 
         armUpButton = (new GamepadButton(manipOp, GamepadKeys.Button.DPAD_UP))
-                .whenPressed(new ArmCommand(shoulder, lift, () -> Constants.SHOULDER_POS_HIGH, () -> Constants.LIFT_POS_HIGH));
+                .whenReleased(new ArmCommand(shoulder, lift, stow,
+                        () -> Constants.SHOULDER_POS_HIGH, () -> Constants.LIFT_POS_HIGH, () -> Constants.STOW_POS_HIGH));
         armMidButton = (new GamepadButton(manipOp, GamepadKeys.Button.DPAD_RIGHT))
-                .whenPressed(new ArmCommand(shoulder, lift, () -> Constants.SHOULDER_POS_MID, () -> Constants.LIFT_POS_MID));
+                .whenReleased(new ArmCommand(shoulder, lift, stow,
+                        () -> Constants.SHOULDER_POS_MID, () -> Constants.LIFT_POS_MID, () -> Constants.STOW_POS_MID));
         armLowButton = (new GamepadButton(manipOp, GamepadKeys.Button.DPAD_DOWN))
-                .whenPressed(new ArmCommand(shoulder, lift, () -> Constants.SHOULDER_POS_LOW, () -> Constants.LIFT_POS_LOW));
+                .whenReleased(new ArmCommand(shoulder, lift, stow,
+                        () -> Constants.SHOULDER_POS_LOW, () -> Constants.LIFT_POS_LOW, () -> Constants.STOW_POS_LOW));
         armRestButton = (new GamepadButton(manipOp, GamepadKeys.Button.DPAD_LEFT))
-                .whenPressed(new ArmCommand(shoulder, lift, () -> Constants.SHOULDER_POS_REST, () -> Constants.LIFT_POS_REST));
+                .whenReleased(new ArmCommand(shoulder, lift, stow,
+                        () -> Constants.SHOULDER_POS_REST, () -> Constants.LIFT_POS_REST, () -> Constants.STOW_POS_REST));
 
         lf.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         rf.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
