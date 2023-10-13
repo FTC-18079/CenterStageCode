@@ -1,5 +1,5 @@
 
-package com.example.meepmeeptesting;
+package com.example.meepmeep;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
@@ -13,7 +13,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-public class MeepMeepTesting {
+public class MeepMeepRun {
     public static void main(String[] args) {
         MeepMeep meepMeep = new MeepMeep(725);
 
@@ -25,8 +25,8 @@ public class MeepMeepTesting {
                         drive.trajectorySequenceBuilder(new Pose2d(-36, -61, Math.toRadians(90)))
                                 .forward(26)
                                 .waitSeconds(0.25)
-                                .back(26)
-                                .strafeTo(new Vector2d(14, -61))
+                                .back(24)
+                                .strafeTo(new Vector2d(24, -61))
                                 .lineToSplineHeading(new Pose2d(38, -38, Math.toRadians(180)))
                                 .waitSeconds(0.5)
                                 .strafeTo(new Vector2d(38, -12))

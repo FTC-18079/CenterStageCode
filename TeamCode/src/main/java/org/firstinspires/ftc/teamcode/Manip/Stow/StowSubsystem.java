@@ -4,6 +4,8 @@ import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.teamcode.Constants;
+
 public class StowSubsystem extends SubsystemBase {
     private Servo stow;
 
@@ -12,10 +14,14 @@ public class StowSubsystem extends SubsystemBase {
     }
 
     public void moveStow() {
-        double pos = stow.getPosition();
+        double pos = getPos();
         if (pos == 1.0) {
             stow.setPosition(0.0);
         } else stow.setPosition(1.0);
+    }
+
+    public void toPos(double pos) {
+        stow.setPosition(pos);
     }
 
     public void stow() {
@@ -23,6 +29,10 @@ public class StowSubsystem extends SubsystemBase {
     }
 
     public void down() {
-        stow.setPosition(1.0);
+        stow.setPosition(Constants.STOW_POS_REST);
+    }
+
+    public double getPos() {
+        return stow.getPosition();
     }
 }
