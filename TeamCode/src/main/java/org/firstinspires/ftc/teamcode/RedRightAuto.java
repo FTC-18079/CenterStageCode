@@ -21,7 +21,7 @@ public class RedRightAuto extends LinearOpMode {
     public void runOpMode() {
         SampleMecanumDrive driveTrain = new SampleMecanumDrive(hardwareMap, telemetry);
 
-        Pose2d startPose = new Pose2d(12, -61.5, Math.toRadians(90));
+        Pose2d startPose = new Pose2d(12, -63.339, Math.toRadians(90));
 
         driveTrain.setPoseEstimate(startPose);
         driveTrain.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -30,12 +30,12 @@ public class RedRightAuto extends LinearOpMode {
         TrajectorySequence trajSeq = driveTrain.trajectorySequenceBuilder(startPose)
                 .forward(26)
                 .waitSeconds(0.25)
-                .back(16)
-                .splineToSplineHeading(new Pose2d(44, -35, Math.toRadians(180)), Math.toRadians(90))
+                .back(15)
+                .splineToSplineHeading(new Pose2d(46, -35, Math.toRadians(180)), Math.toRadians(20))
                 .waitSeconds(0.5)
-                .splineToConstantHeading(new Vector2d(14, -60), Math.toRadians(180))
-                .forward(30)
-                .splineToConstantHeading(new Vector2d(-55.5, -35), Math.toRadians(90))
+                .splineToConstantHeading(new Vector2d(14, -58.5), Math.toRadians(180))
+                .forward(35)
+                .splineToSplineHeading(new Pose2d(-55, -45, Math.toRadians(135)), Math.toRadians(180))
                 .build();
 
         waitForStart();
@@ -44,6 +44,7 @@ public class RedRightAuto extends LinearOpMode {
 
         driveTrain.followTrajectorySequence(trajSeq);
 
+        PoseStorage.hasAutoRun = true;
         PoseStorage.currentPose = driveTrain.getPoseEstimate();
     }
 }

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.button.Button;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
@@ -23,6 +24,8 @@ import org.firstinspires.ftc.teamcode.Chassis.ResetHeading;
 import org.firstinspires.ftc.teamcode.Manip.Claw.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.Manip.Claw.AutoMoveClaw;
 import org.firstinspires.ftc.teamcode.Manip.Stow.Down;
+import org.firstinspires.ftc.teamcode.Manip.Stow.Stow;
+import org.firstinspires.ftc.teamcode.Manip.Stow.StowCommand;
 import org.firstinspires.ftc.teamcode.Manip.Stow.StowSubsystem;
 import org.firstinspires.ftc.teamcode.Manip.WristStow;
 import org.firstinspires.ftc.teamcode.Roadrunner.PoseStorage;
@@ -47,6 +50,8 @@ public class Tele extends CommandOpMode {
     private WristCommand wristCommand;
 //Stow
     private StowSubsystem stow;
+    private Stow stowUp;
+    private Down stowDown;
 //Lift
     private LiftSubsystem lift;
     private LiftCommand liftCommand;
@@ -60,7 +65,7 @@ public class Tele extends CommandOpMode {
     private Button headingResetButton, liftResetButton, shoulderResetButton, armUpButton, armMidButton, armLowButton, armRestButton,
             clawButton, wristButton, stowButton;
     private GamepadEx driverOp, manipOp;
-    private TelemetrySS m_telemetry;
+//    private TelemetrySS m_telemetry;
     private TelemetryCommand telemetryCommand;
 
     @Override
@@ -70,25 +75,26 @@ public class Tele extends CommandOpMode {
         lb = new MotorEx(hardwareMap, "leftBack");
         rb = new MotorEx(hardwareMap, "rightBack");
         drive = new MecanumDrive(hardwareMap, telemetry, true);
-        drive.setPoseEstimate(PoseStorage.currentPose);
+        if (PoseStorage.hasAutoRun) drive.setPoseEstimate(PoseStorage.currentPose);
+        else drive.setPoseEstimate(new Pose2d());
 
-        lift = new LiftSubsystem(hardwareMap, "lift");
+        lift = new LiftSubsystem(hardwareMap, "lift", "touch", telemetry);
         shoulder = new ShoulderSubsystem(hardwareMap, "shoulder1", "shoulder2");
 
         claw = new ClawSubsystem(hardwareMap,"clawOne", "clawTwo");
         wrist = new WristSubsystem(hardwareMap, "wrist", "wristEncoder");
         stow = new StowSubsystem(hardwareMap, "stow");
 
-        m_telemetry = new TelemetrySS(telemetry);
+//        m_telemetry = new TelemetrySS(telemetry);
 
         driverOp = new GamepadEx(gamepad1);
         manipOp = new GamepadEx(gamepad2);
 
         driveCommand = new MecanumDriveCommand(
                 drive,
-                () -> -driverOp.getLeftY() * 0.8,
-                () -> driverOp.getLeftX() * 0.8,
-                () -> driverOp.getRightX() * 0.8
+                () -> -driverOp.getLeftY() * 0.85,
+                () -> driverOp.getLeftX() * 0.85,
+                () -> driverOp.getRightX() * 0.85
         );
         resetHeading = new ResetHeading(drive);
 
@@ -98,7 +104,7 @@ public class Tele extends CommandOpMode {
                 () -> true,
                 () -> manipOp.getButton(GamepadKeys.Button.X)
         );
-        liftReset = new ResetLimit(lift);
+//        liftReset = new ResetLimit(lift);
 
         shoulderCommand = new ShoulderCommand(
                 shoulder,
@@ -109,29 +115,34 @@ public class Tele extends CommandOpMode {
 
         wristCommand = new WristCommand(wrist);
 
-        telemetryCommand = new TelemetryCommand(
-                m_telemetry,
-                () -> lift.getEncoderValue(),
-                () -> shoulder.getEncoderValue(),
-                () -> wrist.getPos(),
-                () -> wrist.getEncoderPos(),
-                () -> claw.getClawOnePos(),
-                () -> claw.getClawTwoPos()
-        );
+        stowUp = new Stow(stow);
+        stowDown = new Down(stow);
+
+//        telemetryCommand = new TelemetryCommand(
+//                m_telemetry,
+//                () -> lift.getEncoderValue(),
+//                () -> shoulder.getEncoderValue(),
+//                () -> wrist.getPos(),
+//                () -> claw.getClawOnePos(),
+//                () -> claw.getClawTwoPos()
+//        );
 
         headingResetButton = (new GamepadButton(driverOp, GamepadKeys.Button.Y))
                 .whenReleased(resetHeading);
 
-        liftResetButton = (new GamepadButton(manipOp, GamepadKeys.Button.Y))
-                .whenPressed(liftReset);
+//        liftResetButton = (new GamepadButton(manipOp, GamepadKeys.Button.Y))
+//                .whenPressed(liftReset);
         shoulderResetButton = (new GamepadButton(manipOp, GamepadKeys.Button.A))
                 .whenPressed(shoulderReset);
 
+        stowButton = (new GamepadButton(manipOp, GamepadKeys.Button.RIGHT_BUMPER))
+                .whenPressed(stowUp)
+                .whenReleased(stowDown);
         clawButton = (new GamepadButton(manipOp, GamepadKeys.Button.B))
                 .whenReleased(new AutoMoveClaw(claw, wrist, shoulder));
         wristButton = (new GamepadButton(manipOp, GamepadKeys.Button.LEFT_BUMPER))
                 .whenPressed(new WristStow(wrist, stow, shoulder))
-                .whenReleased(new Down(stow));
+                .whenReleased(stowDown);
 
         armUpButton = (new GamepadButton(manipOp, GamepadKeys.Button.DPAD_UP))
                 .whenReleased(new ArmCommand(shoulder, lift, stow,
@@ -154,10 +165,10 @@ public class Tele extends CommandOpMode {
         register(drive);
         register(lift);
         register(shoulder);
-        register(m_telemetry);
+//        register(m_telemetry);
         drive.setDefaultCommand(driveCommand);
         lift.setDefaultCommand(liftCommand);
         shoulder.setDefaultCommand(shoulderCommand);
-        m_telemetry.setDefaultCommand(telemetryCommand);
+//        m_telemetry.setDefaultCommand(telemetryCommand);
     }
 }

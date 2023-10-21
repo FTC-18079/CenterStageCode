@@ -1,6 +1,17 @@
 package org.firstinspires.ftc.teamcode;
 
 public class Constants {
+    public static final double ROBOT_WIDTH = 420.0; //mm
+    public static final double ROBOT_LENGTH = 440.0; //mm
+
+    public static final String[] telemetryData = {
+            "Lift Encoder",
+            "Shoulder Encoder",
+            "Wrist Pos",
+            "Claw One Pos",
+            "Claw Two Pos"
+    };
+
     public static final int LIFT_VELOCITY = 2350;
     public static final int SHOULDER_VELOCITY = 2450;
 
@@ -9,7 +20,7 @@ public class Constants {
 
 //    Rest/collect pos
     public static final int SHOULDER_POS_REST = 0;
-    public static final int LIFT_POS_REST = -0;
+    public static final int LIFT_POS_REST = 50;
     public static final double STOW_POS_REST = 1.0;
 
 //    Low score pos

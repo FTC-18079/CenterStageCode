@@ -46,6 +46,7 @@ public class RedLeftAuto extends LinearOpMode {
 
         driveTrain.followTrajectorySequence(trajSeq);
 
+        PoseStorage.hasAutoRun = true;
         PoseStorage.currentPose = driveTrain.getPoseEstimate();
     }
 }
