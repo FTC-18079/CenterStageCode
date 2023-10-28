@@ -15,16 +15,12 @@ import java.util.function.IntSupplier;
 
 public class ArmCommand extends ParallelCommandGroup {
     private final DoubleSupplier shoulderVel, liftVel;
-    public ArmCommand(ShoulderSubsystem shoulder, LiftSubsystem lift, StowSubsystem stow,
-                      IntSupplier shoulderPos, IntSupplier liftPos, DoubleSupplier stowPos) {
+
+    public ArmCommand(ShoulderSubsystem shoulder, LiftSubsystem lift, StowSubsystem stow, IntSupplier shoulderPos, IntSupplier liftPos, DoubleSupplier stowPos) {
         shoulderVel = () -> Constants.SHOULDER_VELOCITY;
         liftVel = () -> Constants.LIFT_VELOCITY;
 
-        addCommands(
-                new ShoulderToPos(shoulder, shoulderPos, shoulderVel),
-                new LiftToPos(lift, liftPos, liftVel),
-                new StowToPos(stow, stowPos)
-        );
+        addCommands(new ShoulderToPos(shoulder, shoulderPos, shoulderVel), new LiftToPos(lift, liftPos, liftVel), new StowToPos(stow, stowPos));
         addRequirements(shoulder, lift);
     }
 }

@@ -2,20 +2,25 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
-import com.arcrobotics.ftclib.command.CommandBase;
+import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
+import com.arcrobotics.ftclib.command.InstantCommand;
+import com.arcrobotics.ftclib.command.SequentialCommandGroup;
+import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.teamcode.Arm.ArmCommand;
+import org.firstinspires.ftc.teamcode.Arm.Lift.LiftCommand;
 import org.firstinspires.ftc.teamcode.Arm.Lift.LiftSubsystem;
+import org.firstinspires.ftc.teamcode.Arm.Lift.LiftToPos;
+import org.firstinspires.ftc.teamcode.Manip.Claw.AutoMoveClaw;
+import org.firstinspires.ftc.teamcode.Manip.Claw.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.Manip.Stow.Down;
-import org.firstinspires.ftc.teamcode.Manip.Stow.Stow;
 import org.firstinspires.ftc.teamcode.Manip.Stow.StowSubsystem;
-import org.firstinspires.ftc.teamcode.RRCommands.RunCommand;
 import org.firstinspires.ftc.teamcode.Roadrunner.PoseStorage;
 import org.firstinspires.ftc.teamcode.Roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.Roadrunner.trajectorysequence.TrajectorySequence;
@@ -24,17 +29,10 @@ import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 
 import java.util.List;
 
-@Autonomous(name = "RedRightAuto", group = "Autos")
-public class RedRightAuto extends LinearOpMode {
-    private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
-
-    // TFOD_MODEL_ASSET points to a model file stored in the project Asset location,
-    // this is only used for Android Studio when using models in Assets.
+@Autonomous(name = "Red Right Auto", group = "Autos")
+public class RedRightAuto extends CommandOpMode {
+    private static final boolean USE_WEBCAM = true;
     private static final String TFOD_MODEL_ASSET = "blueObject_v1.tflite";
-    // TFOD_MODEL_FILE points to a model file stored onboard the Robot Controller's storage,
-    // this is used when uploading models directly to the RC using the model upload interface.
-    private static final String TFOD_MODEL_FILE = "/sdcard/FIRST/tflitemodels/myCustomModel.tflite";
-    // Define the labels recognized in the model for TFOD (must be in training order!)
     private static final String[] LABELS = {
             "blueObject"
     };
@@ -47,13 +45,18 @@ public class RedRightAuto extends LinearOpMode {
 
     LiftSubsystem lift;
     StowSubsystem stow;
+    ClawSubsystem claw;
+
+    LiftToPos liftToPos;
     Down stowDown;
+    AutoMoveClaw moveClaw;
+    ArmCommand armCommand;
 
     @Override
-    public void runOpMode() {
-        stowDown = new Down(stow);
+    public void initialize() {
+        stow = new StowSubsystem(hardwareMap, "stow");
 
-        CommandScheduler scheduler = CommandScheduler.getInstance();
+        stowDown = new Down(stow);
 
         initTfod();
         tfod.setZoom(1.3);
@@ -81,7 +84,7 @@ public class RedRightAuto extends LinearOpMode {
 
         waitForStart();
 
-        if (isStopRequested()) return;
+        if(isStopRequested()) return;
 
         List<Recognition> currentRecognitions = tfod.getRecognitions();
         if (currentRecognitions.size() != 0) {
@@ -92,26 +95,18 @@ public class RedRightAuto extends LinearOpMode {
             else turnAmount = -45.0;
         } else turnAmount = -45.0;
 
-
-        telemetry.addData("Recognition", recognition);
-        telemetry.addData("Pos", elementPos);
-
-        driveTrain.followTrajectorySequence(traj1);
-        scheduler.schedule(stowDown);
-        sleep(1000);
-        stow.stow();
-        driveTrain.followTrajectorySequence(traj2);
-
-        visionPortal.close();
-        PoseStorage.hasAutoRun = true;
-        PoseStorage.currentPose = driveTrain.getPoseEstimate();
-    }
-
-    private void runCommand(CommandBase command) {
-        command.initialize();
-        while (!command.isFinished()) {
-            if (command.isFinished()) break;
-        }
+        CommandScheduler.getInstance().schedule(
+                new SequentialCommandGroup(
+                        new InstantCommand(() -> new TrajectoryRunner(driveTrain, traj1).initialize()),
+                        new InstantCommand(stowDown),
+                        new WaitCommand(1000),
+                        new InstantCommand(() -> new TrajectoryRunner(driveTrain, traj2).initialize())
+                )
+        );
+//        CommandScheduler.getInstance().schedule(new TrajectoryRunner(driveTrain, traj1));
+//        CommandScheduler.getInstance().schedule(new Down(stow));
+//        sleep(1000);
+//        CommandScheduler.getInstance().schedule(new TrajectoryRunner(driveTrain, traj2));
     }
 
     private void initTfod() {
@@ -140,20 +135,5 @@ public class RedRightAuto extends LinearOpMode {
         visionPortal = builder.build();
 
         tfod.setMinResultConfidence(0.85f);
-    }
-
-    private void telemetryTfod() {
-        List<Recognition> currentRecognitions = tfod.getRecognitions();
-        telemetry.addData("# Objects Detected", currentRecognitions.size());
-
-        for (Recognition recognition : currentRecognitions) {
-            double x = (recognition.getLeft() + recognition.getRight()) / 2 ;
-            double y = (recognition.getTop()  + recognition.getBottom()) / 2 ;
-
-            telemetry.addData(""," ");
-            telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100);
-            telemetry.addData("- Position", "%.0f / %.0f", x, y);
-            telemetry.addData("- Size", "%.0f x %.0f", recognition.getWidth(), recognition.getHeight());
-        }
     }
 }

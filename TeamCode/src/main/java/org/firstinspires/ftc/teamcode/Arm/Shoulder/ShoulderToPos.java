@@ -5,7 +5,7 @@ import com.arcrobotics.ftclib.command.CommandBase;
 import java.util.function.DoubleSupplier;
 import java.util.function.IntSupplier;
 
-public class ShoulderToPos extends CommandBase {
+public class ShoulderToPos extends CommandBase implements Runnable {
     private final ShoulderSubsystem shoulder;
     private final IntSupplier position;
     private final DoubleSupplier velocity;
@@ -28,5 +28,10 @@ public class ShoulderToPos extends CommandBase {
     @Override
     public boolean isFinished() {
         return !shoulder.isRunningEnc();
+    }
+
+    @Override
+    public void run() {
+        initialize();
     }
 }

@@ -8,12 +8,9 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 public class WristSubsystem extends SubsystemBase {
     private final Servo wrist;
-    private final DcMotorEx encoder;
 
-    public WristSubsystem(HardwareMap hMap, String name, String encoder) {
+    public WristSubsystem(HardwareMap hMap, String name) {
         wrist = hMap.get(Servo.class, name);
-        this.encoder = hMap.get(DcMotorEx.class, encoder);
-        this.encoder.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
     }
 
     public void moveWrist() {
@@ -25,9 +22,5 @@ public class WristSubsystem extends SubsystemBase {
 
     public double getPos() {
         return wrist.getPosition();
-    }
-
-    public double getEncoderPos() {
-        return encoder.getCurrentPosition();
     }
 }

@@ -5,7 +5,7 @@ import com.arcrobotics.ftclib.command.CommandBase;
 import org.firstinspires.ftc.teamcode.Arm.Shoulder.ShoulderSubsystem;
 import org.firstinspires.ftc.teamcode.Manip.Wrist.WristSubsystem;
 
-public class AutoMoveClaw extends CommandBase {
+public class AutoMoveClaw extends CommandBase implements Runnable {
     private ClawSubsystem claw;
     private WristSubsystem wrist;
     private ShoulderSubsystem shoulder;
@@ -25,5 +25,10 @@ public class AutoMoveClaw extends CommandBase {
     @Override
     public boolean isFinished() {
         return true;
+    }
+
+    @Override
+    public void run() {
+        initialize();
     }
 }

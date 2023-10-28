@@ -36,7 +36,7 @@ public class LinearTele extends LinearOpMode {
         shoulder = initMotor("shoulder1", false, false, true);
         shoulder.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         shoulder.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        testMotor = initMotor("wristEncoder", false, false, true);
+        testMotor = initMotor("shooter", false, false, true);
         testMotor.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         testMotor.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
 

@@ -47,6 +47,7 @@ public class LiftSubsystem extends SubsystemBase {
         }
 
         tele.addData("Lift Encoder", getEncoderValue());
+        tele.update();
     }
 
     public void moveToPos(int target, double vel) {
