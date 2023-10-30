@@ -3,17 +3,16 @@ package org.firstinspires.ftc.teamcode.RRCommands;
 import com.arcrobotics.ftclib.command.CommandBase;
 
 import org.firstinspires.ftc.teamcode.Chassis.MecanumDrive;
+import org.firstinspires.ftc.teamcode.Roadrunner.drive.SampleMecanumDrive;
 
-public class TurnCommand extends CommandBase {
+public class TurnCommand extends CommandBase implements Runnable {
 
-    private final MecanumDrive drive;
+    private final SampleMecanumDrive drive;
     private final double angle;
 
-    public TurnCommand(MecanumDrive drive, double angle) {
+    public TurnCommand(SampleMecanumDrive drive, double angle) {
         this.drive = drive;
         this.angle = angle;
-
-        addRequirements(drive);
     }
 
     @Override
@@ -26,16 +25,20 @@ public class TurnCommand extends CommandBase {
         drive.update();
     }
 
-    @Override
-    public void end(boolean interrupted) {
-        if (interrupted) {
-            drive.stop();
-        }
-    }
+//    @Override
+//    public void end(boolean interrupted) {
+//        if (interrupted) {
+//            drive.stop();
+//        }
+//    }
 
     @Override
     public boolean isFinished() {
         return Thread.currentThread().isInterrupted() || !drive.isBusy();
     }
 
+    @Override
+    public void run() {
+        initialize();
+    }
 }

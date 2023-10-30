@@ -58,4 +58,11 @@ public class ClawSubsystem extends SubsystemBase {
             moveClawTwo();
         }
     }
+
+    public void clawOneToPos(double pos) {
+        claw1.setPosition(0);
+    }
+    public void clawTwoToPos(double pos) {
+        claw2.setPosition(0);
+    }
 }

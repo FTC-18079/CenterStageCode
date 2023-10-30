@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.Roadrunner.PoseStorage;
 import org.firstinspires.ftc.teamcode.Roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.Roadrunner.trajectorysequence.TrajectorySequence;
 
-@Autonomous(name = "RedLeftAuto", group = "Tests")
+@Autonomous(name = "RedLeftAuto", group = "Autos")
 public class RedLeftAuto extends LinearOpMode {
     LiftSubsystem lift;
     RunCommand runCommand;

@@ -22,7 +22,7 @@ import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 
 import java.util.List;
 
-@Autonomous(name = "Old Auto", group = "Autos")
+@Autonomous(name = "Old Auto", group = "Unused")
 public class OldAuto extends LinearOpMode {
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
 

@@ -14,6 +14,7 @@ public class LiftSubsystem extends SubsystemBase {
     private final DcMotorEx lift;
     private final TouchSensor touch;
     private final Telemetry tele;
+    private int targetPos;
 
     public LiftSubsystem(final HardwareMap hMap, String name, String sensor, Telemetry tele) {
         lift = hMap.get(DcMotorEx.class, name);
@@ -47,13 +48,13 @@ public class LiftSubsystem extends SubsystemBase {
         }
 
         tele.addData("Lift Encoder", getEncoderValue());
-        tele.update();
     }
 
     public void moveToPos(int target, double vel) {
         double damp;
-        lift.setTargetPosition(target);
-        if (target > lift.getTargetPosition()) damp = 0.8;
+        targetPos = target;
+        lift.setTargetPosition(targetPos);
+        if (targetPos > lift.getTargetPosition()) damp = 0.8;
         else damp = 1.0;
         lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         lift.setVelocity(vel * damp);
@@ -61,11 +62,8 @@ public class LiftSubsystem extends SubsystemBase {
         tele.addData("Lift Encoder", getEncoderValue());
     }
 
-    public boolean isRunningEnc() {
-        if(getTouch()) {
-            resetLimit();
-        }
-        return lift.isBusy();
+    public boolean isRunning() {
+        return (Math.abs(targetPos - getEncoderValue()) > 5);
     }
 
     public double getEncoderValue() {
@@ -78,6 +76,6 @@ public class LiftSubsystem extends SubsystemBase {
 
     public void resetLimit() {
         lift.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        lift.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        if (!isRunning()) lift.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
     }
 }

@@ -23,14 +23,13 @@ public class MeepMeepRun {
                 .setDimensions(420/25.4, 440/25.4)
                 .followTrajectorySequence(drive ->
                         drive.trajectorySequenceBuilder(new Pose2d(12, -63.339, Math.toRadians(90)))
-                                .forward(26)
+                                .forward(22)
                                 .waitSeconds(0.25)
-                                .back(15)
-                                .splineToSplineHeading(new Pose2d(46, -35, Math.toRadians(180)), Math.toRadians(20))
+                                .back(9)
+                                .splineToSplineHeading(new Pose2d(46, -35, Math.toRadians(0)), Math.toRadians(20))
                                 .waitSeconds(0.5)
-                                .splineToConstantHeading(new Vector2d(14, -58.5), Math.toRadians(180))
-                                .forward(35)
-                                .splineToSplineHeading(new Pose2d(-55, -45, Math.toRadians(135)), Math.toRadians(180))
+                                .back(0.5)
+                                .splineToConstantHeading(new Vector2d(59, -60), Math.toRadians(0))
                                 .build()
                 );
 

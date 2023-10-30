@@ -5,6 +5,7 @@ import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.InstantCommand;
+import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -14,13 +15,20 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDir
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.teamcode.Arm.ArmCommand;
-import org.firstinspires.ftc.teamcode.Arm.Lift.LiftCommand;
 import org.firstinspires.ftc.teamcode.Arm.Lift.LiftSubsystem;
 import org.firstinspires.ftc.teamcode.Arm.Lift.LiftToPos;
+import org.firstinspires.ftc.teamcode.Arm.Shoulder.ShoulderSubsystem;
+import org.firstinspires.ftc.teamcode.Arm.Shoulder.ShoulderToPos;
 import org.firstinspires.ftc.teamcode.Manip.Claw.AutoMoveClaw;
 import org.firstinspires.ftc.teamcode.Manip.Claw.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.Manip.Stow.Down;
+import org.firstinspires.ftc.teamcode.Manip.Stow.Stow;
 import org.firstinspires.ftc.teamcode.Manip.Stow.StowSubsystem;
+import org.firstinspires.ftc.teamcode.Manip.Stow.StowToPos;
+import org.firstinspires.ftc.teamcode.Manip.Wrist.WristCommand;
+import org.firstinspires.ftc.teamcode.Manip.Wrist.WristSubsystem;
+import org.firstinspires.ftc.teamcode.RRCommands.TrajectoryRunner;
+import org.firstinspires.ftc.teamcode.RRCommands.TurnCommand;
 import org.firstinspires.ftc.teamcode.Roadrunner.PoseStorage;
 import org.firstinspires.ftc.teamcode.Roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.Roadrunner.trajectorysequence.TrajectorySequence;
@@ -32,9 +40,9 @@ import java.util.List;
 @Autonomous(name = "Red Right Auto", group = "Autos")
 public class RedRightAuto extends CommandOpMode {
     private static final boolean USE_WEBCAM = true;
-    private static final String TFOD_MODEL_ASSET = "blueObject_v1.tflite";
+    private static final String TFOD_MODEL_ASSET = "redObject_v1.tflite";
     private static final String[] LABELS = {
-            "blueObject"
+            "redObject"
     };
 
     private TfodProcessor tfod;
@@ -43,23 +51,38 @@ public class RedRightAuto extends CommandOpMode {
     private double turnAmount;
     Recognition recognition = null;
 
-    LiftSubsystem lift;
     StowSubsystem stow;
     ClawSubsystem claw;
-
-    LiftToPos liftToPos;
+    WristSubsystem wrist;
+    ShoulderSubsystem shoulder;
+    LiftSubsystem lift;
+    Stow stowUp;
     Down stowDown;
     AutoMoveClaw moveClaw;
-    ArmCommand armCommand;
+    WristCommand moveWrist;
 
     @Override
     public void initialize() {
+        // Subsystems
         stow = new StowSubsystem(hardwareMap, "stow");
+        claw = new ClawSubsystem(hardwareMap, "clawOne", "clawTwo");
+        wrist = new WristSubsystem(hardwareMap, "wrist");
+        shoulder = new ShoulderSubsystem(hardwareMap, "shoulder1", "shoulder2", "shoulderTouch", telemetry);
+        lift = new LiftSubsystem(hardwareMap, "lift", "liftTouch", telemetry);
 
+        // Commands
+        stowUp = new Stow(stow);
         stowDown = new Down(stow);
+        moveClaw = new AutoMoveClaw(claw, wrist, shoulder);
+        moveWrist = new WristCommand(wrist);
 
         initTfod();
-        tfod.setZoom(1.3);
+        tfod.setZoom(1.15);
+
+        claw.clawOneToPos(0);
+        claw.clawTwoToPos(0);
+        stow.stow();
+        wrist.toPos(0);
 
         SampleMecanumDrive driveTrain = new SampleMecanumDrive(hardwareMap, telemetry);
         Pose2d startPose = new Pose2d(12, -63.339, Math.toRadians(90));
@@ -69,44 +92,60 @@ public class RedRightAuto extends CommandOpMode {
         PoseStorage.currentPose = driveTrain.getPoseEstimate();
 
         TrajectorySequence traj1 = driveTrain.trajectorySequenceBuilder(startPose)
-                .forward(26)
+                .forward(22)
                 .build();
 
         TrajectorySequence traj2 = driveTrain.trajectorySequenceBuilder(traj1.end())
-                .waitSeconds(0.25)
-                .back(15)
-                .splineToSplineHeading(new Pose2d(46, -35, Math.toRadians(180)), Math.toRadians(20))
+                .back(9)
+                .splineToSplineHeading(new Pose2d(46, -35, Math.toRadians(0)), Math.toRadians(20))
+                .build();
+
+        TrajectorySequence traj3 = driveTrain.trajectorySequenceBuilder(traj2.end())
                 .waitSeconds(0.5)
+                .back(0.5)
                 .splineToConstantHeading(new Vector2d(14, -58.5), Math.toRadians(180))
-                .forward(35)
-                .splineToSplineHeading(new Pose2d(-55, -45, Math.toRadians(135)), Math.toRadians(180))
+                .waitSeconds(0.1)
+                .lineToSplineHeading(new Pose2d(-21, -58.5, Math.toRadians(0)))
+                .splineToSplineHeading(new Pose2d(-55, -45, Math.toRadians(135)), Math.toRadians(160))
                 .build();
 
         waitForStart();
 
-        if(isStopRequested()) return;
+        if (isStopRequested()) return;
 
         List<Recognition> currentRecognitions = tfod.getRecognitions();
         if (currentRecognitions.size() != 0) {
             recognition = currentRecognitions.get(0);
             elementPos = recognition.getRight() + recognition.getLeft() / 2;
-            if (elementPos < 300) turnAmount = 45.0;
-            else if (elementPos >= 300) turnAmount = 0.0;
-            else turnAmount = -45.0;
-        } else turnAmount = -45.0;
+            if (elementPos < 275) turnAmount = 50.0;
+            else if (elementPos >= 275) turnAmount = 35.0;
+            else turnAmount = -65.0;
+        } else turnAmount = -65.0;
 
         CommandScheduler.getInstance().schedule(
                 new SequentialCommandGroup(
-                        new InstantCommand(() -> new TrajectoryRunner(driveTrain, traj1).initialize()),
-                        new InstantCommand(stowDown),
-                        new WaitCommand(1000),
-                        new InstantCommand(() -> new TrajectoryRunner(driveTrain, traj2).initialize())
+                        new TrajectoryRunner(driveTrain, traj1), //Follow trajectory 1
+                        new TurnCommand(driveTrain, Math.toRadians(turnAmount)), //Turn to face game element's spike mark
+                        new InstantCommand(stowDown), //Bring down stow
+                        new WaitCommand(750), //Wait .75s
+                        new InstantCommand(moveClaw), //Open claw to score spike mark
+                        new WaitCommand(750), //Wait 1s
+                        new InstantCommand(stowUp), //Bring stow up
+                        new WaitCommand(750), //Wait 1s
+                        new TurnCommand(driveTrain, Math.toRadians(turnAmount * -1)),
+                        new ParallelCommandGroup(
+                                new TrajectoryRunner(driveTrain, traj2)//,
+//                                new ShoulderToPos(shoulder, () -> Constants.SHOULDER_POS_LOW, () -> Constants.SHOULDER_VELOCITY),
+//                                new LiftToPos(lift, () -> 0, () -> Constants.LIFT_VELOCITY),
+//                                new WaitCommand(700),
+//                                new StowToPos(stow, () -> Constants.STOW_POS_LOW)
+                        ), //Drive to backboard while brining arm up to score
+                        new WaitCommand(2000), //Wait 2s
+//                        new InstantCommand(moveClaw), //Open claw to score on backboard
+                        new WaitCommand(1000), //Wait 2s
+                        new TrajectoryRunner(driveTrain, traj3)
                 )
         );
-//        CommandScheduler.getInstance().schedule(new TrajectoryRunner(driveTrain, traj1));
-//        CommandScheduler.getInstance().schedule(new Down(stow));
-//        sleep(1000);
-//        CommandScheduler.getInstance().schedule(new TrajectoryRunner(driveTrain, traj2));
     }
 
     private void initTfod() {

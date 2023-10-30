@@ -13,18 +13,18 @@ public class Constants {
     };
 
     public static final int LIFT_VELOCITY = 2350;
-    public static final int SHOULDER_VELOCITY = 2450;
+    public static final int SHOULDER_VELOCITY = 2400;
 
     public static final int LIFT_LIMIT_TOP = -5750;
     public static final int LIFT_LIMIT_BOTTOM = 0;
 
 //    Rest/collect pos
     public static final int SHOULDER_POS_REST = 0;
-    public static final int LIFT_POS_REST = 50;
-    public static final double STOW_POS_REST = 0.66;
+    public static final int LIFT_POS_REST = 0;
+    public static final double STOW_POS_REST = 0.678;
 
 //    Low score pos
-    public static final int SHOULDER_POS_LOW = 2160;
+    public static final int SHOULDER_POS_LOW = 2100;
     public static final int LIFT_POS_LOW = -1000;
     public static final double STOW_POS_LOW = 1.0;
 

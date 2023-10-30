@@ -5,13 +5,21 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.TouchSensor;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class ShoulderSubsystem extends SubsystemBase {
     private final DcMotorEx shoulder1, shoulder2;
+    private final TouchSensor sensor;
+    private final Telemetry tele;
+    private int targetPos;
 
-    public ShoulderSubsystem(final HardwareMap hMap, String motor1, String motor2) {
+    public ShoulderSubsystem(final HardwareMap hMap, String motor1, String motor2, String sensor, Telemetry tele) {
         shoulder1 = hMap.get(DcMotorEx.class, motor1);
         shoulder2 = hMap.get(DcMotorEx.class, motor2);
+        this.sensor = hMap.get(TouchSensor.class, sensor);
+        this.tele = tele;
 
         shoulder1.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         shoulder2.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
@@ -26,17 +34,22 @@ public class ShoulderSubsystem extends SubsystemBase {
     }
 
     public void drive(double sup) {
+        if(getTouch()) resetLimit();
+
         shoulder1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         shoulder2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         shoulder1.setPower(sup);
         shoulder2.setPower(sup);
+
+        tele.addData("Shoulder Encoder:", getEncoderValue());
     }
 
     public void moveToPos(int target, double vel) {
+        targetPos = target;
         double damp;
-        shoulder1.setTargetPosition(target);
-        shoulder2.setTargetPosition(target);
-        if (target < getEncoderValue()) damp = 0.75;
+        shoulder1.setTargetPosition(targetPos);
+        shoulder2.setTargetPosition(targetPos);
+        if (targetPos < getEncoderValue()) damp = 0.75;
         else damp = 1.0;
         shoulder1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         shoulder2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -44,18 +57,24 @@ public class ShoulderSubsystem extends SubsystemBase {
         shoulder2.setVelocity(vel * damp);
     }
 
-    public boolean isRunningEnc() {
-        return shoulder1.isBusy();
+    public boolean isRunning() {
+        return (Math.abs(targetPos - getEncoderValue()) > 20);
     }
 
     public int getEncoderValue() {
         return shoulder1.getCurrentPosition();
     }
 
+    public boolean getTouch() {
+        return sensor.isPressed();
+    }
+
     public void resetLimit() {
         shoulder1.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         shoulder2.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-        shoulder1.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-        shoulder2.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        if (!isRunning()) {
+            shoulder1.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+            shoulder2.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        }
     }
 }

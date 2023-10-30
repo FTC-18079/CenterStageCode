@@ -23,4 +23,8 @@ public class WristSubsystem extends SubsystemBase {
     public double getPos() {
         return wrist.getPosition();
     }
+
+    public void toPos(double pos) {
+        wrist.setPosition(pos);
+    }
 }

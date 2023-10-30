@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.Manip.Stow;
 
 import com.arcrobotics.ftclib.command.CommandBase;
 
-public class Down extends CommandBase implements Runnable{
+public class Down extends CommandBase implements Runnable {
     private final StowSubsystem stow;
 
     public Down(StowSubsystem subsystem) {

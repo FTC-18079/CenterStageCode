@@ -79,8 +79,8 @@ public class Tele extends CommandOpMode {
         if (PoseStorage.hasAutoRun) drive.setPoseEstimate(PoseStorage.currentPose);
         else drive.setPoseEstimate(new Pose2d());
 
-        lift = new LiftSubsystem(hardwareMap, "lift", "touch", telemetry);
-        shoulder = new ShoulderSubsystem(hardwareMap, "shoulder1", "shoulder2");
+        lift = new LiftSubsystem(hardwareMap, "lift", "liftTouch", telemetry);
+        shoulder = new ShoulderSubsystem(hardwareMap, "shoulder1", "shoulder2", "shoulderTouch", telemetry);
 
         claw = new ClawSubsystem(hardwareMap, "clawOne", "clawTwo");
         wrist = new WristSubsystem(hardwareMap, "wrist");
@@ -96,7 +96,7 @@ public class Tele extends CommandOpMode {
                 () -> -driverOp.getLeftY() * 0.85,
                 () -> driverOp.getLeftX() * 0.85,
                 () -> driverOp.getRightX() * 0.85,
-                () -> manipOp.getButton(GamepadKeys.Button.LEFT_BUMPER)
+                () -> driverOp.getButton(GamepadKeys.Button.LEFT_BUMPER)
         );
         resetHeading = new ResetHeading(drive);
 
@@ -106,7 +106,6 @@ public class Tele extends CommandOpMode {
                 () -> true,
                 () -> manipOp.getButton(GamepadKeys.Button.X)
         );
-//        liftReset = new ResetLimit(lift);
 
         shoulderCommand = new ShoulderCommand(
                 shoulder,
@@ -135,21 +134,21 @@ public class Tele extends CommandOpMode {
         clawButton = (new GamepadButton(manipOp, GamepadKeys.Button.B))
                 .whenReleased(new AutoMoveClaw(claw, wrist, shoulder), true);
         wristButton = (new GamepadButton(manipOp, GamepadKeys.Button.LEFT_BUMPER))
-                .whenPressed(new WristStow(wrist, stow, shoulder))
+                .whenPressed(new WristStow(wrist, stow, shoulder.getEncoderValue()))
                 .whenReleased(stowDown, true);
 
         armUpButton = (new GamepadButton(manipOp, GamepadKeys.Button.DPAD_UP))
                 .whenReleased(new ArmCommand(shoulder, lift, stow,
-                        () -> Constants.SHOULDER_POS_HIGH, () -> Constants.LIFT_POS_HIGH, () -> Constants.STOW_POS_HIGH));
+                        () -> Constants.SHOULDER_POS_HIGH, () -> Constants.LIFT_POS_HIGH, () -> Constants.STOW_POS_HIGH, telemetry), true);
         armMidButton = (new GamepadButton(manipOp, GamepadKeys.Button.DPAD_RIGHT))
                 .whenReleased(new ArmCommand(shoulder, lift, stow,
-                        () -> Constants.SHOULDER_POS_MID, () -> Constants.LIFT_POS_MID, () -> Constants.STOW_POS_MID));
+                        () -> Constants.SHOULDER_POS_MID, () -> Constants.LIFT_POS_MID, () -> Constants.STOW_POS_MID, telemetry), true);
         armLowButton = (new GamepadButton(manipOp, GamepadKeys.Button.DPAD_DOWN))
                 .whenReleased(new ArmCommand(shoulder, lift, stow,
-                        () -> Constants.SHOULDER_POS_LOW, () -> Constants.LIFT_POS_LOW, () -> Constants.STOW_POS_LOW));
+                        () -> Constants.SHOULDER_POS_LOW, () -> Constants.LIFT_POS_LOW, () -> Constants.STOW_POS_LOW, telemetry), true);
         armRestButton = (new GamepadButton(manipOp, GamepadKeys.Button.DPAD_LEFT))
                 .whenReleased(new ArmCommand(shoulder, lift, stow,
-                        () -> Constants.SHOULDER_POS_REST, () -> Constants.LIFT_POS_REST, () -> Constants.STOW_POS_REST));
+                        () -> Constants.SHOULDER_POS_REST, () -> Constants.LIFT_POS_REST, () -> Constants.STOW_POS_REST, telemetry), true);
 
         lf.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         rf.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
