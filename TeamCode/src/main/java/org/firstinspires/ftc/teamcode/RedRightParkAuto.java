@@ -91,18 +91,20 @@ public class RedRightParkAuto extends CommandOpMode {
         PoseStorage.currentPose = driveTrain.getPoseEstimate();
 
         TrajectorySequence traj1 = driveTrain.trajectorySequenceBuilder(startPose)
-                .forward(22)
+                .forward(24)
                 .build();
 
         TrajectorySequence traj2 = driveTrain.trajectorySequenceBuilder(traj1.end())
-                .back(9)
+                .back(11)
                 .splineToSplineHeading(new Pose2d(46, -35, Math.toRadians(0)), Math.toRadians(20))
                 .build();
 
         TrajectorySequence traj3 = driveTrain.trajectorySequenceBuilder(traj2.end())
                 .waitSeconds(0.5)
-                .back(0.5)
-                .splineToConstantHeading(new Vector2d(60, -61), Math.toRadians(0))
+                .back(1.0)
+                .strafeRight(24)
+                .forward(6)
+//                .splineToConstantHeading(new Vector2d(60, -61), Math.toRadians(0))
                 .build();
 
         waitForStart();
@@ -113,10 +115,10 @@ public class RedRightParkAuto extends CommandOpMode {
         if (currentRecognitions.size() != 0) {
             recognition = currentRecognitions.get(0);
             elementPos = recognition.getRight() + recognition.getLeft() / 2;
-            if (elementPos < 275) turnAmount = 50.0;
-            else if (elementPos >= 275) turnAmount = 35.0;
-            else turnAmount = -55.0;
-        } else turnAmount = -55.0;
+            if (elementPos < 275) turnAmount = 85.0;
+            else if (elementPos >= 275) turnAmount = -35.0;
+            else turnAmount = -85.0;
+        } else turnAmount = -85.0;
 
         CommandScheduler.getInstance().schedule(
                 new SequentialCommandGroup(
@@ -129,12 +131,12 @@ public class RedRightParkAuto extends CommandOpMode {
                         new InstantCommand(stowUp), //Bring stow up
                         new WaitCommand(750), //Wait 1s
                         new TurnCommand(driveTrain, Math.toRadians(turnAmount * -1)),
-                        new ParallelCommandGroup(
+                        new SequentialCommandGroup(
+                                new StowToPos(stow, () -> 0.5),
                                 new ShoulderToPos(shoulder, () -> 460, () -> Constants.SHOULDER_VELOCITY, telemetry),
+                                new LiftToPos(lift, () -> -2200, () -> Constants.LIFT_VELOCITY, telemetry),
                                 new InstantCommand(moveWrist),
-                                new TrajectoryRunner(driveTrain, traj2),
-                                new LiftToPos(lift, () -> -2100, () -> Constants.LIFT_VELOCITY, telemetry),
-                                new StowToPos(stow, () -> 0.5)
+                                new TrajectoryRunner(driveTrain, traj2)
                         ), //Drive to backboard while brining arm up to score
                         new WaitCommand(2000), //Wait 2s
                         new InstantCommand(moveClaw), //Open claw to score on backboard

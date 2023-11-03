@@ -1,9 +1,7 @@
 package org.firstinspires.ftc.teamcode.Arm.Lift;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
@@ -21,7 +19,7 @@ public class LiftSubsystem extends SubsystemBase {
         touch = hMap.get(TouchSensor.class, sensor);
         this.tele = tele;
         lift.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
-        lift.setDirection(DcMotorSimple.Direction.REVERSE);
+        lift.setDirection(DcMotorEx.Direction.REVERSE);
         lift.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         lift.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
     }
@@ -41,7 +39,7 @@ public class LiftSubsystem extends SubsystemBase {
                     lift.setPower(0);
                 } else lift.setPower(input);
             } else if (input >= 0) {
-                if (getEncoderValue() >= Constants.LIFT_LIMIT_BOTTOM){
+                if (getEncoderValue() >= Constants.LIFT_LIMIT_BOTTOM || getTouch()){
                     lift.setPower(0);
                 } else lift.setPower(input);
             }
@@ -50,20 +48,24 @@ public class LiftSubsystem extends SubsystemBase {
         tele.addData("Lift Encoder", getEncoderValue());
     }
 
+    public void stop() {
+        lift.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+    }
+
     public void moveToPos(int target, double vel) {
         double damp;
         targetPos = target;
         lift.setTargetPosition(targetPos);
         if (targetPos > lift.getTargetPosition()) damp = 0.8;
         else damp = 1.0;
-        lift.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        lift.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
         lift.setVelocity(vel * damp);
 
         tele.addData("Lift Encoder", getEncoderValue());
     }
 
     public boolean isRunning() {
-        return (Math.abs(targetPos - getEncoderValue()) > 5);
+        return (Math.abs(targetPos - getEncoderValue()) > 5 && lift.getMode() == DcMotorEx.RunMode.RUN_TO_POSITION);
     }
 
     public double getEncoderValue() {

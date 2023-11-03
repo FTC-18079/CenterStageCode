@@ -19,8 +19,10 @@ public class ArmCommand extends ParallelCommandGroup {
     private final Telemetry tele;
 
     public ArmCommand(ShoulderSubsystem shoulder, LiftSubsystem lift, StowSubsystem stow, IntSupplier shoulderPos, IntSupplier liftPos, DoubleSupplier stowPos, Telemetry tele) {
+        if (liftPos.getAsInt() == Constants.LIFT_POS_REST) liftVel = () -> Constants.LIFT_VEL_TO_STOW;
+        else liftVel = () -> Constants.LIFT_VELOCITY;
+
         shoulderVel = () -> Constants.SHOULDER_VELOCITY;
-        liftVel = () -> Constants.LIFT_VELOCITY;
         this.tele = tele;
 
         addCommands(new ShoulderToPos(shoulder, shoulderPos, shoulderVel, tele), new LiftToPos(lift, liftPos, liftVel, tele), new StowToPos(stow, stowPos));

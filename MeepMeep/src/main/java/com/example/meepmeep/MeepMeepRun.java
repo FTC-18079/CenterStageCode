@@ -29,7 +29,8 @@ public class MeepMeepRun {
                                 .splineToSplineHeading(new Pose2d(46, -35, Math.toRadians(0)), Math.toRadians(20))
                                 .waitSeconds(0.5)
                                 .back(0.5)
-                                .splineToConstantHeading(new Vector2d(59, -60), Math.toRadians(0))
+                                .strafeRight(24)
+                                .forward(12)
                                 .build()
                 );
 
