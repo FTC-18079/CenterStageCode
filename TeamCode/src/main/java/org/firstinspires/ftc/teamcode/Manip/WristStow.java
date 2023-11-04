@@ -13,8 +13,8 @@ import org.firstinspires.ftc.teamcode.Manip.Wrist.WristSubsystem;
 import java.util.function.IntSupplier;
 
 public class WristStow extends SequentialCommandGroup {
-    public WristStow(WristSubsystem wrist, StowSubsystem stow, ShoulderSubsystem shoulder) {
-        if(shoulder.getEncoderValue() > 85) {
+    public WristStow(WristSubsystem wrist, StowSubsystem stow, double shoulderPos) {
+        if (shoulderPos > 85) {
             addCommands(
                     new WristCommand(wrist)
             );
@@ -25,6 +25,6 @@ public class WristStow extends SequentialCommandGroup {
             );
         }
 
-        addRequirements(wrist, stow, shoulder);
+        addRequirements(wrist, stow);
     }
 }

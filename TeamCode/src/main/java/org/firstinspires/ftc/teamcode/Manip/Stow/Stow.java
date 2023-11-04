@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.Manip.Stow;
 
 import com.arcrobotics.ftclib.command.CommandBase;
 
-public class Stow extends CommandBase {
+public class Stow extends CommandBase implements Runnable {
     private final StowSubsystem stow;
 
     public Stow(StowSubsystem subsystem) {
@@ -18,5 +18,10 @@ public class Stow extends CommandBase {
     @Override
     public boolean isFinished() {
         return true;
+    }
+
+    @Override
+    public void run() {
+        initialize();
     }
 }

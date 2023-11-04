@@ -3,5 +3,6 @@ package org.firstinspires.ftc.teamcode.Roadrunner;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 
 public class PoseStorage {
+    public static boolean hasAutoRun = false;
     public static Pose2d currentPose = new Pose2d();
 }

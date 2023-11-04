@@ -5,18 +5,13 @@ import com.arcrobotics.ftclib.command.CommandBase;
 public class StowCommand extends CommandBase {
     private final StowSubsystem stow;
 
-    public StowCommand(StowSubsystem subsystem){
+    public StowCommand(StowSubsystem subsystem) {
         stow = subsystem;
         addRequirements(stow);
     }
 
     @Override
-    public void initialize(){
-        stow.moveStow();
-    }
-
-    @Override
-    public boolean isFinished() {
-        return true;
+    public void execute() {
+        stow.toPos(stow.getPos());
     }
 }
