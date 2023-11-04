@@ -22,15 +22,15 @@ public class MeepMeepRun {
                 .setConstraints(50, 40, Math.toRadians(201.6), Math.toRadians(180), 13.325)
                 .setDimensions(420/25.4, 440/25.4)
                 .followTrajectorySequence(drive ->
-                        drive.trajectorySequenceBuilder(new Pose2d(12, -63.339, Math.toRadians(90)))
-                                .forward(22)
+                        drive.trajectorySequenceBuilder(new Pose2d(12, 63.339, Math.toRadians(-90)))
+                                .forward(26)
                                 .waitSeconds(0.25)
-                                .back(9)
-                                .splineToSplineHeading(new Pose2d(46, -35, Math.toRadians(0)), Math.toRadians(20))
+                                .back(13)
+                                .splineToSplineHeading(new Pose2d(46, 35, Math.toRadians(0)), Math.toRadians(-20))
                                 .waitSeconds(0.5)
                                 .back(0.5)
-                                .strafeRight(24)
-                                .forward(12)
+                                .strafeLeft(24)
+                                .forward(13)
                                 .build()
                 );
 

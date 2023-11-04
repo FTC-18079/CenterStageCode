@@ -36,12 +36,12 @@ import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 
 import java.util.List;
 
-@Autonomous(name = "Red Right Park", group = "Autos")
-public class RedRightParkAuto extends CommandOpMode {
+@Autonomous(name = "Blue Right Park", group = "Autos")
+public class BlueRightParkAuto extends CommandOpMode {
     private static final boolean USE_WEBCAM = true;
-    private static final String TFOD_MODEL_ASSET = "redObject_v1.tflite";
+    private static final String TFOD_MODEL_ASSET = "blueObject_v1.tflite";
     private static final String[] LABELS = {
-            "redObject"
+            "blueObject"
     };
 
     private TfodProcessor tfod;
@@ -86,7 +86,7 @@ public class RedRightParkAuto extends CommandOpMode {
         wrist.toPos(0);
 
         SampleMecanumDrive driveTrain = new SampleMecanumDrive(hardwareMap, telemetry);
-        Pose2d startPose = new Pose2d(12, -63.339, Math.toRadians(90));
+        Pose2d startPose = new Pose2d(12, 63.339, Math.toRadians(-90));
 
         driveTrain.setPoseEstimate(startPose);
         driveTrain.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -122,13 +122,13 @@ public class RedRightParkAuto extends CommandOpMode {
 
         traj2 = driveTrain.trajectorySequenceBuilder(traj1.end())
                 .back(fwd - 13)
-                .splineToSplineHeading(new Pose2d(46, -35, Math.toRadians(0)), Math.toRadians(20))
+                .splineToSplineHeading(new Pose2d(46, 35, Math.toRadians(0)), Math.toRadians(-20))
                 .build();
 
         traj3 = driveTrain.trajectorySequenceBuilder(traj2.end())
                 .waitSeconds(0.5)
-                .back(1.0)
-                .strafeRight(24)
+                .back(0.5)
+                .strafeLeft(24)
                 .forward(13)
 //                .splineToConstantHeading(new Vector2d(60, -61), Math.toRadians(0))
                 .build();

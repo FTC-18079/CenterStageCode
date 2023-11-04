@@ -83,7 +83,8 @@ public class Tele extends CommandOpMode {
         lb = new MotorEx(hardwareMap, "leftBack");
         rb = new MotorEx(hardwareMap, "rightBack");
         drive = new MecanumDrive(hardwareMap, telemetry, true);
-        if (PoseStorage.hasAutoRun) drive.setPoseEstimate(PoseStorage.currentPose);
+
+        if (PoseStorage.hasAutoRun) drive.setPoseEstimate(PoseStorage.currentPose.plus(new Pose2d(0, 0, Math.toRadians(180))));
         else drive.setPoseEstimate(new Pose2d());
 
         shooter = new ShooterSubsystem(hardwareMap, "shooter");
