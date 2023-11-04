@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Arm.Lift;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
@@ -53,19 +54,24 @@ public class LiftSubsystem extends SubsystemBase {
     }
 
     public void moveToPos(int target, double vel) {
-        double damp;
         targetPos = target;
         lift.setTargetPosition(targetPos);
-        if (targetPos > lift.getTargetPosition()) damp = 0.8;
-        else damp = 1.0;
         lift.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-        lift.setVelocity(vel * damp);
+        lift.setVelocity(vel);
 
         tele.addData("Lift Encoder", getEncoderValue());
     }
 
     public boolean isRunning() {
         return (Math.abs(targetPos - getEncoderValue()) > 5 && lift.getMode() == DcMotorEx.RunMode.RUN_TO_POSITION);
+    }
+
+    public double getTargetPos() {
+        return targetPos;
+    }
+
+    public void setMode(DcMotor.RunMode runMode) {
+        lift.setMode(runMode);
     }
 
     public double getEncoderValue() {

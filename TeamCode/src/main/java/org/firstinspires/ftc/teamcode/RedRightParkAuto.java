@@ -48,6 +48,7 @@ public class RedRightParkAuto extends CommandOpMode {
     private VisionPortal visionPortal;
     private float elementPos;
     private double turnAmount;
+    private double fwd;
     Recognition recognition = null;
 
     StowSubsystem stow;
@@ -59,6 +60,7 @@ public class RedRightParkAuto extends CommandOpMode {
     Down stowDown;
     AutoMoveClaw moveClaw;
     WristCommand moveWrist;
+    private TrajectorySequence traj1, traj2, traj3;
 
     @Override
     public void initialize() {
@@ -90,23 +92,6 @@ public class RedRightParkAuto extends CommandOpMode {
         driveTrain.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         PoseStorage.currentPose = driveTrain.getPoseEstimate();
 
-        TrajectorySequence traj1 = driveTrain.trajectorySequenceBuilder(startPose)
-                .forward(24)
-                .build();
-
-        TrajectorySequence traj2 = driveTrain.trajectorySequenceBuilder(traj1.end())
-                .back(11)
-                .splineToSplineHeading(new Pose2d(46, -35, Math.toRadians(0)), Math.toRadians(20))
-                .build();
-
-        TrajectorySequence traj3 = driveTrain.trajectorySequenceBuilder(traj2.end())
-                .waitSeconds(0.5)
-                .back(1.0)
-                .strafeRight(24)
-                .forward(6)
-//                .splineToConstantHeading(new Vector2d(60, -61), Math.toRadians(0))
-                .build();
-
         waitForStart();
 
         if (isStopRequested()) return;
@@ -115,10 +100,39 @@ public class RedRightParkAuto extends CommandOpMode {
         if (currentRecognitions.size() != 0) {
             recognition = currentRecognitions.get(0);
             elementPos = recognition.getRight() + recognition.getLeft() / 2;
-            if (elementPos < 275) turnAmount = 85.0;
-            else if (elementPos >= 275) turnAmount = -35.0;
-            else turnAmount = -85.0;
-        } else turnAmount = -85.0;
+            if (elementPos < 275) {
+                turnAmount = 68.0;
+                fwd = 20;
+            }
+            else if (elementPos >= 275) {
+                turnAmount = -15.0;
+                fwd = 26;
+            }
+            else {
+                turnAmount = -45.0;
+                fwd = 20;
+            }
+        } else {
+            turnAmount = -45.0;
+            fwd = 20;
+        }
+
+        traj1 = driveTrain.trajectorySequenceBuilder(startPose)
+                .forward(fwd)
+                .build();
+
+        traj2 = driveTrain.trajectorySequenceBuilder(traj1.end())
+                .back(fwd - 13)
+                .splineToSplineHeading(new Pose2d(46, -35, Math.toRadians(0)), Math.toRadians(20))
+                .build();
+
+        traj3 = driveTrain.trajectorySequenceBuilder(traj2.end())
+                .waitSeconds(0.5)
+                .back(1.0)
+                .strafeRight(24)
+                .forward(13)
+//                .splineToConstantHeading(new Vector2d(60, -61), Math.toRadians(0))
+                .build();
 
         CommandScheduler.getInstance().schedule(
                 new SequentialCommandGroup(
@@ -138,13 +152,15 @@ public class RedRightParkAuto extends CommandOpMode {
                                 new InstantCommand(moveWrist),
                                 new TrajectoryRunner(driveTrain, traj2)
                         ), //Drive to backboard while brining arm up to score
-                        new WaitCommand(2000), //Wait 2s
+                        new WaitCommand(600), //Wait 0.6s
                         new InstantCommand(moveClaw), //Open claw to score on backboard
-                        new WaitCommand(1000), //Wait 2s
-                        new ParallelCommandGroup(
-                                new ShoulderToPos(shoulder, () -> 0, () -> Constants.SHOULDER_VELOCITY, telemetry),
+                        new WaitCommand(600), //Wait 0.6s
+                        new SequentialCommandGroup(
                                 new LiftToPos(lift, () -> 0, () -> Constants.LIFT_VELOCITY, telemetry),
-                                new InstantCommand(stowUp)
+                                new InstantCommand(moveWrist),
+                                new WaitCommand(500),
+                                new InstantCommand(stowUp),
+                                new ShoulderToPos(shoulder, () -> 0, () -> Constants.SHOULDER_VELOCITY, telemetry)
                         ),
                         new TrajectoryRunner(driveTrain, traj3)
                 )

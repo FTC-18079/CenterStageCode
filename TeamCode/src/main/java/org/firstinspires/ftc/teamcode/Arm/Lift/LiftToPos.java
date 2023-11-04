@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.Arm.Lift;
 
 import com.arcrobotics.ftclib.command.CommandBase;
+import com.arcrobotics.ftclib.command.CommandScheduler;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -36,7 +38,7 @@ public class LiftToPos extends CommandBase implements Runnable {
 
     @Override
     public void execute() {
-        if (lift.getTouch()) lift.resetLimit();
+        if (lift.getTouch() && lift.getEncoderValue() < lift.getTargetPos()) lift.resetLimit();
         tele.addData("Lift Encoder:", lift.getEncoderValue());
     }
 

@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-
+// TODO: Add Timeout on toPos
 public class ShoulderSubsystem extends SubsystemBase {
     private final DcMotorEx shoulder1, shoulder2;
     private final TouchSensor sensor;

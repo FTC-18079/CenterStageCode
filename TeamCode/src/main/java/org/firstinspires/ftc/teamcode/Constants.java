@@ -30,9 +30,11 @@ public class Constants {
     public static final double STOW_POS_LOW = 1.0;
 
 //    Mid score pos
-    public static final int SHOULDER_POS_MID = 2093;
-    public static final int LIFT_POS_MID = -2684;
-    public static final double STOW_POS_MID = 1.0;
+//    public static final int SHOULDER_POS_MID = 2093;
+    public static final int SHOULDER_POS_MID = 550;
+//    public static final int LIFT_POS_MID = -2684;
+    public static final int LIFT_POS_MID = -800;
+    public static final double STOW_POS_MID = 0.6;
 
 //    Climb pos
     public static final int SHOULDER_POS_CLIMB = 1560;
