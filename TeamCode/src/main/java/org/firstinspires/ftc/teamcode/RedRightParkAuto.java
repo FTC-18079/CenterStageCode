@@ -159,7 +159,7 @@ public class RedRightParkAuto extends CommandOpMode {
                                 new InstantCommand(moveWrist),
                                 new WaitCommand(500),
                                 new InstantCommand(stowUp),
-                                new ShoulderToPos(shoulder, () -> 30, () -> Constants.SHOULDER_VELOCITY, telemetry)
+                                new ShoulderToPos(shoulder, () -> 80, () -> Constants.SHOULDER_VELOCITY, telemetry)
                         ),
                         new TrajectoryRunner(driveTrain, traj3)
                 )

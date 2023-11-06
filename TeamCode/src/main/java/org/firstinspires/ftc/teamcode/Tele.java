@@ -31,6 +31,8 @@ import org.firstinspires.ftc.teamcode.Manip.Stow.StowSubsystem;
 import org.firstinspires.ftc.teamcode.Manip.WristStow;
 import org.firstinspires.ftc.teamcode.Roadrunner.PoseStorage;
 import org.firstinspires.ftc.teamcode.Shooter.FireShooter;
+import org.firstinspires.ftc.teamcode.Shooter.ShooterServoCommand;
+import org.firstinspires.ftc.teamcode.Shooter.ShooterServoSubsystem;
 import org.firstinspires.ftc.teamcode.Shooter.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.Shooter.StopShooter;
 import org.firstinspires.ftc.teamcode.Telemetry.TelemetryCommand;
@@ -59,6 +61,7 @@ public class Tele extends CommandOpMode {
     private ShooterSubsystem shooter;
     private FireShooter fireShooter;
     private StopShooter stopShooter;
+    private ShooterServoSubsystem shooterServo;
     //Lift
     private LiftSubsystem lift;
     private LiftCommand liftCommand;
@@ -71,7 +74,7 @@ public class Tele extends CommandOpMode {
     private ResetEncoder shoulderReset;
 
     private Button headingResetButton, liftResetButton, shoulderResetButton, armClimbButton, armMidButton, armLowButton, armRestButton,
-            clawButton, wristButton, stowButton, shooterButton, liftStopButton;
+            clawButton, wristButton, stowButton, shooterButton, liftStopButton, fireShooterButton;
     private GamepadEx driverOp, manipOp;
     //    private TelemetrySS m_telemetry;
     private TelemetryCommand telemetryCommand;
@@ -88,6 +91,7 @@ public class Tele extends CommandOpMode {
         else drive.setPoseEstimate(new Pose2d());
 
         shooter = new ShooterSubsystem(hardwareMap, "shooter");
+        shooterServo = new ShooterServoSubsystem(hardwareMap, "shooterServo");
 
         lift = new LiftSubsystem(hardwareMap, "lift", "liftTouch", telemetry);
         shoulder = new ShoulderSubsystem(hardwareMap, "shoulder1", "shoulder2", "shoulderTouch", telemetry);
@@ -136,6 +140,8 @@ public class Tele extends CommandOpMode {
 
         headingResetButton = (new GamepadButton(driverOp, GamepadKeys.Button.Y))
                 .whenReleased(resetHeading);
+        fireShooterButton = (new GamepadButton(driverOp, GamepadKeys.Button.DPAD_DOWN))
+                .whenPressed(new ShooterServoCommand(shooterServo), true);
 
 //        liftResetButton = (new GamepadButton(manipOp, GamepadKeys.Button.Y))
 //                .whenPressed(liftReset);
