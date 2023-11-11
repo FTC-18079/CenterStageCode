@@ -5,20 +5,32 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 
+import java.util.List;
+
 public class VisionSubsystem extends SubsystemBase {
     private final WebcamName camera;
+    private final String tfodAsset;
+    private final String[] tfodLabels;
     private final Telemetry tele;
 
     private final AprilTagProcessor aprilTagProcessor;
     private final TfodProcessor tfodProcessor;
     private final VisionPortal visionPortal;
 
-    public VisionSubsystem(HardwareMap hMap, String name, Telemetry tele) {
+    private Recognition tfodRecognition;
+    private boolean targetTagFound = false;
+    private boolean targetTfodFound = false;
+
+    public VisionSubsystem(HardwareMap hMap, String name, String tFodAsset, String[] tfodLabels, Telemetry tele) {
         camera = hMap.get(WebcamName.class, name);
+        this.tfodAsset = tFodAsset;
+        this.tfodLabels = tfodLabels;
         this.tele = tele;
 
         aprilTagProcessor = new AprilTagProcessor.Builder()
@@ -27,11 +39,12 @@ public class VisionSubsystem extends SubsystemBase {
                 .build();
 
         tfodProcessor = new TfodProcessor.Builder()
-                .setModelAssetName("redObject_v1.tflite")
-                .setModelLabels(new String[] {"redObject"})
+                .setModelAssetName(tfodAsset)
+                .setModelLabels(tfodLabels)
                 .setModelAspectRatio(16.0 / 9.0)
                 .build();
         tfodProcessor.setMinResultConfidence(0.85f);
+        tfodProcessor.setZoom(1.15);
 
         visionPortal = new VisionPortal.Builder()
                 .setCamera(camera)
@@ -43,6 +56,40 @@ public class VisionSubsystem extends SubsystemBase {
 
         disableAprilTag();
         disableTfod();
+    }
+
+    public AprilTagDetection getAprilTagDetection(int targetTagId) {
+        targetTagFound = false;
+        List<AprilTagDetection> detectionList;
+        AprilTagDetection aprilTagDetection = null;
+
+        detectionList = aprilTagProcessor.getDetections();
+
+        for (AprilTagDetection detection : detectionList) {
+            if (detection.metadata != null) { // This check for non-null metadata makes sure this tag is one we want to recognize
+                if (detection.id == targetTagId) {
+                    targetTagFound = true;
+                    aprilTagDetection = detection;
+                    break; // Ends loop if we find our AT
+                }
+            }
+        }
+
+        return aprilTagDetection;
+    }
+
+    public Recognition getTfodDetection() {
+        targetTfodFound = false;
+        tfodRecognition = null;
+        List<Recognition> detectionList;
+
+        detectionList = tfodProcessor.getRecognitions();
+        if (detectionList.size() != 0) {
+            targetTfodFound = true;
+            tfodRecognition = detectionList.get(0);
+        }
+
+        return tfodRecognition;
     }
 
     public void enableAprilTag() {
