@@ -55,28 +55,23 @@ public class RedRightAuto extends CommandOpMode {
 
     StowSubsystem stow;
     ClawSubsystem claw;
-    WristSubsystem wrist;
     ShoulderSubsystem shoulder;
     LiftSubsystem lift;
     Stow stowUp;
     Down stowDown;
     AutoMoveClaw moveClaw;
-    WristCommand moveWrist;
 
     @Override
     public void initialize() {
         // Subsystems
         stow = new StowSubsystem(hardwareMap, "stow");
         claw = new ClawSubsystem(hardwareMap, "clawOne", "clawTwo");
-        wrist = new WristSubsystem(hardwareMap, "wrist");
         shoulder = new ShoulderSubsystem(hardwareMap, "shoulder1", "shoulder2", "shoulderTouch", telemetry);
         lift = new LiftSubsystem(hardwareMap, "lift", "liftTouch", telemetry);
 
         // Commands
         stowUp = new Stow(stow);
         stowDown = new Down(stow);
-        moveClaw = new AutoMoveClaw(claw, wrist, shoulder);
-        moveWrist = new WristCommand(wrist);
 
         initTfod();
         tfod.setZoom(1.15);
@@ -84,7 +79,6 @@ public class RedRightAuto extends CommandOpMode {
         claw.clawOneToPos(0);
         claw.clawTwoToPos(0);
         stow.stow();
-        wrist.toPos(0);
 
         SampleMecanumDrive driveTrain = new SampleMecanumDrive(hardwareMap, telemetry);
         Pose2d startPose = new Pose2d(12, -63.339, Math.toRadians(90));

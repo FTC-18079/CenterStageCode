@@ -35,7 +35,7 @@ import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 
 import java.util.List;
-
+//TODO: Yellow Pixel Backdrop placement based on Vision
 @Autonomous(name = "Red Right Park", group = "Autos")
 public class RedRightParkAuto extends CommandOpMode {
     private static final boolean USE_WEBCAM = true;
@@ -53,13 +53,11 @@ public class RedRightParkAuto extends CommandOpMode {
 
     StowSubsystem stow;
     ClawSubsystem claw;
-    WristSubsystem wrist;
     ShoulderSubsystem shoulder;
     LiftSubsystem lift;
     Stow stowUp;
     Down stowDown;
     AutoMoveClaw moveClaw;
-    WristCommand moveWrist;
     private TrajectorySequence traj1, traj2, traj3;
 
     @Override
@@ -67,15 +65,12 @@ public class RedRightParkAuto extends CommandOpMode {
         // Subsystems
         stow = new StowSubsystem(hardwareMap, "stow");
         claw = new ClawSubsystem(hardwareMap, "clawOne", "clawTwo");
-        wrist = new WristSubsystem(hardwareMap, "wrist");
         shoulder = new ShoulderSubsystem(hardwareMap, "shoulder1", "shoulder2", "shoulderTouch", telemetry);
         lift = new LiftSubsystem(hardwareMap, "lift", "liftTouch", telemetry);
 
         // Commands
         stowUp = new Stow(stow);
         stowDown = new Down(stow);
-        moveClaw = new AutoMoveClaw(claw, wrist, shoulder);
-        moveWrist = new WristCommand(wrist);
 
         initTfod();
         tfod.setZoom(1.15);
@@ -83,7 +78,6 @@ public class RedRightParkAuto extends CommandOpMode {
         claw.clawOneToPos(0);
         claw.clawTwoToPos(0);
         stow.stow();
-        wrist.toPos(0);
 
         SampleMecanumDrive driveTrain = new SampleMecanumDrive(hardwareMap, telemetry);
         Pose2d startPose = new Pose2d(12, -63.339, Math.toRadians(90));
@@ -148,7 +142,6 @@ public class RedRightParkAuto extends CommandOpMode {
                                 new StowToPos(stow, () -> 0.5),
                                 new ShoulderToPos(shoulder, () -> 460, () -> Constants.SHOULDER_VELOCITY, telemetry),
                                 new LiftToPos(lift, () -> -2200, () -> Constants.LIFT_VELOCITY, telemetry),
-                                new InstantCommand(moveWrist),
                                 new TrajectoryRunner(driveTrain, traj2)
                         ), //Drive to backboard while brining arm up to score
                         new WaitCommand(600), //Wait 0.6s
@@ -156,7 +149,6 @@ public class RedRightParkAuto extends CommandOpMode {
                         new WaitCommand(600), //Wait 0.6s
                         new SequentialCommandGroup(
                                 new LiftToPos(lift, () -> 0, () -> Constants.LIFT_VELOCITY, telemetry),
-                                new InstantCommand(moveWrist),
                                 new WaitCommand(500),
                                 new InstantCommand(stowUp),
                                 new ShoulderToPos(shoulder, () -> 80, () -> Constants.SHOULDER_VELOCITY, telemetry)
