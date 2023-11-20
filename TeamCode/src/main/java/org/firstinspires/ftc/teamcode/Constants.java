@@ -22,7 +22,7 @@ public class Constants {
 //    Rest/collect pos
     public static final int SHOULDER_POS_REST = 0;
     public static final int LIFT_POS_REST = 0;
-    public static final double STOW_POS_REST = 0.678;
+    public static final double STOW_POS_REST = 0.7;
 
 //    Low score pos
     public static final int SHOULDER_POS_LOW = 635;

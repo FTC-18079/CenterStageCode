@@ -20,6 +20,10 @@ import org.firstinspires.ftc.teamcode.Arm.Shoulder.ShoulderSubsystem;
 import org.firstinspires.ftc.teamcode.Arm.Shoulder.ShoulderToPos;
 import org.firstinspires.ftc.teamcode.Manip.Claw.AutoMoveClaw;
 import org.firstinspires.ftc.teamcode.Manip.Claw.ClawSubsystem;
+import org.firstinspires.ftc.teamcode.Manip.Claw.CloseClawOne;
+import org.firstinspires.ftc.teamcode.Manip.Claw.CloseClawTwo;
+import org.firstinspires.ftc.teamcode.Manip.Claw.MoveClawOne;
+import org.firstinspires.ftc.teamcode.Manip.Claw.MoveClawTwo;
 import org.firstinspires.ftc.teamcode.Manip.Stow.Down;
 import org.firstinspires.ftc.teamcode.Manip.Stow.Stow;
 import org.firstinspires.ftc.teamcode.Manip.Stow.StowSubsystem;
@@ -57,7 +61,8 @@ public class RedRightParkAuto extends CommandOpMode {
     LiftSubsystem lift;
     Stow stowUp;
     Down stowDown;
-    AutoMoveClaw moveClaw;
+    MoveClawOne moveClawOne;
+    MoveClawTwo moveClawTwo;
     private TrajectorySequence traj1, traj2, traj3;
 
     @Override
@@ -71,12 +76,14 @@ public class RedRightParkAuto extends CommandOpMode {
         // Commands
         stowUp = new Stow(stow);
         stowDown = new Down(stow);
+        moveClawOne = new MoveClawOne(claw);
+        moveClawTwo = new MoveClawTwo(claw);
 
         initTfod();
         tfod.setZoom(1.15);
 
         claw.clawOneToPos(0);
-        claw.clawTwoToPos(0);
+        claw.clawTwoToPos(1);
         stow.stow();
 
         SampleMecanumDrive driveTrain = new SampleMecanumDrive(hardwareMap, telemetry);
@@ -133,7 +140,7 @@ public class RedRightParkAuto extends CommandOpMode {
                         new TurnCommand(driveTrain, Math.toRadians(turnAmount)), //Turn to face game element's spike mark
                         new InstantCommand(stowDown), //Bring down stow
                         new WaitCommand(750), //Wait .75s
-                        new InstantCommand(moveClaw), //Open claw to score spike mark
+                        new InstantCommand(moveClawOne), //Open claw to score spike mark
                         new WaitCommand(750), //Wait 1s
                         new InstantCommand(stowUp), //Bring stow up
                         new WaitCommand(750), //Wait 1s
@@ -145,7 +152,7 @@ public class RedRightParkAuto extends CommandOpMode {
                                 new TrajectoryRunner(driveTrain, traj2)
                         ), //Drive to backboard while brining arm up to score
                         new WaitCommand(600), //Wait 0.6s
-                        new InstantCommand(moveClaw), //Open claw to score on backboard
+                        new InstantCommand(moveClawTwo), //Open claw to score on backboard
                         new WaitCommand(600), //Wait 0.6s
                         new SequentialCommandGroup(
                                 new LiftToPos(lift, () -> 0, () -> Constants.LIFT_VELOCITY, telemetry),
