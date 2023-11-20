@@ -8,6 +8,8 @@ import org.firstinspires.ftc.teamcode.Arm.Lift.LiftToPos;
 import org.firstinspires.ftc.teamcode.Arm.Shoulder.ShoulderSubsystem;
 import org.firstinspires.ftc.teamcode.Arm.Shoulder.ShoulderToPos;
 import org.firstinspires.ftc.teamcode.Constants;
+import org.firstinspires.ftc.teamcode.Manip.Claw.ClawSubsystem;
+import org.firstinspires.ftc.teamcode.Manip.Claw.MoveClawTwo;
 import org.firstinspires.ftc.teamcode.Manip.Stow.StowSubsystem;
 import org.firstinspires.ftc.teamcode.Manip.Stow.StowToPos;
 

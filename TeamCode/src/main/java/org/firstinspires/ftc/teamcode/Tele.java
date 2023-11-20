@@ -23,12 +23,14 @@ import org.firstinspires.ftc.teamcode.Arm.Shoulder.ShoulderCommand;
 import org.firstinspires.ftc.teamcode.Arm.Shoulder.ShoulderSubsystem;
 import org.firstinspires.ftc.teamcode.Chassis.ResetHeading;
 import org.firstinspires.ftc.teamcode.Manip.Claw.ClawSubsystem;
-import org.firstinspires.ftc.teamcode.Manip.Claw.AutoMoveClaw;
+import org.firstinspires.ftc.teamcode.Manip.Claw.CloseClawOne;
+import org.firstinspires.ftc.teamcode.Manip.Claw.CloseClawTwo;
+import org.firstinspires.ftc.teamcode.Manip.Claw.MoveClawOne;
+import org.firstinspires.ftc.teamcode.Manip.Claw.MoveClawTwo;
 import org.firstinspires.ftc.teamcode.Manip.Stow.Down;
 import org.firstinspires.ftc.teamcode.Manip.Stow.Stow;
 import org.firstinspires.ftc.teamcode.Manip.Stow.StowCommand;
 import org.firstinspires.ftc.teamcode.Manip.Stow.StowSubsystem;
-import org.firstinspires.ftc.teamcode.Manip.WristStow;
 import org.firstinspires.ftc.teamcode.Roadrunner.PoseStorage;
 import org.firstinspires.ftc.teamcode.Shooter.FireShooter;
 import org.firstinspires.ftc.teamcode.Shooter.ShooterServoCommand;
@@ -36,8 +38,6 @@ import org.firstinspires.ftc.teamcode.Shooter.ShooterServoSubsystem;
 import org.firstinspires.ftc.teamcode.Shooter.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.Shooter.StopShooter;
 import org.firstinspires.ftc.teamcode.Telemetry.TelemetryCommand;
-import org.firstinspires.ftc.teamcode.Manip.Wrist.WristCommand;
-import org.firstinspires.ftc.teamcode.Manip.Wrist.WristSubsystem;
 
 @TeleOp(name = "TeleOp", group = "OpModes")
 public class Tele extends CommandOpMode {
@@ -49,9 +49,11 @@ public class Tele extends CommandOpMode {
     private ResetHeading resetHeading;
     //Claw
     private ClawSubsystem claw;
-    //Wrist
-    private WristSubsystem wrist;
-    private WristCommand wristCommand;
+    private MoveClawOne moveClawOne;
+    private MoveClawTwo moveClawTwo;
+    private CloseClawOne closeClawOne;
+    private CloseClawTwo closeClawTwo;
+
     //Stow
     private StowSubsystem stow;
     private Stow stowUp;
@@ -74,7 +76,7 @@ public class Tele extends CommandOpMode {
     private ResetEncoder shoulderReset;
 
     private Button headingResetButton, liftResetButton, shoulderResetButton, armClimbButton, armMidButton, armLowButton, armRestButton,
-            clawButton, wristButton, stowButton, shooterButton, liftStopButton, fireShooterButton;
+            clawOneButton, clawTwoButton, stowButton, shooterButton, liftStopButton, fireShooterButton;
     private GamepadEx driverOp, manipOp;
     //    private TelemetrySS m_telemetry;
     private TelemetryCommand telemetryCommand;
@@ -97,7 +99,6 @@ public class Tele extends CommandOpMode {
         shoulder = new ShoulderSubsystem(hardwareMap, "shoulder1", "shoulder2", "shoulderTouch", telemetry);
 
         claw = new ClawSubsystem(hardwareMap, "clawOne", "clawTwo");
-        wrist = new WristSubsystem(hardwareMap, "wrist");
         stow = new StowSubsystem(hardwareMap, "stow");
 
 //        m_telemetry = new TelemetrySS(telemetry);
@@ -129,11 +130,13 @@ public class Tele extends CommandOpMode {
         getShoulderPos = new ShoulderPos(shoulder);
         shoulderReset = new ResetEncoder(shoulder);
 
-        wristCommand = new WristCommand(wrist);
-
         fireShooter = new FireShooter(shooter);
         stopShooter = new StopShooter(shooter);
 
+        moveClawOne = new MoveClawOne(claw);
+        moveClawTwo = new MoveClawTwo(claw);
+        closeClawOne = new CloseClawOne(claw);
+        closeClawTwo = new CloseClawTwo(claw);
         stowUp = new Stow(stow);
         stowDown = new Down(stow);
         moveStow = new StowCommand(stow);
@@ -143,20 +146,15 @@ public class Tele extends CommandOpMode {
         fireShooterButton = (new GamepadButton(driverOp, GamepadKeys.Button.DPAD_DOWN))
                 .whenPressed(new ShooterServoCommand(shooterServo), true);
 
-//        liftResetButton = (new GamepadButton(manipOp, GamepadKeys.Button.Y))
-//                .whenPressed(liftReset);
+        clawOneButton = (new GamepadButton(manipOp, GamepadKeys.Button.LEFT_BUMPER))
+                .whenPressed(moveClawOne, true);
+        clawTwoButton = (new GamepadButton(manipOp, GamepadKeys.Button.RIGHT_BUMPER))
+                .whenPressed(moveClawTwo, true);
         shoulderResetButton = (new GamepadButton(manipOp, GamepadKeys.Button.A))
                 .whenPressed(shoulderReset);
-
-        stowButton = (new GamepadButton(manipOp, GamepadKeys.Button.RIGHT_BUMPER))
-                .whenPressed(stowUp, true)
-                .whenReleased(stowDown, true);
-        clawButton = (new GamepadButton(manipOp, GamepadKeys.Button.B))
-                .whenReleased(new AutoMoveClaw(claw, wrist, shoulder), true);
-        wristButton = (new GamepadButton(manipOp, GamepadKeys.Button.LEFT_BUMPER))
-                .whenPressed(new WristStow(wrist, stow, shoulder.getEncoderValue()))
-                .whenReleased(stowDown, true);
-
+        stowButton = (new GamepadButton(manipOp, GamepadKeys.Button.B))
+                .whenPressed(stowDown, true)
+                .whenReleased(stowUp, true);
         shooterButton = (new GamepadButton(driverOp, GamepadKeys.Button.B))
                 .whenPressed(fireShooter, true)
                 .whenReleased(stopShooter, true);
@@ -166,13 +164,14 @@ public class Tele extends CommandOpMode {
         armClimbButton = (new GamepadButton(manipOp, GamepadKeys.Button.DPAD_LEFT))
                 .whenReleased(new ArmCommand(shoulder, lift, stow,
                         () -> Constants.SHOULDER_POS_CLIMB, () -> Constants.LIFT_POS_CLIMB, () -> Constants.STOW_POS_CLIMB, telemetry), true);
-        armMidButton = (new GamepadButton(manipOp, GamepadKeys.Button.DPAD_UP))
+        armMidButton = (new GamepadButton(manipOp, GamepadKeys.Button.DPAD_RIGHT))
                 .whenReleased(new ArmCommand(shoulder, lift, stow,
                         () -> Constants.SHOULDER_POS_MID, () -> Constants.LIFT_POS_MID, () -> Constants.STOW_POS_MID, telemetry), true);
-        armLowButton = (new GamepadButton(manipOp, GamepadKeys.Button.DPAD_RIGHT))
+        armLowButton = (new GamepadButton(manipOp, GamepadKeys.Button.DPAD_UP))
                 .whenReleased(new ArmCommand(shoulder, lift, stow,
                         () -> Constants.SHOULDER_POS_LOW, () -> Constants.LIFT_POS_LOW, () -> Constants.STOW_POS_LOW, telemetry), true);
         armRestButton = (new GamepadButton(manipOp, GamepadKeys.Button.DPAD_DOWN))
+                .whenPressed(closeClawTwo, true)
                 .whenReleased(new ArmCommand(shoulder, lift, stow,
                         () -> Constants.SHOULDER_POS_REST, () -> Constants.LIFT_POS_REST, () -> Constants.STOW_POS_REST, telemetry), true);
 
