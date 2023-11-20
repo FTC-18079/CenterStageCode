@@ -22,19 +22,19 @@ public class Constants {
 //    Rest/collect pos
     public static final int SHOULDER_POS_REST = 0;
     public static final int LIFT_POS_REST = 0;
-    public static final double STOW_POS_REST = 0.678;
+    public static final double STOW_POS_REST = 0.7;
 
 //    Low score pos
-    public static final int SHOULDER_POS_LOW = 2100;
-    public static final int LIFT_POS_LOW = 0;
-    public static final double STOW_POS_LOW = 1.0;
+    public static final int SHOULDER_POS_LOW = 635;
+    public static final int LIFT_POS_LOW = -2022;
+    public static final double STOW_POS_LOW = 0.1;
 
 //    Mid score pos
 //    public static final int SHOULDER_POS_MID = 2093;
-    public static final int SHOULDER_POS_MID = 550;
+    public static final int SHOULDER_POS_MID = 431;
 //    public static final int LIFT_POS_MID = -2684;
-    public static final int LIFT_POS_MID = -800;
-    public static final double STOW_POS_MID = 0.6;
+    public static final int LIFT_POS_MID = -580;
+    public static final double STOW_POS_MID = 0.15;
 
 //    Climb pos
     public static final int SHOULDER_POS_CLIMB = 1560;
