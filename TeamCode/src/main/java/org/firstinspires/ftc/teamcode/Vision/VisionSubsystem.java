@@ -107,4 +107,8 @@ public class VisionSubsystem extends SubsystemBase {
     public void disableTfod() {
         visionPortal.setProcessorEnabled(tfodProcessor, false);
     }
+
+    public double getAprilTagAngle() {
+        return getAprilTagDetection(5).ftcPose.bearing;
+    }
 }
