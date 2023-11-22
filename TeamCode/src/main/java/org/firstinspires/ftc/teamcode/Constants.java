@@ -4,17 +4,9 @@ public class Constants {
     public static final double ROBOT_WIDTH = 420.0; //mm
     public static final double ROBOT_LENGTH = 440.0; //mm
 
-    public static final String[] telemetryData = {
-            "Lift Encoder",
-            "Shoulder Encoder",
-            "Wrist Pos",
-            "Claw One Pos",
-            "Claw Two Pos"
-    };
-
-    public static final int LIFT_VELOCITY = 2350;
-    public static final int LIFT_VEL_TO_STOW = 2450;
-    public static final int SHOULDER_VELOCITY = 2400;
+    public static final int LIFT_VELOCITY = 2450;
+    public static final int LIFT_VEL_TO_STOW = 2600;
+    public static final int SHOULDER_VELOCITY = 2300;
 
     public static final int LIFT_LIMIT_TOP = -5750;
     public static final int LIFT_LIMIT_BOTTOM = 0;
@@ -37,7 +29,7 @@ public class Constants {
     public static final double STOW_POS_MID = 0.15;
 
 //    Climb pos
-    public static final int SHOULDER_POS_CLIMB = 1560;
+    public static final int SHOULDER_POS_CLIMB = 1450;
     public static final int LIFT_POS_CLIMB = -4060;
-    public static final double STOW_POS_CLIMB = 1.0;
+    public static final double STOW_POS_CLIMB = 0.25;
 }
