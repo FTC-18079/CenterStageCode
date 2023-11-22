@@ -1,18 +1,19 @@
 package org.firstinspires.ftc.teamcode.Shooter;
 
 import com.arcrobotics.ftclib.command.CommandBase;
+import com.qualcomm.robotcore.hardware.Servo;
 
 public class ShooterServoCommand extends CommandBase implements Runnable {
-    private final ShooterServoSubsystem shooterServo;
+    private final ShooterSubsystem shooterServo;
 
-    public ShooterServoCommand(ShooterServoSubsystem shooterServo) {
+    public ShooterServoCommand(ShooterSubsystem shooterServo) {
         this.shooterServo = shooterServo;
         addRequirements(shooterServo);
     }
 
     @Override
     public void initialize() {
-        shooterServo.shooterToPos(1);
+        shooterServo.shooterToPos(0);
     }
 
     @Override

@@ -2,6 +2,9 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.arcrobotics.ftclib.command.InstantCommand;
+import com.arcrobotics.ftclib.command.SequentialCommandGroup;
+import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.button.Button;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
@@ -33,8 +36,8 @@ import org.firstinspires.ftc.teamcode.Manip.Stow.StowCommand;
 import org.firstinspires.ftc.teamcode.Manip.Stow.StowSubsystem;
 import org.firstinspires.ftc.teamcode.Roadrunner.PoseStorage;
 import org.firstinspires.ftc.teamcode.Shooter.FireShooter;
+import org.firstinspires.ftc.teamcode.Shooter.ShooterCommand;
 import org.firstinspires.ftc.teamcode.Shooter.ShooterServoCommand;
-import org.firstinspires.ftc.teamcode.Shooter.ShooterServoSubsystem;
 import org.firstinspires.ftc.teamcode.Shooter.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.Shooter.StopShooter;
 
@@ -60,7 +63,7 @@ public class Tele extends CommandOpMode {
     private ShooterSubsystem shooter;
     private FireShooter fireShooter;
     private StopShooter stopShooter;
-    private ShooterServoSubsystem shooterServo;
+    private ShooterServoCommand fireServo;
     //Lift
     private LiftSubsystem lift;
     private LiftCommand liftCommand;
@@ -71,7 +74,7 @@ public class Tele extends CommandOpMode {
     private ResetEncoder shoulderReset;
 
     private Button headingResetButton, liftResetButton, shoulderResetButton, armClimbButton, armMidButton, armLowButton, armRestButton,
-            clawOneButton, clawTwoButton, stowButton, shooterButton, liftStopButton, fireShooterButton;
+            clawOneButton, clawTwoButton, stowButton, shooterCommandButton, shooterButton, liftStopButton, fireShooterButton;
     private GamepadEx driverOp, manipOp;
 
     @Override
@@ -85,8 +88,7 @@ public class Tele extends CommandOpMode {
         if (PoseStorage.hasAutoRun) drive.setPoseEstimate(PoseStorage.currentPose.plus(new Pose2d(0, 0, Math.toRadians(180))));
         else drive.setPoseEstimate(new Pose2d());
 
-        shooter = new ShooterSubsystem(hardwareMap, "shooter");
-        shooterServo = new ShooterServoSubsystem(hardwareMap, "shooterServo");
+        shooter = new ShooterSubsystem(hardwareMap, "shooter", "shooterServo");
 
         lift = new LiftSubsystem(hardwareMap, "lift", "liftTouch", telemetry);
         shoulder = new ShoulderSubsystem(hardwareMap, "shoulder1", "shoulder2", "shoulderTouch", telemetry);
@@ -124,6 +126,7 @@ public class Tele extends CommandOpMode {
 
         fireShooter = new FireShooter(shooter);
         stopShooter = new StopShooter(shooter);
+        fireServo = new ShooterServoCommand(shooter);
 
         moveClawOne = new MoveClawOne(claw);
         moveClawTwo = new MoveClawTwo(claw);
@@ -134,7 +137,7 @@ public class Tele extends CommandOpMode {
         headingResetButton = (new GamepadButton(driverOp, GamepadKeys.Button.Y))
                 .whenReleased(resetHeading);
         fireShooterButton = (new GamepadButton(driverOp, GamepadKeys.Button.DPAD_DOWN))
-                .whenPressed(new ShooterServoCommand(shooterServo), true);
+                .whenPressed(fireServo, true);
 
         clawOneButton = (new GamepadButton(manipOp, GamepadKeys.Button.LEFT_BUMPER))
                 .whenPressed(moveClawOne, true);
@@ -148,6 +151,8 @@ public class Tele extends CommandOpMode {
         shooterButton = (new GamepadButton(driverOp, GamepadKeys.Button.B))
                 .whenPressed(fireShooter, true)
                 .whenReleased(stopShooter, true);
+        shooterCommandButton = (new GamepadButton(driverOp, GamepadKeys.Button.X)).
+                whenReleased(new ShooterCommand(shooter, telemetry), true);
 
         liftStopButton = (new GamepadButton(manipOp, GamepadKeys.Button.Y))
                 .whenPressed(stopLift, true);

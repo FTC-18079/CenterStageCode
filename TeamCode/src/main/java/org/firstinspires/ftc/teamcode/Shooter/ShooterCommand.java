@@ -1,0 +1,24 @@
+package org.firstinspires.ftc.teamcode.Shooter;
+
+import com.arcrobotics.ftclib.command.ParallelCommandGroup;
+import com.arcrobotics.ftclib.command.SequentialCommandGroup;
+import com.arcrobotics.ftclib.command.WaitCommand;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
+public class ShooterCommand extends SequentialCommandGroup {
+    private final Telemetry tele;
+
+    public ShooterCommand(ShooterSubsystem shooterSubsystem, Telemetry tele){
+        this.tele = tele;
+        addCommands(
+                new FireShooter(shooterSubsystem),
+                new WaitCommand(1200),
+                new ShooterServoCommand(shooterSubsystem),
+                new WaitCommand(1700),
+                new StopShooter(shooterSubsystem)
+        );
+        addRequirements(shooterSubsystem);
+    }
+
+}

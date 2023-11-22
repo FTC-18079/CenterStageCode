@@ -16,6 +16,11 @@ public class FireShooter extends CommandBase implements Runnable {
     }
 
     @Override
+    public boolean isFinished() {
+        return true;
+    }
+
+    @Override
     public void run() {
         initialize();
     }
