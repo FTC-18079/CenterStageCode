@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Arm.Shoulder;
 
 import com.arcrobotics.ftclib.command.CommandBase;
+import com.arcrobotics.ftclib.util.Timing;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -13,6 +14,8 @@ public class ShoulderToPos extends CommandBase implements Runnable {
     private final DoubleSupplier velocity;
     private final Telemetry tele;
 
+    private final Timing.Timer timer = new Timing.Timer(2);
+
     public ShoulderToPos(ShoulderSubsystem subsystem, IntSupplier pos, DoubleSupplier vel, Telemetry tele) {
         shoulder = subsystem;
         position = pos;
@@ -23,6 +26,7 @@ public class ShoulderToPos extends CommandBase implements Runnable {
 
     @Override
     public void initialize() {
+        timer.start();
         shoulder.moveToPos(
                 position.getAsInt(),
                 velocity.getAsDouble()
@@ -31,12 +35,11 @@ public class ShoulderToPos extends CommandBase implements Runnable {
 
     @Override
     public boolean isFinished() {
-        return !shoulder.isRunning();
+        return !shoulder.isRunning() || timer.done();
     }
 
     @Override
     public void execute() {
-//        if (shoulder.getTouch()) shoulder.resetLimit();
         tele.addData("Shoulder Encoder:", shoulder.getEncoderValue());
     }
 

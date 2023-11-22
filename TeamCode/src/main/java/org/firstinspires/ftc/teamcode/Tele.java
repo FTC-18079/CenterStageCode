@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Arm.ArmCommand;
 import org.firstinspires.ftc.teamcode.Arm.Lift.StopLift;
-import org.firstinspires.ftc.teamcode.Arm.Shoulder.ShoulderPos;
+import org.firstinspires.ftc.teamcode.Arm.Shoulder.GetShoulderPos;
 import org.firstinspires.ftc.teamcode.Chassis.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Chassis.MecanumDriveCommand;
 import org.firstinspires.ftc.teamcode.Arm.Lift.LiftCommand;
@@ -37,7 +37,6 @@ import org.firstinspires.ftc.teamcode.Shooter.ShooterServoCommand;
 import org.firstinspires.ftc.teamcode.Shooter.ShooterServoSubsystem;
 import org.firstinspires.ftc.teamcode.Shooter.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.Shooter.StopShooter;
-import org.firstinspires.ftc.teamcode.Telemetry.TelemetryCommand;
 
 @TeleOp(name = "TeleOp", group = "OpModes")
 public class Tele extends CommandOpMode {
@@ -51,14 +50,12 @@ public class Tele extends CommandOpMode {
     private ClawSubsystem claw;
     private MoveClawOne moveClawOne;
     private MoveClawTwo moveClawTwo;
-    private CloseClawOne closeClawOne;
     private CloseClawTwo closeClawTwo;
 
     //Stow
     private StowSubsystem stow;
     private Stow stowUp;
     private Down stowDown;
-    private StowCommand moveStow;
     //Shooter
     private ShooterSubsystem shooter;
     private FireShooter fireShooter;
@@ -67,19 +64,15 @@ public class Tele extends CommandOpMode {
     //Lift
     private LiftSubsystem lift;
     private LiftCommand liftCommand;
-    private ResetLimit liftReset;
     private StopLift stopLift;
     //Shoulder
     private ShoulderSubsystem shoulder;
     private ShoulderCommand shoulderCommand;
-    private ShoulderPos getShoulderPos;
     private ResetEncoder shoulderReset;
 
     private Button headingResetButton, liftResetButton, shoulderResetButton, armClimbButton, armMidButton, armLowButton, armRestButton,
             clawOneButton, clawTwoButton, stowButton, shooterButton, liftStopButton, fireShooterButton;
     private GamepadEx driverOp, manipOp;
-    //    private TelemetrySS m_telemetry;
-    private TelemetryCommand telemetryCommand;
 
     @Override
     public void initialize() {
@@ -127,7 +120,6 @@ public class Tele extends CommandOpMode {
                 shoulder,
                 () -> manipOp.getLeftY() * 0.5
         );
-        getShoulderPos = new ShoulderPos(shoulder);
         shoulderReset = new ResetEncoder(shoulder);
 
         fireShooter = new FireShooter(shooter);
@@ -135,11 +127,9 @@ public class Tele extends CommandOpMode {
 
         moveClawOne = new MoveClawOne(claw);
         moveClawTwo = new MoveClawTwo(claw);
-        closeClawOne = new CloseClawOne(claw);
         closeClawTwo = new CloseClawTwo(claw);
         stowUp = new Stow(stow);
         stowDown = new Down(stow);
-        moveStow = new StowCommand(stow);
 
         headingResetButton = (new GamepadButton(driverOp, GamepadKeys.Button.Y))
                 .whenReleased(resetHeading);
@@ -183,10 +173,8 @@ public class Tele extends CommandOpMode {
         register(drive);
         register(lift);
         register(shoulder);
-//        register(m_telemetry);
         drive.setDefaultCommand(driveCommand);
         lift.setDefaultCommand(liftCommand);
         shoulder.setDefaultCommand(shoulderCommand);
-//        m_telemetry.setDefaultCommand(telemetryCommand);
     }
 }
