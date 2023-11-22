@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Arm.Lift;
 
 import com.arcrobotics.ftclib.command.CommandBase;
 import com.arcrobotics.ftclib.command.CommandScheduler;
+import com.arcrobotics.ftclib.util.Timing;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -15,6 +16,8 @@ public class LiftToPos extends CommandBase implements Runnable {
     private final DoubleSupplier velocity;
     private final Telemetry tele;
 
+    private final Timing.Timer timer = new Timing.Timer(3);
+
     public LiftToPos(LiftSubsystem subsystem, IntSupplier pos, DoubleSupplier vel, Telemetry tele) {
         lift = subsystem;
         position = pos;
@@ -25,6 +28,7 @@ public class LiftToPos extends CommandBase implements Runnable {
 
     @Override
     public void initialize() {
+        timer.start();
         lift.moveToPos(
                 position.getAsInt(),
                 velocity.getAsDouble()
@@ -33,7 +37,7 @@ public class LiftToPos extends CommandBase implements Runnable {
 
     @Override
     public boolean isFinished() {
-        return !lift.isRunning();
+        return !lift.isRunning() || timer.done();
     }
 
     @Override

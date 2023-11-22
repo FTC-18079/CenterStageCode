@@ -77,4 +77,9 @@ public class ShoulderSubsystem extends SubsystemBase {
             shoulder2.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
         }
     }
+
+    public void stopVelocity() {
+        shoulder1.setVelocity(0);
+        shoulder2.setVelocity(0);
+    }
 }

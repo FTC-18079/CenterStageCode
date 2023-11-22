@@ -40,7 +40,6 @@ public class MecanumDrive extends SubsystemBase {
 
     public void update() {
         m_telemetry.addData("Robot Pose Estimate", getPoseEstimate());
-        m_telemetry.update();
         drive.update();
     }
 
