@@ -153,8 +153,8 @@ public class Tele extends CommandOpMode {
         shoulderResetButton = (new GamepadButton(manipOp, GamepadKeys.Button.A))
                 .whenPressed(shoulderReset);
         stowButton = (new GamepadButton(manipOp, GamepadKeys.Button.B))
-                .whenPressed(stowDown, true)
-                .whenReleased(stowUp, true);
+                .whenPressed(stowUp, true)
+                .whenReleased(stowDown, true);
         shooterButton = (new GamepadButton(driverOp, GamepadKeys.Button.B))
                 .whenPressed(fireShooter, true)
                 .whenReleased(stopShooter, true);
