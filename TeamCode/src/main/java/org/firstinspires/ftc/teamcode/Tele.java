@@ -2,6 +2,9 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.arcrobotics.ftclib.command.InstantCommand;
+import com.arcrobotics.ftclib.command.SequentialCommandGroup;
+import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.button.Button;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
@@ -33,6 +36,7 @@ import org.firstinspires.ftc.teamcode.Manip.Stow.StowCommand;
 import org.firstinspires.ftc.teamcode.Manip.Stow.StowSubsystem;
 import org.firstinspires.ftc.teamcode.Roadrunner.PoseStorage;
 import org.firstinspires.ftc.teamcode.Shooter.FireShooter;
+import org.firstinspires.ftc.teamcode.Shooter.ShooterCommand;
 import org.firstinspires.ftc.teamcode.Shooter.ShooterServoCommand;
 import org.firstinspires.ftc.teamcode.Shooter.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.Shooter.StopShooter;
@@ -74,7 +78,7 @@ public class Tele extends CommandOpMode {
     private ResetEncoder shoulderReset;
 
     private Button headingResetButton, liftResetButton, shoulderResetButton, armClimbButton, armMidButton, armLowButton, armRestButton,
-            clawOneButton, clawTwoButton, stowButton, shooterButton, liftStopButton, fireShooterButton;
+            clawOneButton, clawTwoButton, stowButton, shooterCommandButton, shooterButton, liftStopButton, fireShooterButton;
     private GamepadEx driverOp, manipOp;
     //    private TelemetrySS m_telemetry;
     private TelemetryCommand telemetryCommand;
@@ -156,6 +160,8 @@ public class Tele extends CommandOpMode {
         shooterButton = (new GamepadButton(driverOp, GamepadKeys.Button.B))
                 .whenPressed(fireShooter, true)
                 .whenReleased(stopShooter, true);
+        shooterCommandButton = (new GamepadButton(driverOp, GamepadKeys.Button.X)).
+                whenReleased(new ShooterCommand(shooter, telemetry), true);
 
         liftStopButton = (new GamepadButton(manipOp, GamepadKeys.Button.Y))
                 .whenPressed(stopLift, true);
