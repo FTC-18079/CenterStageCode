@@ -2,9 +2,6 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
-import com.arcrobotics.ftclib.command.InstantCommand;
-import com.arcrobotics.ftclib.command.SequentialCommandGroup;
-import com.arcrobotics.ftclib.command.WaitCommand;
 import com.arcrobotics.ftclib.command.button.Button;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
@@ -15,24 +12,22 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Arm.ArmCommand;
 import org.firstinspires.ftc.teamcode.Arm.Lift.StopLift;
-import org.firstinspires.ftc.teamcode.Arm.Shoulder.GetShoulderPos;
 import org.firstinspires.ftc.teamcode.Chassis.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Chassis.MecanumDriveCommand;
 import org.firstinspires.ftc.teamcode.Arm.Lift.LiftCommand;
 import org.firstinspires.ftc.teamcode.Arm.Lift.LiftSubsystem;
-import org.firstinspires.ftc.teamcode.Arm.Lift.ResetLimit;
 import org.firstinspires.ftc.teamcode.Arm.Shoulder.ResetEncoder;
 import org.firstinspires.ftc.teamcode.Arm.Shoulder.ShoulderCommand;
 import org.firstinspires.ftc.teamcode.Arm.Shoulder.ShoulderSubsystem;
 import org.firstinspires.ftc.teamcode.Chassis.ResetHeading;
+import org.firstinspires.ftc.teamcode.Lights.LightOrange;
+import org.firstinspires.ftc.teamcode.Lights.LightSubsystem;
 import org.firstinspires.ftc.teamcode.Manip.Claw.ClawSubsystem;
-import org.firstinspires.ftc.teamcode.Manip.Claw.CloseClawOne;
 import org.firstinspires.ftc.teamcode.Manip.Claw.CloseClawTwo;
 import org.firstinspires.ftc.teamcode.Manip.Claw.MoveClawOne;
 import org.firstinspires.ftc.teamcode.Manip.Claw.MoveClawTwo;
 import org.firstinspires.ftc.teamcode.Manip.Stow.Down;
 import org.firstinspires.ftc.teamcode.Manip.Stow.Stow;
-import org.firstinspires.ftc.teamcode.Manip.Stow.StowCommand;
 import org.firstinspires.ftc.teamcode.Manip.Stow.StowSubsystem;
 import org.firstinspires.ftc.teamcode.Roadrunner.PoseStorage;
 import org.firstinspires.ftc.teamcode.Shooter.FireShooter;
@@ -72,6 +67,8 @@ public class Tele extends CommandOpMode {
     private ShoulderSubsystem shoulder;
     private ShoulderCommand shoulderCommand;
     private ResetEncoder shoulderReset;
+    //Lights
+    private LightSubsystem led;
 
     private Button headingResetButton, liftResetButton, shoulderResetButton, armClimbButton, armMidButton, armLowButton, armRestButton,
             clawOneButton, clawTwoButton, stowButton, shooterCommandButton, shooterButton, liftStopButton, fireShooterButton;
@@ -84,6 +81,8 @@ public class Tele extends CommandOpMode {
         lb = new MotorEx(hardwareMap, "leftBack");
         rb = new MotorEx(hardwareMap, "rightBack");
         drive = new MecanumDrive(hardwareMap, telemetry, true);
+
+        led = new LightSubsystem(hardwareMap, "led");
 
         if (PoseStorage.hasAutoRun) drive.setPoseEstimate(PoseStorage.currentPose.plus(new Pose2d(0, 0, Math.toRadians(180))));
         else drive.setPoseEstimate(new Pose2d());
@@ -181,5 +180,7 @@ public class Tele extends CommandOpMode {
         drive.setDefaultCommand(driveCommand);
         lift.setDefaultCommand(liftCommand);
         shoulder.setDefaultCommand(shoulderCommand);
+
+        schedule(new LightOrange(led));
     }
 }
