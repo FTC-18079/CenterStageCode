@@ -157,12 +157,12 @@ public class Tele extends CommandOpMode {
         armClimbButton = (new GamepadButton(manipOp, GamepadKeys.Button.DPAD_LEFT))
                 .whenReleased(new ArmCommand(shoulder, lift, stow,
                         () -> Constants.SHOULDER_POS_CLIMB, () -> Constants.LIFT_POS_CLIMB, () -> Constants.STOW_POS_CLIMB, telemetry), true);
-        armMidButton = (new GamepadButton(manipOp, GamepadKeys.Button.DPAD_RIGHT))
-                .whenReleased(new ArmCommand(shoulder, lift, stow,
-                        () -> Constants.SHOULDER_POS_MID, () -> Constants.LIFT_POS_MID, () -> Constants.STOW_POS_MID, telemetry), true);
-        armLowButton = (new GamepadButton(manipOp, GamepadKeys.Button.DPAD_UP))
+        armLowButton = (new GamepadButton(manipOp, GamepadKeys.Button.DPAD_RIGHT))
                 .whenReleased(new ArmCommand(shoulder, lift, stow,
                         () -> Constants.SHOULDER_POS_LOW, () -> Constants.LIFT_POS_LOW, () -> Constants.STOW_POS_LOW, telemetry), true);
+        armMidButton = (new GamepadButton(manipOp, GamepadKeys.Button.DPAD_UP))
+                .whenReleased(new ArmCommand(shoulder, lift, stow,
+                        () -> Constants.SHOULDER_POS_MID, () -> Constants.LIFT_POS_MID, () -> Constants.STOW_POS_MID, telemetry), true);
         armRestButton = (new GamepadButton(manipOp, GamepadKeys.Button.DPAD_DOWN))
                 .whenPressed(closeClawTwo, true)
                 .whenReleased(new ArmCommand(shoulder, lift, stow,

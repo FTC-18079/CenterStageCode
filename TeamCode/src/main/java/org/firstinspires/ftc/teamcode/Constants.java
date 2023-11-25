@@ -17,16 +17,16 @@ public class Constants {
     public static final double STOW_POS_REST = 0.7;
 
 //    Low score pos
-    public static final int SHOULDER_POS_LOW = 635;
-    public static final int LIFT_POS_LOW = -2022;
-    public static final double STOW_POS_LOW = 0.1;
+    public static final int SHOULDER_POS_LOW = 431;
+    public static final int LIFT_POS_LOW = -580;
+    public static final double STOW_POS_LOW = 0.15;
 
 //    Mid score pos
 //    public static final int SHOULDER_POS_MID = 2093;
-    public static final int SHOULDER_POS_MID = 431;
+    public static final int SHOULDER_POS_MID = 635;
 //    public static final int LIFT_POS_MID = -2684;
-    public static final int LIFT_POS_MID = -580;
-    public static final double STOW_POS_MID = 0.15;
+    public static final int LIFT_POS_MID = -2022;
+    public static final double STOW_POS_MID = 0.1;
 
 //    Climb pos
     public static final int SHOULDER_POS_CLIMB = 1450;
