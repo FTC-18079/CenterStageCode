@@ -6,6 +6,7 @@ import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -56,6 +57,8 @@ public class AutoBlueBackstagePark extends CommandOpMode {
     MoveClawOne moveClawOne;
     MoveClawTwo moveClawTwo;
 
+    private RevBlinkinLedDriver led;
+
     @Override
     public void initialize() {
         // Subsystems
@@ -63,6 +66,8 @@ public class AutoBlueBackstagePark extends CommandOpMode {
         claw = new ClawSubsystem(hardwareMap, "clawOne", "clawTwo");
         shoulder = new ShoulderSubsystem(hardwareMap, "shoulder1", "shoulder2", "shoulderTouch", telemetry);
         lift = new LiftSubsystem(hardwareMap, "lift", "liftTouch", telemetry);
+
+        led = hardwareMap.get(RevBlinkinLedDriver.class, "led");
 
         // Commands
         stowUp = new Stow(stow);
@@ -85,8 +90,9 @@ public class AutoBlueBackstagePark extends CommandOpMode {
         driveTrain.setPoseEstimate(startPose);
         driveTrain.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        waitForStart();
+        led.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP1_SHOT);
 
+        waitForStart();
         if (isStopRequested()) return;
 
         List<Recognition> currentRecognitions = tfod.getRecognitions();
@@ -175,6 +181,7 @@ public class AutoBlueBackstagePark extends CommandOpMode {
                         // Update pose storage and telemetry
                         new SequentialCommandGroup(
                                 new InstantCommand(() -> PoseStorage.currentPose = driveTrain.getPoseEstimate()),
+                                new InstantCommand(() -> PoseStorage.pattern = RevBlinkinLedDriver.BlinkinPattern.CP1_SHOT),
                                 new InstantCommand(() -> PoseStorage.hasAutoRun = true),
                                 new InstantCommand(() -> telemetry.addData("PoseStorage saved", PoseStorage.hasAutoRun)),
                                 new InstantCommand(() -> telemetry.update())
