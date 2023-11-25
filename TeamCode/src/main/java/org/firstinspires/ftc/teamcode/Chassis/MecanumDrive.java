@@ -67,8 +67,6 @@ public class MecanumDrive extends SubsystemBase {
                         -rightX * dampen
                 )
         );
-        drive.update();
-        m_telemetry.update();
     }
 
     public void resetHeading() {
