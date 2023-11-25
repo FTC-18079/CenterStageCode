@@ -6,6 +6,7 @@ import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -56,6 +57,8 @@ public class AutoRedBackstagePark extends CommandOpMode {
     MoveClawOne moveClawOne;
     MoveClawTwo moveClawTwo;
 
+    private RevBlinkinLedDriver led;
+
     @Override
     public void initialize() {
         // Subsystems
@@ -63,6 +66,8 @@ public class AutoRedBackstagePark extends CommandOpMode {
         claw = new ClawSubsystem(hardwareMap, "clawOne", "clawTwo");
         shoulder = new ShoulderSubsystem(hardwareMap, "shoulder1", "shoulder2", "shoulderTouch", telemetry);
         lift = new LiftSubsystem(hardwareMap, "lift", "liftTouch", telemetry);
+
+        led = hardwareMap.get(RevBlinkinLedDriver.class, "led");
 
         // Commands
         stowUp = new Stow(stow);
@@ -84,6 +89,8 @@ public class AutoRedBackstagePark extends CommandOpMode {
 
         driveTrain.setPoseEstimate(startPose);
         driveTrain.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        led.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP2_SHOT);
 
         waitForStart();
         if (isStopRequested()) return;
@@ -175,6 +182,7 @@ public class AutoRedBackstagePark extends CommandOpMode {
                         new SequentialCommandGroup(
                                 new InstantCommand(() -> PoseStorage.currentPose = driveTrain.getPoseEstimate()),
                                 new InstantCommand(() -> PoseStorage.hasAutoRun = true),
+                                new InstantCommand(() -> PoseStorage.pattern = RevBlinkinLedDriver.BlinkinPattern.CP2_SHOT),
                                 new InstantCommand(() -> telemetry.addData("PoseStorage saved", PoseStorage.hasAutoRun)),
                                 new InstantCommand(() -> telemetry.update())
                         )
