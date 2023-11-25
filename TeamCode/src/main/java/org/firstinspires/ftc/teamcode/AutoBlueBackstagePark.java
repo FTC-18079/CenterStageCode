@@ -1,11 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.InstantCommand;
-import com.arcrobotics.ftclib.command.ParallelCommandGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -18,7 +16,6 @@ import org.firstinspires.ftc.teamcode.Arm.Lift.LiftSubsystem;
 import org.firstinspires.ftc.teamcode.Arm.Lift.LiftToPos;
 import org.firstinspires.ftc.teamcode.Arm.Shoulder.ShoulderSubsystem;
 import org.firstinspires.ftc.teamcode.Arm.Shoulder.ShoulderToPos;
-import org.firstinspires.ftc.teamcode.Manip.Claw.AutoMoveClaw;
 import org.firstinspires.ftc.teamcode.Manip.Claw.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.Manip.Claw.MoveClawOne;
 import org.firstinspires.ftc.teamcode.Manip.Claw.MoveClawTwo;
@@ -26,8 +23,6 @@ import org.firstinspires.ftc.teamcode.Manip.Stow.Down;
 import org.firstinspires.ftc.teamcode.Manip.Stow.Stow;
 import org.firstinspires.ftc.teamcode.Manip.Stow.StowSubsystem;
 import org.firstinspires.ftc.teamcode.Manip.Stow.StowToPos;
-import org.firstinspires.ftc.teamcode.Manip.Wrist.WristCommand;
-import org.firstinspires.ftc.teamcode.Manip.Wrist.WristSubsystem;
 import org.firstinspires.ftc.teamcode.RRCommands.TrajectoryRunner;
 import org.firstinspires.ftc.teamcode.RRCommands.TurnCommand;
 import org.firstinspires.ftc.teamcode.Roadrunner.PoseStorage;
@@ -38,8 +33,8 @@ import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 
 import java.util.List;
 
-@Autonomous(name = "Blue Right Park", group = "Autos")
-public class BlueRightParkAuto extends CommandOpMode {
+@Autonomous(name = "Blue Backstage - Park", group = "Blue Autos")
+public class AutoBlueBackstagePark extends CommandOpMode {
     private static final boolean USE_WEBCAM = true;
     private static final String TFOD_MODEL_ASSET = "blueObject_v1.tflite";
     private static final String[] LABELS = {
