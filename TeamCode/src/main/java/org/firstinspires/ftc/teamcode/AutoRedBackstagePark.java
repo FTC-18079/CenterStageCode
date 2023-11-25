@@ -111,7 +111,7 @@ public class AutoRedBackstagePark extends CommandOpMode {
                 aprilTagY = -38.0;
             }
         } else {
-            // Right turn
+            // Right
             turnAmount = -45.0;
             fwd = 20;
             aprilTagY = -38.0;
@@ -136,11 +136,11 @@ public class AutoRedBackstagePark extends CommandOpMode {
                         new TrajectoryRunner(driveTrain, traj1), // Follow trajectory 1
                         new TurnCommand(driveTrain, Math.toRadians(turnAmount)), // Turn to face game element's spike mark
                         new InstantCommand(stowDown), // Bring down stow
-                        new WaitCommand(750), // Wait .75s
+                        new WaitCommand(500), // Wait .5s
                         new InstantCommand(moveClawOne), // Open claw to score spike mark
-                        new WaitCommand(750), // Wait 1s
+                        new WaitCommand(500), // Wait .5s
                         new InstantCommand(stowUp), // Bring stow up
-                        new WaitCommand(750), // Wait 1s
+                        new WaitCommand(500), // Wait .5s
                         new TurnCommand(driveTrain, Math.toRadians(turnAmount * -1)),
                         new ArmCommand(
                                 shoulder,
@@ -152,13 +152,12 @@ public class AutoRedBackstagePark extends CommandOpMode {
                                 telemetry
                         ),
                         new TrajectoryRunner(driveTrain, traj2), // Drive to backboard while brining arm up to score
-                        new WaitCommand(400), // Wait 0.6s
                         new InstantCommand(moveClawTwo), // Open claw to score on backboard
 
                         // TODO: SUPER SKETCHY, this would be replaced for updating estimate by using apriltags
-                        new InstantCommand(() -> driveTrain.setPoseEstimate(new Pose2d(50, aprilTagY, Math.toRadians(-12)))),
+                        new InstantCommand(() -> driveTrain.setPoseEstimate(new Pose2d(50, aprilTagY, Math.toRadians(12)))),
 
-                        new WaitCommand(600), // Wait 0.6s
+                        new WaitCommand(500), // Wait 0.5s
                         new ArmCommand(
                                 shoulder,
                                 lift,
@@ -181,8 +180,6 @@ public class AutoRedBackstagePark extends CommandOpMode {
                         )
                 )
         );
-
-
     }
 
     private void initTfod() {
