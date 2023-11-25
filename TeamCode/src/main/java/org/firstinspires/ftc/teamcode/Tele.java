@@ -8,6 +8,7 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Arm.ArmCommand;
@@ -20,8 +21,6 @@ import org.firstinspires.ftc.teamcode.Arm.Shoulder.ResetEncoder;
 import org.firstinspires.ftc.teamcode.Arm.Shoulder.ShoulderCommand;
 import org.firstinspires.ftc.teamcode.Arm.Shoulder.ShoulderSubsystem;
 import org.firstinspires.ftc.teamcode.Chassis.ResetHeading;
-import org.firstinspires.ftc.teamcode.Lights.LightOrange;
-import org.firstinspires.ftc.teamcode.Lights.LightSubsystem;
 import org.firstinspires.ftc.teamcode.Manip.Claw.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.Manip.Claw.CloseClawTwo;
 import org.firstinspires.ftc.teamcode.Manip.Claw.MoveClawOne;
@@ -68,7 +67,7 @@ public class Tele extends CommandOpMode {
     private ShoulderCommand shoulderCommand;
     private ResetEncoder shoulderReset;
     //Lights
-    private LightSubsystem led;
+    private RevBlinkinLedDriver led;
 
     private Button headingResetButton, liftResetButton, shoulderResetButton, armClimbButton, armMidButton, armLowButton, armRestButton,
             clawOneButton, clawTwoButton, stowButton, shooterCommandButton, shooterButton, liftStopButton, fireShooterButton;
@@ -82,7 +81,7 @@ public class Tele extends CommandOpMode {
         rb = new MotorEx(hardwareMap, "rightBack");
         drive = new MecanumDrive(hardwareMap, telemetry, true);
 
-        led = new LightSubsystem(hardwareMap, "led");
+        led = hardwareMap.get(RevBlinkinLedDriver.class, "led");
 
         if (PoseStorage.hasAutoRun) drive.setPoseEstimate(PoseStorage.currentPose.plus(new Pose2d(0, 0, Math.toRadians(180))));
         else drive.setPoseEstimate(new Pose2d());
@@ -181,6 +180,6 @@ public class Tele extends CommandOpMode {
         lift.setDefaultCommand(liftCommand);
         shoulder.setDefaultCommand(shoulderCommand);
 
-        schedule(new LightOrange(led));
+        led.setPattern(PoseStorage.pattern);
     }
 }
