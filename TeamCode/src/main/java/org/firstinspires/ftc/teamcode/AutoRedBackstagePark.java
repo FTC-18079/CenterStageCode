@@ -72,6 +72,7 @@ public class AutoRedBackstagePark extends CommandOpMode {
 
         initTfod();
         tfod.setZoom(1.1);
+        tfod.setClippingMargins(0, 100, 125, 0);
 
         claw.clawOneToPos(0);
         claw.clawTwoToPos(1);
@@ -93,9 +94,9 @@ public class AutoRedBackstagePark extends CommandOpMode {
             elementPos = recognition.getRight() + recognition.getLeft() / 2;
             if (elementPos < 275) {
                 // Left
-                turnAmount = 65.0;
+                turnAmount = 62.0;
                 fwd = 20;
-                aprilTagY = -28.0;
+                aprilTagY = -20.5;
             }
             else if (elementPos >= 275) {
                 // Middle
@@ -107,13 +108,13 @@ public class AutoRedBackstagePark extends CommandOpMode {
                 // Right
                 turnAmount = -45.0;
                 fwd = 20;
-                aprilTagY = -41.0;
+                aprilTagY = -38.0;
             }
         } else {
             // Right turn
             turnAmount = -45.0;
             fwd = 20;
-            aprilTagY = -41.0;
+            aprilTagY = -38.0;
         }
 
         TrajectorySequence traj1 = driveTrain.trajectorySequenceBuilder(startPose)
@@ -126,9 +127,8 @@ public class AutoRedBackstagePark extends CommandOpMode {
                 .build();
 
         TrajectorySequence traj3 = driveTrain.trajectorySequenceBuilder(traj2.end())
-                .lineToLinearHeading(new Pose2d(47, -58, Math.toRadians(0)))
-                .waitSeconds(0.35)
-                .forward(6)
+                .lineToLinearHeading(new Pose2d(45, -58, Math.toRadians(0)))
+                .forward(9)
                 .build();
 
         CommandScheduler.getInstance().schedule(
@@ -152,11 +152,11 @@ public class AutoRedBackstagePark extends CommandOpMode {
                                 telemetry
                         ),
                         new TrajectoryRunner(driveTrain, traj2), // Drive to backboard while brining arm up to score
-                        new WaitCommand(600), // Wait 0.6s
+                        new WaitCommand(400), // Wait 0.6s
                         new InstantCommand(moveClawTwo), // Open claw to score on backboard
 
                         // TODO: SUPER SKETCHY, this would be replaced for updating estimate by using apriltags
-                        new InstantCommand(() -> driveTrain.setPoseEstimate(new Pose2d(50, -35, Math.toRadians(-11)))),
+                        new InstantCommand(() -> driveTrain.setPoseEstimate(new Pose2d(50, aprilTagY, Math.toRadians(-12)))),
 
                         new WaitCommand(600), // Wait 0.6s
                         new ArmCommand(
@@ -170,15 +170,19 @@ public class AutoRedBackstagePark extends CommandOpMode {
                         ),
                         new TrajectoryRunner(driveTrain, traj3),
                         new InstantCommand(() -> shoulder.stopVelocity()),
-                        new InstantCommand(() -> driveTrain.setWeightedDrivePower(new Pose2d()))
+                        new InstantCommand(() -> driveTrain.setWeightedDrivePower(new Pose2d())),
+
+                        // Update pose storage and telemetry
+                        new SequentialCommandGroup(
+                                new InstantCommand(() -> PoseStorage.currentPose = driveTrain.getPoseEstimate()),
+                                new InstantCommand(() -> PoseStorage.hasAutoRun = true),
+                                new InstantCommand(() -> telemetry.addData("PoseStorage saved", PoseStorage.hasAutoRun)),
+                                new InstantCommand(() -> telemetry.update())
+                        )
                 )
         );
 
-        PoseStorage.currentPose = driveTrain.getPoseEstimate();
-        PoseStorage.hasAutoRun = true;
 
-        telemetry.addData("PoseStorage saved", PoseStorage.hasAutoRun);
-        telemetry.update();
     }
 
     private void initTfod() {
