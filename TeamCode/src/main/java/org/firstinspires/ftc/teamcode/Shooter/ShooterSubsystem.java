@@ -16,8 +16,8 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public void drive() {
-        shooter.setPower(0.635);
-    }
+        shooter.setPower(0.74);
+    }//0.635
 
     public void stop() {
         shooter.setPower(0);

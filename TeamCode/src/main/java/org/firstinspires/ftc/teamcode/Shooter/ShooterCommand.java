@@ -14,9 +14,10 @@ public class ShooterCommand extends SequentialCommandGroup {
         addCommands(
                 new FireShooter(shooterSubsystem),
                 new WaitCommand(1200),
-                new ShooterServoCommand(shooterSubsystem),
+                new ShooterServoCommand(shooterSubsystem,0),
                 new WaitCommand(1700),
-                new StopShooter(shooterSubsystem)
+                new StopShooter(shooterSubsystem),
+                new ShooterServoCommand(shooterSubsystem, 1)
         );
         addRequirements(shooterSubsystem);
     }

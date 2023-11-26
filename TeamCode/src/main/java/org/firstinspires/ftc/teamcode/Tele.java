@@ -124,7 +124,7 @@ public class Tele extends CommandOpMode {
 
         fireShooter = new FireShooter(shooter);
         stopShooter = new StopShooter(shooter);
-        fireServo = new ShooterServoCommand(shooter);
+        fireServo = new ShooterServoCommand(shooter,0);
 
         moveClawOne = new MoveClawOne(claw);
         moveClawTwo = new MoveClawTwo(claw);
