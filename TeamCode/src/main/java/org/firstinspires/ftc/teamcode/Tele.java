@@ -101,10 +101,11 @@ public class Tele extends CommandOpMode {
 
         driveCommand = new MecanumDriveCommand(
                 drive,
-                () -> -driverOp.getLeftY() * 0.85,
-                () -> driverOp.getLeftX() * 0.85,
-                () -> driverOp.getRightX() * 0.85,
-                () -> driverOp.getButton(GamepadKeys.Button.LEFT_BUMPER)
+                () -> -driverOp.getLeftY(),
+                () -> driverOp.getLeftX(),
+                () -> driverOp.getRightX(),
+                () -> (driverOp.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.05),
+                () -> driverOp.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER)
         );
         resetHeading = new ResetHeading(drive);
 

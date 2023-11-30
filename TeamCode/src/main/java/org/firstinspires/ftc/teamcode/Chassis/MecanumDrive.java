@@ -47,26 +47,31 @@ public class MecanumDrive extends SubsystemBase {
         drive.updatePoseEstimate();
     }
 
-    public void drive(double leftY, double leftX, double rightX, boolean slowMode) {
+    public void drive(double leftY, double leftX, double rightX, boolean speedMode, double brakePower) {
         double dampen;
+        double brake = 1.0 - brakePower;
 
-        if (slowMode) dampen = 0.2;
-        else dampen = 1.0;
+        if (speedMode) {
+            dampen = 1.0;
+        } else {
+            dampen = 0.85;
+        }
 
         Pose2d poseEstimate = getPoseEstimate();
 
         Vector2d input = new Vector2d(
-                -leftY * dampen,
-                -leftX * dampen
+                -leftY * dampen * brakePower,
+                -leftX * dampen * brakePower
         ).rotated(fieldCentric ? -poseEstimate.getHeading() : 0);
 
         drive.setWeightedDrivePower(
                 new Pose2d(
                         input.getX(),
                         input.getY(),
-                        -rightX * dampen
+                        -rightX * dampen * brakePower
                 )
         );
+        m_telemetry.addData("Brake", brakePower);
     }
 
     public void resetHeading() {
@@ -114,7 +119,7 @@ public class MecanumDrive extends SubsystemBase {
     }
 
     public void stop() {
-        drive(0, 0, 0, false);
+        drive(0, 0, 0, false, 0);
     }
 
     public Pose2d getPoseVelocity() {
