@@ -8,21 +8,21 @@ import java.util.function.DoubleSupplier;
 public class MecanumDriveCommand extends CommandBase {
     private final MecanumDrive drive;
     private final DoubleSupplier leftY, leftX, rightX;
-    private final BooleanSupplier slowMode;
+    private final DoubleSupplier brakePower;
 
-    public MecanumDriveCommand(MecanumDrive drive, DoubleSupplier leftY, DoubleSupplier leftX, DoubleSupplier rightX, BooleanSupplier slowMode) {
+    public MecanumDriveCommand(MecanumDrive drive, DoubleSupplier leftY, DoubleSupplier leftX, DoubleSupplier rightX, DoubleSupplier brakePower) {
         this.drive = drive;
         this.leftY = leftY;
         this.leftX = leftX;
         this.rightX = rightX;
-        this.slowMode = slowMode;
+        this.brakePower = brakePower;
 
         addRequirements(drive);
     }
 
     @Override
     public void execute() {
-        drive.drive(leftY.getAsDouble(), leftX.getAsDouble(), rightX.getAsDouble(), slowMode.getAsBoolean());
+        drive.drive(leftY.getAsDouble(), leftX.getAsDouble(), rightX.getAsDouble(), brakePower.getAsDouble());
         drive.update();
     }
 }
