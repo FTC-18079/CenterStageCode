@@ -104,7 +104,6 @@ public class Tele extends CommandOpMode {
                 () -> -driverOp.getLeftY(),
                 () -> driverOp.getLeftX(),
                 () -> driverOp.getRightX(),
-                () -> (driverOp.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.05),
                 () -> driverOp.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER)
         );
         resetHeading = new ResetHeading(drive);
