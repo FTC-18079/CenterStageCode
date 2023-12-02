@@ -4,6 +4,7 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.InstantCommand;
+import com.arcrobotics.ftclib.command.ParallelRaceGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
@@ -109,7 +110,7 @@ public class AutoRedBackstagePark extends CommandOpMode {
                 // Middle
                 turnAmount = -15.0;
                 fwd = 26;
-                aprilTagY = -28.0;
+                aprilTagY = -29.0;
             }
             else {
                 // Right
@@ -162,7 +163,7 @@ public class AutoRedBackstagePark extends CommandOpMode {
                         new InstantCommand(moveClawTwo), // Open claw to score on backboard
 
                         // TODO: SUPER SKETCHY, this would be replaced for updating estimate by using apriltags
-                        new InstantCommand(() -> driveTrain.setPoseEstimate(new Pose2d(50, aprilTagY, Math.toRadians(12)))),
+//                        new InstantCommand(() -> driveTrain.setPoseEstimate(new Pose2d(50, aprilTagY, Math.toRadians(12)))),
 
                         new WaitCommand(500), // Wait 0.5s
                         new ArmCommand(
@@ -174,7 +175,10 @@ public class AutoRedBackstagePark extends CommandOpMode {
                                 () -> Constants.STOW_POS_REST,
                                 telemetry
                         ),
-                        new TrajectoryRunner(driveTrain, traj3),
+                        new ParallelRaceGroup(
+                                new TrajectoryRunner(driveTrain, traj3),
+                                new WaitCommand(6000)
+                        ),
                         new InstantCommand(() -> shoulder.stopVelocity()),
                         new InstantCommand(() -> driveTrain.setWeightedDrivePower(new Pose2d())),
 
@@ -184,6 +188,7 @@ public class AutoRedBackstagePark extends CommandOpMode {
                                 new InstantCommand(() -> PoseStorage.hasAutoRun = true),
                                 new InstantCommand(() -> PoseStorage.pattern = RevBlinkinLedDriver.BlinkinPattern.CP2_SHOT),
                                 new InstantCommand(() -> telemetry.addData("PoseStorage saved", PoseStorage.hasAutoRun)),
+                                new InstantCommand(() -> telemetry.addData("Pose", PoseStorage.currentPose)),
                                 new InstantCommand(() -> telemetry.update())
                         )
                 )
