@@ -110,7 +110,7 @@ public class AutoRedBackstagePark extends CommandOpMode {
                 // Middle
                 turnAmount = -15.0;
                 fwd = 26;
-                aprilTagY = -29.0;
+                aprilTagY = -28.5;
             }
             else {
                 // Right
