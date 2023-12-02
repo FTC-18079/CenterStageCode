@@ -2,6 +2,9 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
+import com.arcrobotics.ftclib.command.CommandScheduler;
+import com.arcrobotics.ftclib.command.InstantCommand;
+import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.button.Button;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
@@ -81,10 +84,10 @@ public class Tele extends CommandOpMode {
         rb = new MotorEx(hardwareMap, "rightBack");
         drive = new MecanumDrive(hardwareMap, telemetry, true);
 
-        led = hardwareMap.get(RevBlinkinLedDriver.class, "led");
+        drive.setPoseEstimate(PoseStorage.currentPose.plus(new Pose2d(0, 0, Math.toRadians(-90))));
+        drive.update();
 
-        if (PoseStorage.hasAutoRun) drive.setPoseEstimate(PoseStorage.currentPose.plus(new Pose2d(0, 0, Math.toRadians(180))));
-        else drive.setPoseEstimate(new Pose2d());
+        led = hardwareMap.get(RevBlinkinLedDriver.class, "led");
 
         shooter = new ShooterSubsystem(hardwareMap, "shooter", "shooterServo");
 
@@ -179,7 +182,6 @@ public class Tele extends CommandOpMode {
         drive.setDefaultCommand(driveCommand);
         lift.setDefaultCommand(liftCommand);
         shoulder.setDefaultCommand(shoulderCommand);
-
         led.setPattern(PoseStorage.pattern);
     }
 }
