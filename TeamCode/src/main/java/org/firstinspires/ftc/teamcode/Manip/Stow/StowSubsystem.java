@@ -35,7 +35,7 @@ public class StowSubsystem extends SubsystemBase {
 
     public void down() {
 //        pos = Constants.STOW_POS_REST;
-        stow.setPosition(0.035);
+        stow.setPosition(0.01);
     }
 
     public double getPos() {
