@@ -15,9 +15,9 @@ public class ShooterSubsystem extends SubsystemBase {
         shooter.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
-    public void drive() {
-        shooter.setPower(0.74);
-    }//0.635
+    public void drive(double power) {
+        shooter.setPower(power);
+    }//0.74
 
     public void stop() {
         shooter.setPower(0);
