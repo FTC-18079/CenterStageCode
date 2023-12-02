@@ -2,9 +2,6 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
-import com.arcrobotics.ftclib.command.CommandScheduler;
-import com.arcrobotics.ftclib.command.InstantCommand;
-import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.button.Button;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
@@ -73,7 +70,7 @@ public class Tele extends CommandOpMode {
     private RevBlinkinLedDriver led;
 
     private Button headingResetButton, liftResetButton, shoulderResetButton, armClimbButton, armMidButton, armLowButton, armRestButton,
-            clawOneButton, clawTwoButton, stowButton, shooterCommandButton, shooterButton, liftStopButton, fireShooterButton;
+            clawOneButton, clawTwoButton, stowButton, redShooterButton, blueShooterButton, liftStopButton;
     private GamepadEx driverOp, manipOp;
 
     @Override
@@ -125,7 +122,6 @@ public class Tele extends CommandOpMode {
         );
         shoulderReset = new ResetEncoder(shoulder);
 
-        fireShooter = new FireShooter(shooter);
         stopShooter = new StopShooter(shooter);
         fireServo = new ShooterServoCommand(shooter,0);
 
@@ -137,8 +133,6 @@ public class Tele extends CommandOpMode {
 
         headingResetButton = (new GamepadButton(driverOp, GamepadKeys.Button.Y))
                 .whenReleased(resetHeading);
-        fireShooterButton = (new GamepadButton(driverOp, GamepadKeys.Button.DPAD_DOWN))
-                .whenPressed(fireServo, true);
 
         clawOneButton = (new GamepadButton(manipOp, GamepadKeys.Button.LEFT_BUMPER))
                 .whenPressed(moveClawOne, true);
@@ -149,11 +143,11 @@ public class Tele extends CommandOpMode {
         stowButton = (new GamepadButton(manipOp, GamepadKeys.Button.B))
                 .whenPressed(stowUp, true)
                 .whenReleased(stowDown, true);
-        shooterButton = (new GamepadButton(driverOp, GamepadKeys.Button.B))
-                .whenPressed(fireShooter, true)
-                .whenReleased(stopShooter, true);
-        shooterCommandButton = (new GamepadButton(driverOp, GamepadKeys.Button.X)).
-                whenReleased(new ShooterCommand(shooter, telemetry), true);
+
+        redShooterButton = (new GamepadButton(driverOp, GamepadKeys.Button.B))
+                .whenReleased(new ShooterCommand(shooter, () -> 0.74, telemetry), true);
+        blueShooterButton = (new GamepadButton(driverOp, GamepadKeys.Button.X))
+                .whenReleased(new ShooterCommand(shooter, () -> 0.85, telemetry), true);
 
         liftStopButton = (new GamepadButton(manipOp, GamepadKeys.Button.Y))
                 .whenPressed(stopLift, true);
