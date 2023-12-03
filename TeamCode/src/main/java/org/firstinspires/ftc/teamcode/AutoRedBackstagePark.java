@@ -32,7 +32,7 @@ import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 
 import java.util.List;
-//TODO: Yellow Pixel Backdrop placement based on Vision
+
 @Autonomous(name = "Red Backstage - Park", group = "Red Autos")
 public class AutoRedBackstagePark extends CommandOpMode {
     private static final boolean USE_WEBCAM = true;
@@ -165,7 +165,7 @@ public class AutoRedBackstagePark extends CommandOpMode {
                         // TODO: SUPER SKETCHY, this would be replaced for updating estimate by using apriltags
 //                        new InstantCommand(() -> driveTrain.setPoseEstimate(new Pose2d(50, aprilTagY, Math.toRadians(12)))),
 
-                        new WaitCommand(500), // Wait 0.5s
+                        new WaitCommand(600), // Wait 0.6s
                         new ArmCommand(
                                 shoulder,
                                 lift,
