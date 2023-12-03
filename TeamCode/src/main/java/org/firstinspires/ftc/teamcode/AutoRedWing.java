@@ -4,7 +4,6 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.InstantCommand;
-import com.arcrobotics.ftclib.command.ParallelRaceGroup;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
@@ -14,7 +13,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
-import org.firstinspires.ftc.teamcode.Arm.ArmCommand;
 import org.firstinspires.ftc.teamcode.Arm.Lift.LiftSubsystem;
 import org.firstinspires.ftc.teamcode.Arm.Shoulder.ShoulderSubsystem;
 import org.firstinspires.ftc.teamcode.Manip.Claw.ClawSubsystem;
@@ -33,12 +31,12 @@ import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 
 import java.util.List;
 
-@Autonomous(name = "Blue Backstage - Park", group = "Blue Autos")
-public class AutoBlueBackstagePark extends CommandOpMode {
+@Autonomous(name = "Red Wing Side", group = "Red Autos")
+public class AutoRedWing extends CommandOpMode {
     private static final boolean USE_WEBCAM = true;
-    private static final String TFOD_MODEL_ASSET = "blueObject_v1.tflite";
+    private static final String TFOD_MODEL_ASSET = "redObject_v1.tflite";
     private static final String[] LABELS = {
-            "blueObject"
+            "redObject"
     };
 
     private TfodProcessor tfod;
@@ -77,7 +75,7 @@ public class AutoBlueBackstagePark extends CommandOpMode {
         moveClawTwo = new MoveClawTwo(claw);
 
         initTfod();
-        tfod.setZoom(1.15);
+        tfod.setZoom(1.1);
         tfod.setClippingMargins(0, 100, 125, 0);
 
         claw.clawOneToPos(0);
@@ -86,12 +84,12 @@ public class AutoBlueBackstagePark extends CommandOpMode {
         stow.stow();
 
         SampleMecanumDrive driveTrain = new SampleMecanumDrive(hardwareMap, telemetry);
-        Pose2d startPose = new Pose2d(12, 63.339, Math.toRadians(-90));
+        Pose2d startPose = new Pose2d(-35, -63.339, Math.toRadians(90));
 
         driveTrain.setPoseEstimate(startPose);
         driveTrain.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        led.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP1_SHOT);
+        led.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP2_SHOT);
 
         waitForStart();
         if (isStopRequested()) return;
@@ -102,91 +100,48 @@ public class AutoBlueBackstagePark extends CommandOpMode {
             elementPos = recognition.getRight() + recognition.getLeft() / 2;
             if (elementPos < 275) {
                 // Left
-                turnAmount = 60.0;
+                turnAmount = 62.0;
                 fwd = 20;
-                aprilTagY = 44.0;
+                aprilTagY = -20.5;
             }
             else if (elementPos >= 275) {
                 // Middle
-                turnAmount = 15.0;
+                turnAmount = -15.0;
                 fwd = 26;
-                aprilTagY = 38.5;
+                aprilTagY = -28.5;
             }
             else {
                 // Right
-                turnAmount = -60.0;
+                turnAmount = -45.0;
                 fwd = 20;
-                aprilTagY = 30.0;
+                aprilTagY = -38.0;
             }
         } else {
             // Right
-            turnAmount = -60.0;
+            turnAmount = -45.0;
             fwd = 20;
-            aprilTagY = 30.0;
+            aprilTagY = -38.0;
         }
 
         TrajectorySequence traj1 = driveTrain.trajectorySequenceBuilder(startPose)
                 .forward(fwd)
                 .build();
 
-        TrajectorySequence traj2 = driveTrain.trajectorySequenceBuilder(traj1.end())
-                .back(fwd - 13)
-                .splineToSplineHeading(new Pose2d(50, aprilTagY, Math.toRadians(0)), Math.toRadians(-20))
-                .build();
-
-        TrajectorySequence traj3 = driveTrain.trajectorySequenceBuilder(traj2.end())
-                .lineToLinearHeading(new Pose2d(45, 58, Math.toRadians(0)))
-                .forward(9)
-                .build();
-
         CommandScheduler.getInstance().schedule(
                 new SequentialCommandGroup(
-                        new TrajectoryRunner(driveTrain, traj1), //Follow trajectory 1
-                        new TurnCommand(driveTrain, Math.toRadians(turnAmount)), //Turn to face game element's spike mark
-                        new InstantCommand(stowDown), //Bring down stow
-                        new WaitCommand(500), //Wait .5s
-                        new InstantCommand(moveClawOne), //Open claw to score spike mark
-                        new WaitCommand(500), //Wait .5s
-                        new InstantCommand(stowUp), //Bring stow up
-                        new WaitCommand(500), //Wait .5s
+                        new TrajectoryRunner(driveTrain, traj1), // Follow trajectory 1 to spike mark
+                        new TurnCommand(driveTrain, Math.toRadians(turnAmount)), // Turn to face game element's spike mark
+                        new InstantCommand(stowDown), // Bring down stow
+                        new WaitCommand(500), // Wait .5s
+                        new InstantCommand(moveClawOne), // Open claw to score spike mark
+                        new WaitCommand(500), // Wait .5s
+                        new InstantCommand(stowUp), // Bring stow up
+                        new WaitCommand(500), // Wait .5s
                         new TurnCommand(driveTrain, Math.toRadians(turnAmount * -1)),
-                        new ArmCommand(
-                                shoulder,
-                                lift,
-                                stow,
-                                () -> Constants.SHOULDER_POS_LOW,
-                                () -> Constants.LIFT_POS_LOW,
-                                () -> Constants.STOW_POS_LOW,
-                                telemetry
-                        ),
-                        new TrajectoryRunner(driveTrain, traj2), // Drive to backboard while brining arm up to score
-                        new InstantCommand(moveClawTwo), //Open claw to score on backboard
-
-                        // TODO: SUPER SKETCHY, this would be replaced for updating estimate by using apriltags
-//                        new InstantCommand(() -> driveTrain.setPoseEstimate(new Pose2d(50, aprilTagY, Math.toRadians(-12)))),
-
-                        new WaitCommand(600), // Wait .6s
-                        new ArmCommand(
-                                shoulder,
-                                lift,
-                                stow,
-                                () -> Constants.SHOULDER_POS_REST,
-                                () -> Constants.LIFT_POS_REST,
-                                () -> Constants.STOW_POS_REST,
-                                telemetry
-                        ),
-                        new ParallelRaceGroup(
-                                new TrajectoryRunner(driveTrain, traj3),
-                                new WaitCommand(6000)
-                        ),
-                        new InstantCommand(() -> shoulder.stopVelocity()),
-                        new InstantCommand(() -> driveTrain.setWeightedDrivePower(new Pose2d())),
-
-                        // Update pose storage and telemetry
                         new SequentialCommandGroup(
                                 new InstantCommand(() -> PoseStorage.currentPose = driveTrain.getPoseEstimate()),
                                 new InstantCommand(() -> PoseStorage.hasAutoRun = true),
-                                new InstantCommand(() -> PoseStorage.pattern = RevBlinkinLedDriver.BlinkinPattern.CP1_SHOT),
+                                new InstantCommand(() -> PoseStorage.pattern = RevBlinkinLedDriver.BlinkinPattern.CP2_SHOT),
                                 new InstantCommand(() -> telemetry.addData("PoseStorage saved", PoseStorage.hasAutoRun)),
                                 new InstantCommand(() -> telemetry.addData("Pose", PoseStorage.currentPose)),
                                 new InstantCommand(() -> telemetry.update())

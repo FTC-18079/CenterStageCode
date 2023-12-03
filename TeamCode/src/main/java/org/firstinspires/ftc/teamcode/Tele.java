@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
+import static com.qualcomm.hardware.rev.RevBlinkinLedDriver.BlinkinPattern.CP1_SHOT;
+import static com.qualcomm.hardware.rev.RevBlinkinLedDriver.BlinkinPattern.CP2_SHOT;
+
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.button.Button;
@@ -81,7 +84,12 @@ public class Tele extends CommandOpMode {
         rb = new MotorEx(hardwareMap, "rightBack");
         drive = new MecanumDrive(hardwareMap, telemetry, true);
 
-        drive.setPoseEstimate(PoseStorage.currentPose.plus(new Pose2d(0, 0, Math.toRadians(-90))));
+        // Get pose estimate from auto
+        double autoAngle = -90.0;
+        if (PoseStorage.pattern == CP1_SHOT) {
+            autoAngle = 90.0;
+        }
+        drive.setPoseEstimate(PoseStorage.currentPose.plus(new Pose2d(0, 0, Math.toRadians(autoAngle))));
         drive.update();
 
         led = hardwareMap.get(RevBlinkinLedDriver.class, "led");
@@ -147,7 +155,7 @@ public class Tele extends CommandOpMode {
         redShooterButton = (new GamepadButton(driverOp, GamepadKeys.Button.B))
                 .whenReleased(new ShooterCommand(shooter, () -> 0.74, telemetry), true);
         blueShooterButton = (new GamepadButton(driverOp, GamepadKeys.Button.X))
-                .whenReleased(new ShooterCommand(shooter, () -> 0.85, telemetry), true);
+                .whenReleased(new ShooterCommand(shooter, () -> 0.775, telemetry), true);
 
         liftStopButton = (new GamepadButton(manipOp, GamepadKeys.Button.Y))
                 .whenPressed(stopLift, true);
