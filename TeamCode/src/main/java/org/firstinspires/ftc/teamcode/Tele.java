@@ -155,7 +155,7 @@ public class Tele extends CommandOpMode {
         redShooterButton = (new GamepadButton(driverOp, GamepadKeys.Button.B))
                 .whenReleased(new ShooterCommand(shooter, () -> 0.74, telemetry), true);
         blueShooterButton = (new GamepadButton(driverOp, GamepadKeys.Button.X))
-                .whenReleased(new ShooterCommand(shooter, () -> 0.775, telemetry), true);
+                .whenReleased(new ShooterCommand(shooter, () -> 0.50, telemetry), true);
 
         liftStopButton = (new GamepadButton(manipOp, GamepadKeys.Button.Y))
                 .whenPressed(stopLift, true);

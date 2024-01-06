@@ -28,4 +28,9 @@ public class TrajectoryRunner extends CommandBase implements Runnable {
     public void run() {
         initialize();
     }
+
+    @Override
+    public void execute() {
+        drive.update();
+    }
 }
