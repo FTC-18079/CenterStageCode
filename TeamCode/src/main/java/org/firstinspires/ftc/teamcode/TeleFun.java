@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.button.Button;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
@@ -34,6 +35,9 @@ public class TeleFun extends CommandOpMode {
         rb = new MotorEx(hardwareMap, "rightBack");
         drive = new MecanumDrive(hardwareMap, telemetry, true);
 
+        drive.setPoseEstimate(new Pose2d(0, 0, Math.toRadians(90)));
+        drive.update();
+
         driverOp = new GamepadEx(gamepad1);
 
         driveCommand = new MecanumDriveCommand(
@@ -49,10 +53,10 @@ public class TeleFun extends CommandOpMode {
                 .whenReleased(resetHeading);
         funButton = (new GamepadButton(driverOp, GamepadKeys.Button.LEFT_BUMPER))
                 .whileHeld(new DriveToCollect(
-                        drive,
-                        () -> -driverOp.getLeftY(),
-                        () -> driverOp.getLeftX(),
-                        () -> Math.toRadians(45)
+                        drive, 5, 5, Math.toRadians(45)
+//                        () -> -driverOp.getLeftY(),
+//                        () -> driverOp.getLeftX(),
+//
                 ));
 
         lf.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
