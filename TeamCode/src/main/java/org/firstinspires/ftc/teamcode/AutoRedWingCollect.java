@@ -27,6 +27,7 @@ import org.firstinspires.ftc.teamcode.Manip.Stow.StowSubsystem;
 import org.firstinspires.ftc.teamcode.RRCommands.TrajectoryRunner;
 import org.firstinspires.ftc.teamcode.RRCommands.TurnCommand;
 import org.firstinspires.ftc.teamcode.Roadrunner.PoseStorage;
+import org.firstinspires.ftc.teamcode.Roadrunner.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.Roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.Roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -109,8 +110,8 @@ public class AutoRedWingCollect extends CommandOpMode {
             }
             else if (elementPos >= 275) {
                 // Middle
-                turnAmount = 180;
-                fwd = 50;
+                turnAmount = -15;
+                fwd = 26;
                 aprilTagY = -28.5;
             }
             else {
@@ -131,9 +132,13 @@ public class AutoRedWingCollect extends CommandOpMode {
                 .build();
 
         TrajectorySequence traj2 = driveTrain.trajectorySequenceBuilder(traj1.end())
-                .back(fwd - 11)
-//                .splineToSplineHeading(new Pose2d(-56, -40, Math.toRadians(180)), Math.toRadians(90))
-                .lineToLinearHeading(new Pose2d(-56, -10, Math.toRadians(180)))
+                .lineToLinearHeading(
+                        new Pose2d(-35, -55, Math.toRadians(180)),
+                        SampleMecanumDrive.getVelocityConstraint(DriveConstants.MAX_VEL, 180, DriveConstants.TRACK_WIDTH),
+                        SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL)
+                )
+                .splineToConstantHeading(new Vector2d(-56, -46), Math.toRadians(150))
+                .lineToLinearHeading(new Pose2d(-55, -9, Math.toRadians(180)))
                 .build();
 
         TrajectorySequence traj3 = driveTrain.trajectorySequenceBuilder(traj2.end())
@@ -151,9 +156,11 @@ public class AutoRedWingCollect extends CommandOpMode {
                         new WaitCommand(500), // Wait .5s
                         new InstantCommand(stowUp), // Bring stow up
                         new WaitCommand(500), // Wait .5s
-                        new TurnCommand(driveTrain, Math.toRadians(-turnAmount)),
+                        new TurnCommand(driveTrain, Math.toRadians(-turnAmount)), // Turn back to original orientation
+                        new TrajectoryRunner(driveTrain, traj2), // Follow traj2 to pixel stack
+                        new WaitCommand(500),
+                        new InstantCommand(stowDown), // Drop stow to collect
 
-                        new TrajectoryRunner(driveTrain, traj2),
                         /* new ArmCommand(
                                 shoulder,
                                 lift,
