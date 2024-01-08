@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Chassis;
 
+import com.acmerobotics.roadrunner.control.PIDFController;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.localization.Localizer;
@@ -21,6 +22,7 @@ public class MecanumDrive extends SubsystemBase {
     private final SampleMecanumDrive drive;
     Telemetry m_telemetry;
     private final boolean fieldCentric;
+    public PIDFController headingController = new PIDFController(SampleMecanumDrive.HEADING_PID);
 
     public MecanumDrive(HardwareMap hardwareMap, Telemetry telemetry, boolean isFieldCentric) {
         this.drive = new SampleMecanumDrive(hardwareMap, telemetry);
@@ -69,19 +71,32 @@ public class MecanumDrive extends SubsystemBase {
         m_telemetry.addData("Brake", brakePower);
     }
 
-    public void collect(double targetX, double targetY, double targetAngle) {
-        double x = getPoseEstimate().getX();
-        double y = getPoseEstimate().getY();
-        double heading = getPoseEstimate().getHeading();
+    public void collect(double leftY, double leftX, Vector2d targetPos) {
+        Pose2d poseEstimate = getPoseEstimate();
+        m_telemetry.addData("TARGETING", "true");
+        m_telemetry.addData("X", targetPos.getX());
+        m_telemetry.addData("Y", targetPos.getY());
 
-        m_telemetry.addData("X", x);
-        m_telemetry.addData("Target", targetX);
-        m_telemetry.addData("POW", 0.1 * (targetX - x));
-        double drive = Range.clip(0.1 * (targetX - x), -0.5, 0.5);
-        double turn = Range.clip(0.02 * (targetAngle - heading), -0.5, 0.5);
-        double strafe = Range.clip(0.02 * (targetX - x), -0.5, 0.5);
+        Vector2d input = new Vector2d(
+                -leftY,
+                -leftX
+        );
+        Vector2d robotFrameInput = input.rotated(-poseEstimate.getHeading());
 
-        drive(drive, 0, 0, 0);
+        Vector2d difference = targetPos.minus(poseEstimate.vec());
+        double theta = difference.angle();
+        double thetaFF = -input.rotated(-Math.PI / 2).dot(difference) / (difference.norm() * difference.norm());
+
+        headingController.setTargetPosition(theta);
+
+        double headingInput = (headingController.update(poseEstimate.getHeading())
+                * DriveConstants.kV + thetaFF)
+                * DriveConstants.TRACK_WIDTH;
+
+        Pose2d driveDirection = new Pose2d(robotFrameInput, headingInput);
+
+        drive.setWeightedDrivePower(driveDirection);
+        headingController.update(poseEstimate.getHeading());
     }
 
     public void resetHeading() {
