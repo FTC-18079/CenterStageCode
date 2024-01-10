@@ -14,6 +14,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.Chassis.DriveToCollect;
 import org.firstinspires.ftc.teamcode.Chassis.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Chassis.MecanumDriveCommand;
+import org.firstinspires.ftc.teamcode.Chassis.NewDriveCommand;
 import org.firstinspires.ftc.teamcode.Chassis.ResetHeading;
 
 @TeleOp(name = "FUNZIES", group = "TEST")
@@ -21,7 +22,7 @@ public class TeleFun extends CommandOpMode {
     //Chassis
     private MotorEx lf, rf, lb, rb;
     private MecanumDrive drive;
-    private MecanumDriveCommand driveCommand;
+    private NewDriveCommand driveCommand;
     private ResetHeading resetHeading;
     private DriveToCollect driveToCollect;
 
@@ -42,24 +43,19 @@ public class TeleFun extends CommandOpMode {
 
         driverOp = new GamepadEx(gamepad1);
 
-        driveCommand = new MecanumDriveCommand(
+        driveCommand = new NewDriveCommand(
                 drive,
                 () -> -driverOp.getLeftY(),
                 () -> driverOp.getLeftX(),
                 () -> driverOp.getRightX(),
-                () -> driverOp.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER)
+                () -> driverOp.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER),
+                targetPos,
+                () -> driverOp.getButton(GamepadKeys.Button.LEFT_BUMPER)
         );
         resetHeading = new ResetHeading(drive);
 
         headingResetButton = (new GamepadButton(driverOp, GamepadKeys.Button.Y))
                 .whenReleased(resetHeading);
-        funButton = (new GamepadButton(driverOp, GamepadKeys.Button.LEFT_BUMPER))
-                .whileHeld(new DriveToCollect(
-                        drive,
-                        () -> -driverOp.getLeftY(),
-                        () -> driverOp.getLeftX(),
-                        targetPos
-                ));
 
         lf.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         rf.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
