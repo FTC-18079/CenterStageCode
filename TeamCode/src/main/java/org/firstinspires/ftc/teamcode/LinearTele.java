@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
-//@Disabled
+@Disabled
 @TeleOp(name = "Test OpMode", group = "Tests")
 public class LinearTele extends LinearOpMode {
     private DcMotorEx lift, testMotor, shoulder;

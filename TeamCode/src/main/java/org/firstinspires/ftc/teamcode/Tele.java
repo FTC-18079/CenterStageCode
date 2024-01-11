@@ -1,9 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
 import static com.qualcomm.hardware.rev.RevBlinkinLedDriver.BlinkinPattern.CP1_SHOT;
-import static com.qualcomm.hardware.rev.RevBlinkinLedDriver.BlinkinPattern.CP2_SHOT;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.button.Button;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
@@ -15,14 +15,15 @@ import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Arm.ArmCommand;
+import org.firstinspires.ftc.teamcode.Arm.ArmConstants;
 import org.firstinspires.ftc.teamcode.Arm.Lift.StopLift;
 import org.firstinspires.ftc.teamcode.Chassis.MecanumDrive;
-import org.firstinspires.ftc.teamcode.Chassis.MecanumDriveCommand;
 import org.firstinspires.ftc.teamcode.Arm.Lift.LiftCommand;
 import org.firstinspires.ftc.teamcode.Arm.Lift.LiftSubsystem;
 import org.firstinspires.ftc.teamcode.Arm.Shoulder.ResetEncoder;
 import org.firstinspires.ftc.teamcode.Arm.Shoulder.ShoulderCommand;
 import org.firstinspires.ftc.teamcode.Arm.Shoulder.ShoulderSubsystem;
+import org.firstinspires.ftc.teamcode.Chassis.TeleOpDriveCommand;
 import org.firstinspires.ftc.teamcode.Chassis.ResetHeading;
 import org.firstinspires.ftc.teamcode.Manip.Claw.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.Manip.Claw.CloseClawTwo;
@@ -44,7 +45,7 @@ public class Tele extends CommandOpMode {
     //Chassis
     private MotorEx lf, rf, lb, rb;
     private MecanumDrive drive;
-    private MecanumDriveCommand driveCommand;
+    private TeleOpDriveCommand driveCommand;
     private ResetHeading resetHeading;
     //Claw
     private ClawSubsystem claw;
@@ -74,6 +75,8 @@ public class Tele extends CommandOpMode {
 
     private Button headingResetButton, liftResetButton, shoulderResetButton, armClimbButton, armMidButton, armLowButton, armRestButton,
             clawOneButton, clawTwoButton, stowButton, redShooterButton, blueShooterButton, liftStopButton;
+
+    private Vector2d collectPose = new Vector2d();
     private GamepadEx driverOp, manipOp;
 
     @Override
@@ -85,11 +88,10 @@ public class Tele extends CommandOpMode {
         drive = new MecanumDrive(hardwareMap, telemetry, true);
 
         // Get pose estimate from auto
-        double autoAngle = -90.0;
         if (PoseStorage.pattern == CP1_SHOT) {
-            autoAngle = 90.0;
-        }
-        drive.setPoseEstimate(PoseStorage.currentPose.plus(new Pose2d(0, 0, Math.toRadians(autoAngle))));
+            collectPose = new Vector2d(-61, -61);
+        } else collectPose = new Vector2d(-61, -8); // TODO: Change y to 61
+        drive.setPoseEstimate(PoseStorage.currentPose);
         drive.update();
 
         led = hardwareMap.get(RevBlinkinLedDriver.class, "led");
@@ -107,12 +109,15 @@ public class Tele extends CommandOpMode {
         driverOp = new GamepadEx(gamepad1);
         manipOp = new GamepadEx(gamepad2);
 
-        driveCommand = new MecanumDriveCommand(
+        driveCommand = new TeleOpDriveCommand(
                 drive,
                 () -> -driverOp.getLeftY(),
                 () -> driverOp.getLeftX(),
                 () -> driverOp.getRightX(),
-                () -> driverOp.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER)
+                () -> driverOp.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER),
+                collectPose,
+                () -> driverOp.getButton(GamepadKeys.Button.LEFT_BUMPER),
+                () -> driverOp.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER)
         );
         resetHeading = new ResetHeading(drive);
 
@@ -140,7 +145,7 @@ public class Tele extends CommandOpMode {
         stowDown = new Down(stow);
 
         headingResetButton = (new GamepadButton(driverOp, GamepadKeys.Button.Y))
-                .whenReleased(resetHeading);
+                .whenPressed(resetHeading);
 
         clawOneButton = (new GamepadButton(manipOp, GamepadKeys.Button.LEFT_BUMPER))
                 .whenPressed(moveClawOne, true);
@@ -161,17 +166,17 @@ public class Tele extends CommandOpMode {
                 .whenPressed(stopLift, true);
         armClimbButton = (new GamepadButton(manipOp, GamepadKeys.Button.DPAD_LEFT))
                 .whenReleased(new ArmCommand(shoulder, lift, stow,
-                        () -> Constants.SHOULDER_POS_CLIMB, () -> Constants.LIFT_POS_CLIMB, () -> Constants.STOW_POS_CLIMB, telemetry), true);
+                        () -> ArmConstants.SHOULDER_POS_CLIMB, () -> ArmConstants.LIFT_POS_CLIMB, () -> ArmConstants.STOW_POS_CLIMB, telemetry), true);
         armLowButton = (new GamepadButton(manipOp, GamepadKeys.Button.DPAD_RIGHT))
                 .whenReleased(new ArmCommand(shoulder, lift, stow,
-                        () -> Constants.SHOULDER_POS_LOW, () -> Constants.LIFT_POS_LOW, () -> Constants.STOW_POS_LOW, telemetry), true);
+                        () -> ArmConstants.SHOULDER_POS_LOW, () -> ArmConstants.LIFT_POS_LOW, () -> ArmConstants.STOW_POS_LOW, telemetry), true);
         armMidButton = (new GamepadButton(manipOp, GamepadKeys.Button.DPAD_UP))
                 .whenReleased(new ArmCommand(shoulder, lift, stow,
-                        () -> Constants.SHOULDER_POS_MID, () -> Constants.LIFT_POS_MID, () -> Constants.STOW_POS_MID, telemetry), true);
+                        () -> ArmConstants.SHOULDER_POS_MID, () -> ArmConstants.LIFT_POS_MID, () -> ArmConstants.STOW_POS_MID, telemetry), true);
         armRestButton = (new GamepadButton(manipOp, GamepadKeys.Button.DPAD_DOWN))
                 .whenPressed(closeClawTwo, true)
                 .whenReleased(new ArmCommand(shoulder, lift, stow,
-                        () -> Constants.SHOULDER_POS_REST, () -> Constants.LIFT_POS_REST, () -> Constants.STOW_POS_REST, telemetry), true);
+                        () -> ArmConstants.SHOULDER_POS_REST, () -> ArmConstants.LIFT_POS_REST, () -> ArmConstants.STOW_POS_REST, telemetry), true);
 
         lf.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         rf.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);

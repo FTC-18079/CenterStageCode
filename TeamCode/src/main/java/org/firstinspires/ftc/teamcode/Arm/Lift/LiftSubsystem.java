@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.Constants;
+import org.firstinspires.ftc.teamcode.Arm.ArmConstants;
 
 public class LiftSubsystem extends SubsystemBase {
     private final DcMotorEx lift;
@@ -36,11 +36,11 @@ public class LiftSubsystem extends SubsystemBase {
             lift.setPower(input);
         } else {
             if (input < 0) {
-                if (getEncoderValue() <= Constants.LIFT_LIMIT_TOP) {
+                if (getEncoderValue() <= ArmConstants.LIFT_LIMIT_TOP) {
                     lift.setPower(0);
                 } else lift.setPower(input);
             } else if (input >= 0) {
-                if (getEncoderValue() >= Constants.LIFT_LIMIT_BOTTOM || getTouch()){
+                if (getEncoderValue() >= ArmConstants.LIFT_LIMIT_BOTTOM || getTouch()){
                     lift.setPower(0);
                 } else lift.setPower(input);
             }

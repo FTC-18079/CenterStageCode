@@ -15,6 +15,7 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDir
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.teamcode.Arm.ArmCommand;
+import org.firstinspires.ftc.teamcode.Arm.ArmConstants;
 import org.firstinspires.ftc.teamcode.Arm.Lift.LiftSubsystem;
 import org.firstinspires.ftc.teamcode.Arm.Shoulder.ShoulderSubsystem;
 import org.firstinspires.ftc.teamcode.Manip.Claw.ClawSubsystem;
@@ -93,6 +94,10 @@ public class AutoBlueBackstagePark extends CommandOpMode {
 
         led.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP1_SHOT);
 
+        PoseStorage.pattern = RevBlinkinLedDriver.BlinkinPattern.CP1_SHOT;
+        PoseStorage.currentPose = driveTrain.getPoseEstimate();
+        PoseStorage.hasAutoRun = false;
+
         waitForStart();
         if (isStopRequested()) return;
 
@@ -154,9 +159,9 @@ public class AutoBlueBackstagePark extends CommandOpMode {
                                 shoulder,
                                 lift,
                                 stow,
-                                () -> Constants.SHOULDER_POS_LOW,
-                                () -> Constants.LIFT_POS_LOW,
-                                () -> Constants.STOW_POS_LOW,
+                                () -> ArmConstants.SHOULDER_POS_LOW,
+                                () -> ArmConstants.LIFT_POS_LOW,
+                                () -> ArmConstants.STOW_POS_LOW,
                                 telemetry
                         ),
                         new TrajectoryRunner(driveTrain, traj2), // Drive to backboard while brining arm up to score
@@ -170,9 +175,9 @@ public class AutoBlueBackstagePark extends CommandOpMode {
                                 shoulder,
                                 lift,
                                 stow,
-                                () -> Constants.SHOULDER_POS_REST,
-                                () -> Constants.LIFT_POS_REST,
-                                () -> Constants.STOW_POS_REST,
+                                () -> ArmConstants.SHOULDER_POS_REST,
+                                () -> ArmConstants.LIFT_POS_REST,
+                                () -> ArmConstants.STOW_POS_REST,
                                 telemetry
                         ),
                         new ParallelRaceGroup(

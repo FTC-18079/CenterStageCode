@@ -91,6 +91,10 @@ public class AutoRedWing extends CommandOpMode {
 
         led.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP2_SHOT);
 
+        PoseStorage.pattern = RevBlinkinLedDriver.BlinkinPattern.CP2_SHOT;
+        PoseStorage.currentPose = driveTrain.getPoseEstimate();
+        PoseStorage.hasAutoRun = false;
+
         waitForStart();
         if (isStopRequested()) return;
 
