@@ -1,6 +1,6 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Arm;
 
-public class Constants {
+public class ArmConstants {
     public static final double ROBOT_WIDTH = 420.0; //mm
     public static final double ROBOT_LENGTH = 440.0; //mm
 

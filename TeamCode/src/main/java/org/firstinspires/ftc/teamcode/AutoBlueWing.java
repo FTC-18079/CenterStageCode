@@ -91,6 +91,10 @@ public class AutoBlueWing extends CommandOpMode {
 
         led.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP1_SHOT);
 
+        PoseStorage.pattern = RevBlinkinLedDriver.BlinkinPattern.CP1_SHOT;
+        PoseStorage.currentPose = driveTrain.getPoseEstimate();
+        PoseStorage.hasAutoRun = false;
+
         waitForStart();
         if (isStopRequested()) return;
 

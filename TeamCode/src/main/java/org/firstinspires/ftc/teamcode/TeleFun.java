@@ -11,10 +11,8 @@ import com.arcrobotics.ftclib.hardware.motors.Motor;
 import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.Chassis.DriveToCollect;
 import org.firstinspires.ftc.teamcode.Chassis.MecanumDrive;
-import org.firstinspires.ftc.teamcode.Chassis.MecanumDriveCommand;
-import org.firstinspires.ftc.teamcode.Chassis.NewDriveCommand;
+import org.firstinspires.ftc.teamcode.Chassis.TeleOpDriveCommand;
 import org.firstinspires.ftc.teamcode.Chassis.ResetHeading;
 
 @TeleOp(name = "FUNZIES", group = "TEST")
@@ -22,9 +20,8 @@ public class TeleFun extends CommandOpMode {
     //Chassis
     private MotorEx lf, rf, lb, rb;
     private MecanumDrive drive;
-    private NewDriveCommand driveCommand;
+    private TeleOpDriveCommand driveCommand;
     private ResetHeading resetHeading;
-    private DriveToCollect driveToCollect;
 
     private GamepadEx driverOp;
     private Button headingResetButton, funButton;
@@ -43,7 +40,7 @@ public class TeleFun extends CommandOpMode {
 
         driverOp = new GamepadEx(gamepad1);
 
-        driveCommand = new NewDriveCommand(
+        driveCommand = new TeleOpDriveCommand(
                 drive,
                 () -> -driverOp.getLeftY(),
                 () -> driverOp.getLeftX(),

@@ -6,14 +6,14 @@ import com.arcrobotics.ftclib.command.CommandBase;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
-public class NewDriveCommand extends CommandBase {
+public class TeleOpDriveCommand extends CommandBase {
     private final MecanumDrive drive;
 
     private final DoubleSupplier leftY, leftX, rightX, brakePower;
     private final BooleanSupplier collecting;
     private final Vector2d targetPos;
 
-    public NewDriveCommand(MecanumDrive drive, DoubleSupplier leftY, DoubleSupplier leftX, DoubleSupplier rightX, DoubleSupplier brakePower, Vector2d targetPos, BooleanSupplier collecting) {
+    public TeleOpDriveCommand(MecanumDrive drive, DoubleSupplier leftY, DoubleSupplier leftX, DoubleSupplier rightX, DoubleSupplier brakePower, Vector2d targetPos, BooleanSupplier collecting) {
         this.drive = drive;
         this.leftY = leftY;
         this.leftX = leftX;
@@ -34,5 +34,6 @@ public class NewDriveCommand extends CommandBase {
                 targetPos,
                 collecting.getAsBoolean()
         );
+        drive.update();
     }
 }
