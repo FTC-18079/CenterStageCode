@@ -11,9 +11,10 @@ public class TeleOpDriveCommand extends CommandBase {
 
     private final DoubleSupplier leftY, leftX, rightX, brakePower;
     private final BooleanSupplier collecting;
+    private final DoubleSupplier rightTrigger;
     private final Vector2d targetPos;
 
-    public TeleOpDriveCommand(MecanumDrive drive, DoubleSupplier leftY, DoubleSupplier leftX, DoubleSupplier rightX, DoubleSupplier brakePower, Vector2d targetPos, BooleanSupplier collecting) {
+    public TeleOpDriveCommand(MecanumDrive drive, DoubleSupplier leftY, DoubleSupplier leftX, DoubleSupplier rightX, DoubleSupplier brakePower, Vector2d targetPos, BooleanSupplier collecting, DoubleSupplier rightTrigger) {
         this.drive = drive;
         this.leftY = leftY;
         this.leftX = leftX;
@@ -21,6 +22,7 @@ public class TeleOpDriveCommand extends CommandBase {
         this.brakePower = brakePower;
         this.targetPos = targetPos;
         this.collecting = collecting;
+        this.rightTrigger = rightTrigger;
         addRequirements(drive);
     }
 
@@ -32,7 +34,8 @@ public class TeleOpDriveCommand extends CommandBase {
                 rightX.getAsDouble(),
                 brakePower.getAsDouble(),
                 targetPos,
-                collecting.getAsBoolean()
+                collecting.getAsBoolean(),
+                rightTrigger.getAsDouble()
         );
         drive.update();
     }

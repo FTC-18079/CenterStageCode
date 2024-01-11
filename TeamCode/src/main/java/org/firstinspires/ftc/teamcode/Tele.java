@@ -116,7 +116,8 @@ public class Tele extends CommandOpMode {
                 () -> driverOp.getRightX(),
                 () -> driverOp.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER),
                 collectPose,
-                () -> driverOp.getButton(GamepadKeys.Button.LEFT_BUMPER)
+                () -> driverOp.getButton(GamepadKeys.Button.LEFT_BUMPER),
+                () -> driverOp.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER)
         );
         resetHeading = new ResetHeading(drive);
 

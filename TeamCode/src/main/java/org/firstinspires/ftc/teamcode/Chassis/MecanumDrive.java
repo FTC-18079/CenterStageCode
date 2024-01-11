@@ -76,7 +76,9 @@ public class MecanumDrive extends SubsystemBase {
         m_telemetry.addData("Brake", brakePower);
     }
 
-    public void driveCollect(double leftY, double leftX, double rightX, double brakePower, Vector2d targetPos, boolean collecting) {
+    public void driveCollect(double leftY, double leftX, double rightX, double brakePower, Vector2d targetPos, boolean collecting, double fwd) {
+        double collectFwd = fwd * 0.60;
+        boolean isToCollect = fwd > 0.05;
         Pose2d poseEstimate = getPoseEstimate();
         Pose2d driveDirection;
         m_telemetry.addData("Collecting", collecting);
@@ -87,15 +89,24 @@ public class MecanumDrive extends SubsystemBase {
                 -leftX * brake
         );
 
-        if (!collecting) {
-            input = input.rotated(-poseEstimate.getHeading() + orientation);
-
-            driveDirection = new Pose2d(
-                    input.getX(),
-                    input.getY(),
-                    -rightX * brake
+        if (isToCollect && collecting) {
+            Vector2d direction = new Vector2d(
+                    collectFwd,
+                    0
             );
-        } else {
+
+            Vector2d difference = targetPos.minus(poseEstimate.vec());
+            double theta = difference.angle();
+            double thetaFF = -input.rotated(-Math.PI / 2).dot(difference) / (difference.norm() * difference.norm());
+
+            headingController.setTargetPosition(theta);
+
+            double headingInput = (headingController.update(poseEstimate.getHeading())
+                    * DriveConstants.kV + thetaFF)
+                    * DriveConstants.TRACK_WIDTH;
+
+            driveDirection = new Pose2d(direction, headingInput);
+        } else if (collecting) {
             Vector2d robotFrameInput = input.rotated(-poseEstimate.getHeading() + orientation);
 
             Vector2d difference = targetPos.minus(poseEstimate.vec());
@@ -109,6 +120,14 @@ public class MecanumDrive extends SubsystemBase {
                     * DriveConstants.TRACK_WIDTH;
 
             driveDirection = new Pose2d(robotFrameInput, headingInput);
+        } else {
+            input = input.rotated(-poseEstimate.getHeading() + orientation);
+
+            driveDirection = new Pose2d(
+                    input.getX(),
+                    input.getY(),
+                    -rightX * brake
+            );
         }
 
         drive.setWeightedDrivePower(driveDirection);
