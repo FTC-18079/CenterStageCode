@@ -8,12 +8,14 @@ import com.acmerobotics.roadrunner.localization.Localizer;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Roadrunner.PoseStorage;
 import org.firstinspires.ftc.teamcode.Roadrunner.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.Roadrunner.drive.SampleMecanumDrive;
 
@@ -24,11 +26,13 @@ public class MecanumDrive extends SubsystemBase {
     Telemetry m_telemetry;
     private final boolean fieldCentric;
     public PIDFController headingController = new PIDFController(new PIDCoefficients(4.0, 0.0, 0.3));
+    private final double orientation;
 
     public MecanumDrive(HardwareMap hardwareMap, Telemetry telemetry, boolean isFieldCentric) {
         this.drive = new SampleMecanumDrive(hardwareMap, telemetry);
         m_telemetry = telemetry;
         fieldCentric = isFieldCentric;
+        this.orientation = PoseStorage.pattern == RevBlinkinLedDriver.BlinkinPattern.CP1_SHOT ? Math.toRadians(-90) : Math.toRadians(+90);
     }
 
     public void setMode(DcMotor.RunMode mode) {
@@ -84,7 +88,7 @@ public class MecanumDrive extends SubsystemBase {
         );
 
         if (!collecting) {
-            input = input.rotated(fieldCentric ? -poseEstimate.getHeading() : 0);
+            input = input.rotated(-poseEstimate.getHeading() + orientation);
 
             driveDirection = new Pose2d(
                     input.getX(),
@@ -92,7 +96,7 @@ public class MecanumDrive extends SubsystemBase {
                     -rightX * brake
             );
         } else {
-            Vector2d robotFrameInput = input.rotated(-poseEstimate.getHeading());
+            Vector2d robotFrameInput = input.rotated(-poseEstimate.getHeading() + orientation);
 
             Vector2d difference = targetPos.minus(poseEstimate.vec());
             double theta = difference.angle();
@@ -116,7 +120,9 @@ public class MecanumDrive extends SubsystemBase {
         drive.setPoseEstimate(new Pose2d(
                 poseEstimate.getX(),
                 poseEstimate.getY(),
-                0));
+                orientation
+        ));
+
     }
 
     public void setDrivePower(Pose2d drivePower) {

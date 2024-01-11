@@ -88,12 +88,10 @@ public class Tele extends CommandOpMode {
         drive = new MecanumDrive(hardwareMap, telemetry, true);
 
         // Get pose estimate from auto
-        double autoAngle = -90.0;
         if (PoseStorage.pattern == CP1_SHOT) {
-            autoAngle = 90.0;
             collectPose = new Vector2d(-61, -61);
         } else collectPose = new Vector2d(-61, -8); // TODO: Change y to 61
-        drive.setPoseEstimate(PoseStorage.currentPose.plus(new Pose2d(0, 0, Math.toRadians(autoAngle))));
+        drive.setPoseEstimate(PoseStorage.currentPose);
         drive.update();
 
         led = hardwareMap.get(RevBlinkinLedDriver.class, "led");
@@ -146,7 +144,7 @@ public class Tele extends CommandOpMode {
         stowDown = new Down(stow);
 
         headingResetButton = (new GamepadButton(driverOp, GamepadKeys.Button.Y))
-                .whenReleased(resetHeading);
+                .whenPressed(resetHeading);
 
         clawOneButton = (new GamepadButton(manipOp, GamepadKeys.Button.LEFT_BUMPER))
                 .whenPressed(moveClawOne, true);
