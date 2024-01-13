@@ -189,7 +189,10 @@ public class AutoRedBackstagePark extends CommandOpMode {
 
                         // Update pose storage and telemetry
                         new SequentialCommandGroup(
-                                new InstantCommand(() -> PoseStorage.currentPose = driveTrain.getPoseEstimate()),
+                                new InstantCommand(() -> PoseStorage.currentPose = new Pose2d(
+                                        driveTrain.getPoseEstimate().vec(),
+                                        driveTrain.getPoseEstimate().getHeading() + Math.toRadians(6)
+                                )),
                                 new InstantCommand(() -> PoseStorage.hasAutoRun = true),
                                 new InstantCommand(() -> PoseStorage.pattern = RevBlinkinLedDriver.BlinkinPattern.CP2_SHOT),
                                 new InstantCommand(() -> telemetry.addData("PoseStorage saved", PoseStorage.hasAutoRun)),

@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode;
 
 import static com.qualcomm.hardware.rev.RevBlinkinLedDriver.BlinkinPattern.CP1_SHOT;
 
-import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.button.Button;
@@ -74,7 +73,7 @@ public class Tele extends CommandOpMode {
     private RevBlinkinLedDriver led;
 
     private Button headingResetButton, liftResetButton, shoulderResetButton, armClimbButton, armMidButton, armLowButton, armRestButton,
-            clawOneButton, clawTwoButton, stowButton, redShooterButton, blueShooterButton, liftStopButton;
+            clawOneButton, clawTwoButton, stowButton, shooterButton, blueShooterButton, liftStopButton;
 
     private Vector2d collectPose = new Vector2d();
     private GamepadEx driverOp, manipOp;
@@ -146,6 +145,8 @@ public class Tele extends CommandOpMode {
 
         headingResetButton = (new GamepadButton(driverOp, GamepadKeys.Button.Y))
                 .whenPressed(resetHeading);
+        shooterButton = (new GamepadButton(driverOp, GamepadKeys.Button.B))
+                .whenReleased(new ShooterCommand(shooter, () -> 0.74, telemetry),true);
 
         clawOneButton = (new GamepadButton(manipOp, GamepadKeys.Button.LEFT_BUMPER))
                 .whenPressed(moveClawOne, true);
@@ -156,11 +157,6 @@ public class Tele extends CommandOpMode {
         stowButton = (new GamepadButton(manipOp, GamepadKeys.Button.B))
                 .whenPressed(stowUp, true)
                 .whenReleased(stowDown, true);
-
-        redShooterButton = (new GamepadButton(driverOp, GamepadKeys.Button.B))
-                .whenReleased(new ShooterCommand(shooter, () -> 0.74, telemetry), true);
-        blueShooterButton = (new GamepadButton(driverOp, GamepadKeys.Button.X))
-                .whenReleased(new ShooterCommand(shooter, () -> 0.775, telemetry), true);
 
         liftStopButton = (new GamepadButton(manipOp, GamepadKeys.Button.Y))
                 .whenPressed(stopLift, true);
