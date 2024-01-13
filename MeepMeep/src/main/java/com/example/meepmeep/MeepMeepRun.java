@@ -34,11 +34,7 @@ public class MeepMeepRun {
                                 .build()
                 );
 
-        Image img = null;
-        try { img = ImageIO.read(new File("C:\\Users\\nicsi\\Documents\\centerstagefield.png")); }
-        catch (IOException e) {}
-
-        meepMeep.setBackground(img /*MeepMeep.Background.FIELD_POWERPLAY_OFFICIAL*/ )
+        meepMeep.setBackground(MeepMeep.Background.FIELD_CENTERSTAGE_JUICE_DARK)
                 .setDarkMode(true)
                 .setBackgroundAlpha(0.95f)
                 .addEntity(myBot)

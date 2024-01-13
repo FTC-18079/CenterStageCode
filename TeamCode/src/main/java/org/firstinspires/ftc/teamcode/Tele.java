@@ -89,8 +89,8 @@ public class Tele extends CommandOpMode {
 
         // Get pose estimate from auto
         if (PoseStorage.pattern == CP1_SHOT) {
-            collectPose = new Vector2d(-61, -61);
-        } else collectPose = new Vector2d(-61, -8); // TODO: Change y to 61
+            collectPose = new Vector2d(-55, -55); // Blue Alliance
+        } else collectPose = new Vector2d(-55, -12); // Red Alliance TODO: Change y to 55
         drive.setPoseEstimate(PoseStorage.currentPose);
         drive.update();
 
