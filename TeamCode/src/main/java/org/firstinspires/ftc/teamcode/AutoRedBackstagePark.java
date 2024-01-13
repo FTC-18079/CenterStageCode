@@ -115,17 +115,17 @@ public class AutoRedBackstagePark extends CommandOpMode {
                 // Middle
                 turnAmount = -15.0;
                 fwd = 26;
-                aprilTagY = -28.5;
+                aprilTagY = -28.75;
             }
             else {
                 // Right
-                turnAmount = -45.0;
+                turnAmount = -50.0;
                 fwd = 20;
                 aprilTagY = -38.0;
             }
         } else {
             // Right
-            turnAmount = -45.0;
+            turnAmount = -50.0;
             fwd = 20;
             aprilTagY = -38.0;
         }
@@ -136,7 +136,7 @@ public class AutoRedBackstagePark extends CommandOpMode {
 
         TrajectorySequence traj2 = driveTrain.trajectorySequenceBuilder(traj1.end())
                 .back(fwd - 13)
-                .splineToSplineHeading(new Pose2d(50, aprilTagY, Math.toRadians(0)), Math.toRadians(20))
+                .splineToSplineHeading(new Pose2d(50.2, aprilTagY, Math.toRadians(0)), Math.toRadians(20))
                 .build();
 
         TrajectorySequence traj3 = driveTrain.trajectorySequenceBuilder(traj2.end())
@@ -189,7 +189,10 @@ public class AutoRedBackstagePark extends CommandOpMode {
 
                         // Update pose storage and telemetry
                         new SequentialCommandGroup(
-                                new InstantCommand(() -> PoseStorage.currentPose = driveTrain.getPoseEstimate()),
+                                new InstantCommand(() -> PoseStorage.currentPose = new Pose2d(
+                                        driveTrain.getPoseEstimate().vec(),
+                                        driveTrain.getPoseEstimate().getHeading() + Math.toRadians(6)
+                                )),
                                 new InstantCommand(() -> PoseStorage.hasAutoRun = true),
                                 new InstantCommand(() -> PoseStorage.pattern = RevBlinkinLedDriver.BlinkinPattern.CP2_SHOT),
                                 new InstantCommand(() -> telemetry.addData("PoseStorage saved", PoseStorage.hasAutoRun)),
