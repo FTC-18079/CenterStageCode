@@ -112,17 +112,17 @@ public class AutoRedWing extends CommandOpMode {
                 // Middle
                 turnAmount = -15.0;
                 fwd = 26;
-                aprilTagY = -28.5;
+                aprilTagY = -28.75;
             }
             else {
                 // Right
-                turnAmount = -45.0;
+                turnAmount = -50.0;
                 fwd = 20;
                 aprilTagY = -38.0;
             }
         } else {
             // Right
-            turnAmount = -45.0;
+            turnAmount = -50.0;
             fwd = 20;
             aprilTagY = -38.0;
         }

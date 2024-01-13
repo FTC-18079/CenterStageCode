@@ -136,7 +136,7 @@ public class AutoBlueBackstagePark extends CommandOpMode {
 
         TrajectorySequence traj2 = driveTrain.trajectorySequenceBuilder(traj1.end())
                 .back(fwd - 13)
-                .splineToSplineHeading(new Pose2d(50, aprilTagY, Math.toRadians(0)), Math.toRadians(-20))
+                .splineToSplineHeading(new Pose2d(50.5, aprilTagY, Math.toRadians(0)), Math.toRadians(-20))
                 .build();
 
         TrajectorySequence traj3 = driveTrain.trajectorySequenceBuilder(traj2.end())

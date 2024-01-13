@@ -5,6 +5,7 @@ import com.arcrobotics.ftclib.util.Timing;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
+import java.util.concurrent.TimeUnit;
 import java.util.function.DoubleSupplier;
 import java.util.function.IntSupplier;
 
@@ -14,7 +15,7 @@ public class ShoulderToPos extends CommandBase implements Runnable {
     private final DoubleSupplier velocity;
     private final Telemetry tele;
 
-    private final Timing.Timer timer = new Timing.Timer(2);
+    private final Timing.Timer timer = new Timing.Timer(1500, TimeUnit.MILLISECONDS);
 
     public ShoulderToPos(ShoulderSubsystem subsystem, IntSupplier pos, DoubleSupplier vel, Telemetry tele) {
         shoulder = subsystem;

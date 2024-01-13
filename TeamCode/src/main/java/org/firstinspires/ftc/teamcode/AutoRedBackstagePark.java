@@ -115,17 +115,17 @@ public class AutoRedBackstagePark extends CommandOpMode {
                 // Middle
                 turnAmount = -15.0;
                 fwd = 26;
-                aprilTagY = -28.5;
+                aprilTagY = -28.75;
             }
             else {
                 // Right
-                turnAmount = -45.0;
+                turnAmount = -50.0;
                 fwd = 20;
                 aprilTagY = -38.0;
             }
         } else {
             // Right
-            turnAmount = -45.0;
+            turnAmount = -50.0;
             fwd = 20;
             aprilTagY = -38.0;
         }
@@ -136,7 +136,7 @@ public class AutoRedBackstagePark extends CommandOpMode {
 
         TrajectorySequence traj2 = driveTrain.trajectorySequenceBuilder(traj1.end())
                 .back(fwd - 13)
-                .splineToSplineHeading(new Pose2d(50, aprilTagY, Math.toRadians(0)), Math.toRadians(20))
+                .splineToSplineHeading(new Pose2d(50.2, aprilTagY, Math.toRadians(0)), Math.toRadians(20))
                 .build();
 
         TrajectorySequence traj3 = driveTrain.trajectorySequenceBuilder(traj2.end())
