@@ -1,11 +1,16 @@
 package org.firstinspires.ftc.teamcode.Vision;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.teamcode.Chassis.MecanumDrive;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
@@ -36,7 +41,9 @@ public class VisionSubsystem extends SubsystemBase {
         aprilTagProcessor = new AprilTagProcessor.Builder()
                 .setDrawAxes(true)
                 .setDrawCubeProjection(true)
+                .setOutputUnits(DistanceUnit.INCH, AngleUnit.RADIANS)
                 .build();
+        aprilTagProcessor.setDecimation(2);
 
         tfodProcessor = new TfodProcessor.Builder()
                 .setModelAssetName(tfodAsset)
@@ -44,7 +51,7 @@ public class VisionSubsystem extends SubsystemBase {
                 .setModelAspectRatio(16.0 / 9.0)
                 .build();
         tfodProcessor.setMinResultConfidence(0.85f);
-        tfodProcessor.setZoom(1.15);
+        tfodProcessor.setZoom(1.0);
 
         visionPortal = new VisionPortal.Builder()
                 .setCamera(camera)
@@ -76,6 +83,25 @@ public class VisionSubsystem extends SubsystemBase {
         }
 
         return aprilTagDetection;
+    }
+
+    public void updatePoseAprilTag(int targetTagId, MecanumDrive drive) {
+        AprilTagDetection aprilTag = getAprilTagDetection(targetTagId);
+
+        if (aprilTag != null) {
+            double range = aprilTag.ftcPose.range;
+            double angle = aprilTag.ftcPose.yaw;
+
+            double x = 60 - (range * Math.cos(angle) + 6.0);
+            double y = (targetTagId == 2 ? 35 : -35) + (range * Math.sin(angle) - 4.33);
+
+            Pose2d newRobotPose = new Pose2d(x, y, angle);
+
+            if (range <= 48) {
+                drive.setPoseEstimate(newRobotPose);
+                drive.update();
+            }
+        }
     }
 
     public Recognition getTfodDetection() {

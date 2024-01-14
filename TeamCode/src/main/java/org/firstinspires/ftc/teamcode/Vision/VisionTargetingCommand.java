@@ -40,12 +40,12 @@ public class VisionTargetingCommand extends CommandBase {
         pidController.setTargetPosition(targetAngle);
         double headingControl = pidController.update(vision.getAprilTagAngle() * Math.PI / 180.0);
 
-        drive.drive(
-                leftY.getAsDouble(),
-                leftX.getAsDouble(),
-                headingControl,
-                slowMode.getAsBoolean()
-        );
+//        drive.drive(
+//                leftY.getAsDouble(),
+//                leftX.getAsDouble(),
+//                headingControl,
+//                slowMode.getAsBoolean()
+//        );
         drive.update();
     }
 }

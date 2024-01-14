@@ -37,6 +37,8 @@ import org.firstinspires.ftc.teamcode.Shooter.ShooterCommand;
 import org.firstinspires.ftc.teamcode.Shooter.ShooterServoCommand;
 import org.firstinspires.ftc.teamcode.Shooter.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.Shooter.StopShooter;
+import org.firstinspires.ftc.teamcode.Vision.VisionSubsystem;
+import org.firstinspires.ftc.teamcode.Vision.VisionUpdatePose;
 
 @TeleOp(name = "TeleOp", group = "OpModes")
 public class Tele extends CommandOpMode {
@@ -69,6 +71,14 @@ public class Tele extends CommandOpMode {
     private ShoulderSubsystem shoulder;
     private ShoulderCommand shoulderCommand;
     private ResetEncoder shoulderReset;
+    //Vision
+    private VisionSubsystem visionSubsystem;
+    private VisionUpdatePose visionUpdatePose;
+    private static final String TFOD_MODEL_ASSET = "redObject_v1.tflite";
+    private static final String[] LABELS = {
+            "redObject"
+    };
+    private int targetTag;
     //Lights
     private RevBlinkinLedDriver led;
 
@@ -86,10 +96,14 @@ public class Tele extends CommandOpMode {
         rb = new MotorEx(hardwareMap, "rightBack");
         drive = new MecanumDrive(hardwareMap, telemetry, true);
 
-        // Get pose estimate from auto
+        // Get pose estimate from auto & determine alliance
         if (PoseStorage.pattern == CP1_SHOT) {
             collectPose = new Vector2d(-55, -55); // Blue Alliance
-        } else collectPose = new Vector2d(-55, -12); // Red Alliance TODO: Change y to 55
+            targetTag = 2;
+        } else {
+            collectPose = new Vector2d(-55, 55); // Red Alliance TODO: Change y to 55
+            targetTag = 5;
+        }
         drive.setPoseEstimate(PoseStorage.currentPose);
         drive.update();
 
@@ -102,6 +116,9 @@ public class Tele extends CommandOpMode {
 
         claw = new ClawSubsystem(hardwareMap, "clawOne", "clawTwo");
         stow = new StowSubsystem(hardwareMap, "stow");
+
+        visionSubsystem = new VisionSubsystem(hardwareMap, "Webcam 1", TFOD_MODEL_ASSET, LABELS, telemetry);
+        visionSubsystem.enableAprilTag();
 
 //        m_telemetry = new TelemetrySS(telemetry);
 
@@ -143,6 +160,8 @@ public class Tele extends CommandOpMode {
         stowUp = new Stow(stow);
         stowDown = new Down(stow);
 
+        visionUpdatePose = new VisionUpdatePose(visionSubsystem, drive, () -> targetTag);
+
         headingResetButton = (new GamepadButton(driverOp, GamepadKeys.Button.Y))
                 .whenPressed(resetHeading);
         shooterButton = (new GamepadButton(driverOp, GamepadKeys.Button.B))
@@ -179,9 +198,11 @@ public class Tele extends CommandOpMode {
         lb.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         rb.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
 
+        register(visionSubsystem);
         register(drive);
         register(lift);
         register(shoulder);
+        visionSubsystem.setDefaultCommand(visionUpdatePose);
         drive.setDefaultCommand(driveCommand);
         lift.setDefaultCommand(liftCommand);
         shoulder.setDefaultCommand(shoulderCommand);
