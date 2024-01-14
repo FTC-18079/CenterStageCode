@@ -75,7 +75,7 @@ public class AutoBlueWing extends CommandOpMode {
         moveClawTwo = new MoveClawTwo(claw);
 
         initTfod();
-        tfod.setZoom(1.1);
+        tfod.setZoom(1.0);
         tfod.setClippingMargins(0, 100, 125, 0);
 
         claw.clawOneToPos(0);

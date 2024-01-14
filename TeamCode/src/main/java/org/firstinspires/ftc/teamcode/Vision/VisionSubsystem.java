@@ -97,7 +97,7 @@ public class VisionSubsystem extends SubsystemBase {
 
             Pose2d newRobotPose = new Pose2d(x, y, angle);
 
-            if (range <= 48) {
+            if (range <= 48 && Math.abs(angle) < 40.0) {
                 drive.setPoseEstimate(newRobotPose);
                 drive.update();
             }
