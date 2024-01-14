@@ -1,16 +1,22 @@
 package org.firstinspires.ftc.teamcode.Chassis;
 
+import com.acmerobotics.roadrunner.control.PIDCoefficients;
+import com.acmerobotics.roadrunner.control.PIDFController;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.roadrunner.localization.Localizer;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Roadrunner.PoseStorage;
+import org.firstinspires.ftc.teamcode.Roadrunner.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.Roadrunner.drive.SampleMecanumDrive;
 
 import java.util.List;
@@ -19,11 +25,14 @@ public class MecanumDrive extends SubsystemBase {
     private final SampleMecanumDrive drive;
     Telemetry m_telemetry;
     private final boolean fieldCentric;
+    public PIDFController headingController = new PIDFController(new PIDCoefficients(4.0, 0.0, 0.3));
+    private final double orientation;
 
     public MecanumDrive(HardwareMap hardwareMap, Telemetry telemetry, boolean isFieldCentric) {
         this.drive = new SampleMecanumDrive(hardwareMap, telemetry);
         m_telemetry = telemetry;
         fieldCentric = isFieldCentric;
+        this.orientation = PoseStorage.pattern == RevBlinkinLedDriver.BlinkinPattern.CP1_SHOT ? Math.toRadians(-90) : Math.toRadians(+90);
     }
 
     public void setMode(DcMotor.RunMode mode) {
@@ -40,7 +49,6 @@ public class MecanumDrive extends SubsystemBase {
 
     public void update() {
         m_telemetry.addData("Robot Pose Estimate", getPoseEstimate());
-        m_telemetry.update();
         drive.update();
     }
 
@@ -48,28 +56,82 @@ public class MecanumDrive extends SubsystemBase {
         drive.updatePoseEstimate();
     }
 
-    public void drive(double leftY, double leftX, double rightX, boolean slowMode) {
-        double dampen;
-
-        if (slowMode) dampen = 0.2;
-        else dampen = 1.0;
+    public void drive(double leftY, double leftX, double rightX, double brakePower) {
+        double brake = 1.0 - brakePower * 0.8;
 
         Pose2d poseEstimate = getPoseEstimate();
 
         Vector2d input = new Vector2d(
-                -leftY * dampen,
-                -leftX * dampen
+                -leftY * brake,
+                -leftX * brake
         ).rotated(fieldCentric ? -poseEstimate.getHeading() : 0);
 
         drive.setWeightedDrivePower(
                 new Pose2d(
                         input.getX(),
                         input.getY(),
-                        -rightX * dampen
+                        -rightX * brake
                 )
         );
-        drive.update();
-        m_telemetry.update();
+        m_telemetry.addData("Brake", brakePower);
+    }
+
+    public void driveCollect(double leftY, double leftX, double rightX, double brakePower, Vector2d targetPos, boolean collecting, double fwd) {
+        double collectFwd = fwd * 0.60;
+        boolean isToCollect = fwd > 0.05;
+        Pose2d poseEstimate = getPoseEstimate();
+        Pose2d driveDirection;
+        m_telemetry.addData("Collecting", collecting);
+        double brake = 1.0 - brakePower * 0.8;
+
+        Vector2d input = new Vector2d(
+                -leftY * brake,
+                -leftX * brake
+        );
+
+        if (isToCollect && collecting) {
+            Vector2d direction = new Vector2d(
+                    collectFwd,
+                    0
+            );
+
+            Vector2d difference = targetPos.minus(poseEstimate.vec());
+            double theta = difference.angle();
+            double thetaFF = -input.rotated(-Math.PI / 2).dot(difference) / (difference.norm() * difference.norm());
+
+            headingController.setTargetPosition(theta);
+
+            double headingInput = (headingController.update(poseEstimate.getHeading())
+                    * DriveConstants.kV + thetaFF)
+                    * DriveConstants.TRACK_WIDTH;
+
+            driveDirection = new Pose2d(direction, headingInput);
+        } else if (collecting) {
+            Vector2d robotFrameInput = input.rotated(-poseEstimate.getHeading() + orientation);
+
+            Vector2d difference = targetPos.minus(poseEstimate.vec());
+            double theta = difference.angle();
+            double thetaFF = -input.rotated(-Math.PI / 2).dot(difference) / (difference.norm() * difference.norm());
+
+            headingController.setTargetPosition(theta);
+
+            double headingInput = (headingController.update(poseEstimate.getHeading())
+                    * DriveConstants.kV + thetaFF)
+                    * DriveConstants.TRACK_WIDTH;
+
+            driveDirection = new Pose2d(robotFrameInput, headingInput);
+        } else {
+            input = input.rotated(-poseEstimate.getHeading() + orientation);
+
+            driveDirection = new Pose2d(
+                    input.getX(),
+                    input.getY(),
+                    -rightX * brake
+            );
+        }
+
+        drive.setWeightedDrivePower(driveDirection);
+        headingController.update(poseEstimate.getHeading());
     }
 
     public void resetHeading() {
@@ -77,7 +139,9 @@ public class MecanumDrive extends SubsystemBase {
         drive.setPoseEstimate(new Pose2d(
                 poseEstimate.getX(),
                 poseEstimate.getY(),
-                0));
+                orientation
+        ));
+
     }
 
     public void setDrivePower(Pose2d drivePower) {
@@ -117,7 +181,7 @@ public class MecanumDrive extends SubsystemBase {
     }
 
     public void stop() {
-        drive(0, 0, 0, false);
+        drive(0, 0, 0, 0);
     }
 
     public Pose2d getPoseVelocity() {

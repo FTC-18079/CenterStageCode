@@ -13,6 +13,7 @@ public class ResetHeading extends CommandBase {
     @Override
     public void initialize() {
         drive.resetHeading();
+        drive.update();
     }
 
     @Override

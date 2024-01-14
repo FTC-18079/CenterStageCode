@@ -22,7 +22,7 @@ public class MeepMeepRun {
                 .setConstraints(50, 40, Math.toRadians(201.6), Math.toRadians(180), 13.325)
                 .setDimensions(420/25.4, 440/25.4)
                 .followTrajectorySequence(drive ->
-                        drive.trajectorySequenceBuilder(new Pose2d(12, 63.339, Math.toRadians(-90)))
+                        drive.trajectorySequenceBuilder(new Pose2d(-35, -63.339, Math.toRadians(90)))
                                 .forward(26)
                                 .waitSeconds(0.25)
                                 .back(13)
@@ -34,11 +34,7 @@ public class MeepMeepRun {
                                 .build()
                 );
 
-        Image img = null;
-        try { img = ImageIO.read(new File("C:\\Users\\nicsi\\Documents\\centerstagefield.png")); }
-        catch (IOException e) {}
-
-        meepMeep.setBackground(img /*MeepMeep.Background.FIELD_POWERPLAY_OFFICIAL*/ )
+        meepMeep.setBackground(MeepMeep.Background.FIELD_CENTERSTAGE_JUICE_DARK)
                 .setDarkMode(true)
                 .setBackgroundAlpha(0.95f)
                 .addEntity(myBot)

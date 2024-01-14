@@ -5,7 +5,7 @@ import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.Constants;
+import org.firstinspires.ftc.teamcode.Arm.ArmConstants;
 
 @Config
 public class StowSubsystem extends SubsystemBase {
@@ -30,12 +30,12 @@ public class StowSubsystem extends SubsystemBase {
 
     public void stow() {
 //        pos = 0.15;
-        stow.setPosition(1.0);
+        stow.setPosition(ArmConstants.STOW_POS_REST);
     }
 
     public void down() {
 //        pos = Constants.STOW_POS_REST;
-        stow.setPosition(Constants.STOW_POS_REST);
+        stow.setPosition(0.01);
     }
 
     public double getPos() {

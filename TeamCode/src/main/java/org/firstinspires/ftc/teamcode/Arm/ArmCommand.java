@@ -7,9 +7,6 @@ import org.firstinspires.ftc.teamcode.Arm.Lift.LiftSubsystem;
 import org.firstinspires.ftc.teamcode.Arm.Lift.LiftToPos;
 import org.firstinspires.ftc.teamcode.Arm.Shoulder.ShoulderSubsystem;
 import org.firstinspires.ftc.teamcode.Arm.Shoulder.ShoulderToPos;
-import org.firstinspires.ftc.teamcode.Constants;
-import org.firstinspires.ftc.teamcode.Manip.Claw.ClawSubsystem;
-import org.firstinspires.ftc.teamcode.Manip.Claw.MoveClawTwo;
 import org.firstinspires.ftc.teamcode.Manip.Stow.StowSubsystem;
 import org.firstinspires.ftc.teamcode.Manip.Stow.StowToPos;
 
@@ -18,14 +15,12 @@ import java.util.function.IntSupplier;
 
 public class ArmCommand extends ParallelCommandGroup {
     private final DoubleSupplier shoulderVel, liftVel;
-    private final Telemetry tele;
 
     public ArmCommand(ShoulderSubsystem shoulder, LiftSubsystem lift, StowSubsystem stow, IntSupplier shoulderPos, IntSupplier liftPos, DoubleSupplier stowPos, Telemetry tele) {
-        if (liftPos.getAsInt() == Constants.LIFT_POS_REST) liftVel = () -> Constants.LIFT_VEL_TO_STOW;
-        else liftVel = () -> Constants.LIFT_VELOCITY;
+        if (liftPos.getAsInt() == ArmConstants.LIFT_POS_REST) liftVel = () -> ArmConstants.LIFT_VEL_TO_STOW;
+        else liftVel = () -> ArmConstants.LIFT_VELOCITY;
 
-        shoulderVel = () -> Constants.SHOULDER_VELOCITY;
-        this.tele = tele;
+        shoulderVel = () -> ArmConstants.SHOULDER_VELOCITY;
 
         addCommands(new ShoulderToPos(shoulder, shoulderPos, shoulderVel, tele), new LiftToPos(lift, liftPos, liftVel, tele), new StowToPos(stow, stowPos));
         addRequirements(shoulder, lift, stow);
