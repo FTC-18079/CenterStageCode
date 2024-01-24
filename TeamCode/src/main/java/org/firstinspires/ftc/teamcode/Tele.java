@@ -99,10 +99,10 @@ public class Tele extends CommandOpMode {
         // Get pose estimate from auto & determine alliance
         if (PoseStorage.pattern == CP1_SHOT) {
             collectPose = new Vector2d(-55, -55); // Blue Alliance
-            targetTag = 2;
+            targetTag = 7;
         } else {
             collectPose = new Vector2d(-55, 55); // Red Alliance TODO: Change y to 55
-            targetTag = 5;
+            targetTag = 10;
         }
         drive.setPoseEstimate(PoseStorage.currentPose);
         drive.update();
@@ -165,7 +165,7 @@ public class Tele extends CommandOpMode {
         headingResetButton = (new GamepadButton(driverOp, GamepadKeys.Button.Y))
                 .whenPressed(resetHeading);
         shooterButton = (new GamepadButton(driverOp, GamepadKeys.Button.B))
-                .whenReleased(new ShooterCommand(shooter, () -> 0.74, telemetry),true);
+                .whenReleased(new ShooterCommand(shooter, () -> 0.55, telemetry),true);
 
         clawOneButton = (new GamepadButton(manipOp, GamepadKeys.Button.LEFT_BUMPER))
                 .whenPressed(moveClawOne, true);
@@ -198,11 +198,11 @@ public class Tele extends CommandOpMode {
         lb.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         rb.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
 
-        register(visionSubsystem);
+//        register(visionSubsystem);
         register(drive);
         register(lift);
         register(shoulder);
-        visionSubsystem.setDefaultCommand(visionUpdatePose);
+//        visionSubsystem.setDefaultCommand(visionUpdatePose);
         drive.setDefaultCommand(driveCommand);
         lift.setDefaultCommand(liftCommand);
         shoulder.setDefaultCommand(shoulderCommand);
