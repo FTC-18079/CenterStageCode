@@ -79,7 +79,7 @@ public class AutoRedBackstagePark extends CommandOpMode {
 
         initTfod();
         tfod.setZoom(1.0);
-        tfod.setClippingMargins(0, 100, 125, 0);
+        tfod.setClippingMargins(0, 100, 130, 0);
 
         claw.clawOneToPos(0);
         claw.clawTwoToPos(1);
@@ -141,7 +141,8 @@ public class AutoRedBackstagePark extends CommandOpMode {
 
         TrajectorySequence traj3 = driveTrain.trajectorySequenceBuilder(traj2.end())
                 .lineToLinearHeading(new Pose2d(45, -58, Math.toRadians(0)))
-                .forward(9)
+                .forward(16)
+                .strafeRight(2)
                 .build();
 
         CommandScheduler.getInstance().schedule(

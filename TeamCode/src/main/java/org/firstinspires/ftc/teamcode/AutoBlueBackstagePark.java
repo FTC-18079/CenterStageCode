@@ -79,7 +79,7 @@ public class AutoBlueBackstagePark extends CommandOpMode {
 
         initTfod();
         tfod.setZoom(1.0);
-        tfod.setClippingMargins(0, 100, 125, 0);
+        tfod.setClippingMargins(0, 100, 130, 0);
 
         claw.clawOneToPos(0);
         claw.clawTwoToPos(1);

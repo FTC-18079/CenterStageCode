@@ -43,7 +43,7 @@ public class VisionSubsystem extends SubsystemBase {
                 .setDrawCubeProjection(true)
                 .setOutputUnits(DistanceUnit.INCH, AngleUnit.RADIANS)
                 .build();
-        aprilTagProcessor.setDecimation(2);
+        aprilTagProcessor.setDecimation(3);
 
         tfodProcessor = new TfodProcessor.Builder()
                 .setModelAssetName(tfodAsset)
@@ -92,10 +92,10 @@ public class VisionSubsystem extends SubsystemBase {
             double range = aprilTag.ftcPose.range;
             double angle = aprilTag.ftcPose.yaw;
 
-            double x = 60 - (range * Math.cos(angle) + 6.0);
-            double y = (targetTagId == 2 ? 35 : -35) + (range * Math.sin(angle) - 4.33);
+            double x = -70 + (range * Math.cos(angle) + 6.0);
+            double y = (targetTagId == 7 ? -36.5 : +36.5) + (range * Math.sin(angle) - 4.33);
 
-            Pose2d newRobotPose = new Pose2d(x, y, angle);
+            Pose2d newRobotPose = new Pose2d(x, y, -angle);
 
             if (range <= 48 && Math.abs(angle) < 40.0) {
                 drive.setPoseEstimate(newRobotPose);
