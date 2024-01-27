@@ -34,9 +34,9 @@ import java.util.List;
 
 @Autonomous(name = "Red Wing Side", group = "Red Autos")
 public class AutoRedWing extends CommandOpMode {
-    private static final String TFOD_MODEL_ASSET = "blueObject_v1.tflite";
+    private static final String TFOD_MODEL_ASSET = "redObject_v1.tflite";
     private static final String[] LABELS = {
-            "blueObject"
+            "redObject"
     };
 
     private float elementPos;

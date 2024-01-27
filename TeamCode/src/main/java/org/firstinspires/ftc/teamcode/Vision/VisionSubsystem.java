@@ -32,9 +32,9 @@ public class VisionSubsystem extends SubsystemBase {
     private boolean targetTagFound = false;
     private boolean targetTfodFound = false;
 
-    public VisionSubsystem(HardwareMap hMap, String name, String tFodAsset, String[] tfodLabels, Telemetry tele) {
+    public VisionSubsystem(HardwareMap hMap, String name, String tfodAsset, String[] tfodLabels, Telemetry tele) {
         camera = hMap.get(WebcamName.class, name);
-        this.tfodAsset = tFodAsset;
+        this.tfodAsset = tfodAsset;
         this.tfodLabels = tfodLabels;
         this.tele = tele;
 
@@ -46,8 +46,8 @@ public class VisionSubsystem extends SubsystemBase {
         aprilTagProcessor.setDecimation(3);
 
         tfodProcessor = new TfodProcessor.Builder()
-                .setModelAssetName(tfodAsset)
-                .setModelLabels(tfodLabels)
+                .setModelAssetName(this.tfodAsset)
+                .setModelLabels(this.tfodLabels)
                 .setModelAspectRatio(16.0 / 9.0)
                 .build();
         tfodProcessor.setMinResultConfidence(0.85f);
