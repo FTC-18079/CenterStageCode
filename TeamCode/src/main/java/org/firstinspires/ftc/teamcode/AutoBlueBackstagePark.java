@@ -29,6 +29,7 @@ import org.firstinspires.ftc.teamcode.RRCommands.TurnCommand;
 import org.firstinspires.ftc.teamcode.Roadrunner.PoseStorage;
 import org.firstinspires.ftc.teamcode.Roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.Roadrunner.trajectorysequence.TrajectorySequence;
+import org.firstinspires.ftc.teamcode.Vision.VisionSubsystem;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 
@@ -36,20 +37,17 @@ import java.util.List;
 
 @Autonomous(name = "Blue Backstage - Park", group = "Blue Autos")
 public class AutoBlueBackstagePark extends CommandOpMode {
-    private static final boolean USE_WEBCAM = true;
     private static final String TFOD_MODEL_ASSET = "blueObject_v1.tflite";
     private static final String[] LABELS = {
             "blueObject"
     };
 
-    private TfodProcessor tfod;
-    private VisionPortal visionPortal;
     private float elementPos;
     private double turnAmount;
     private double fwd;
     private double aprilTagY;
-    Recognition recognition = null;
 
+    VisionSubsystem vision;
     StowSubsystem stow;
     ClawSubsystem claw;
     ShoulderSubsystem shoulder;
@@ -58,12 +56,14 @@ public class AutoBlueBackstagePark extends CommandOpMode {
     Down stowDown;
     MoveClawOne moveClawOne;
     MoveClawTwo moveClawTwo;
-
     private RevBlinkinLedDriver led;
+
+    private TrajectorySequence traj1, traj2, traj3;
 
     @Override
     public void initialize() {
         // Subsystems
+        vision = new VisionSubsystem(hardwareMap, "Webcam 1", TFOD_MODEL_ASSET, LABELS, telemetry);
         stow = new StowSubsystem(hardwareMap, "stow");
         claw = new ClawSubsystem(hardwareMap, "clawOne", "clawTwo");
         shoulder = new ShoulderSubsystem(hardwareMap, "shoulder1", "shoulder2", "shoulderTouch", telemetry);
@@ -77,9 +77,8 @@ public class AutoBlueBackstagePark extends CommandOpMode {
         moveClawOne = new MoveClawOne(claw);
         moveClawTwo = new MoveClawTwo(claw);
 
-        initTfod();
-        tfod.setZoom(1.0);
-        tfod.setClippingMargins(0, 100, 130, 0);
+        vision.enableTfod();
+        vision.disableAprilTag();
 
         claw.clawOneToPos(0);
         claw.clawTwoToPos(1);
@@ -101,9 +100,8 @@ public class AutoBlueBackstagePark extends CommandOpMode {
         waitForStart();
         if (isStopRequested()) return;
 
-        List<Recognition> currentRecognitions = tfod.getRecognitions();
-        if (currentRecognitions.size() != 0) {
-            recognition = currentRecognitions.get(0);
+        Recognition recognition = vision.getTfodDetection();
+        if (recognition != null) {
             elementPos = recognition.getRight() + recognition.getLeft() / 2;
             if (elementPos < 275) {
                 // Left
@@ -167,9 +165,6 @@ public class AutoBlueBackstagePark extends CommandOpMode {
                         new TrajectoryRunner(driveTrain, traj2), // Drive to backboard while brining arm up to score
                         new InstantCommand(moveClawTwo), //Open claw to score on backboard
 
-                        // TODO: SUPER SKETCHY, this would be replaced for updating estimate by using apriltags
-//                        new InstantCommand(() -> driveTrain.setPoseEstimate(new Pose2d(50, aprilTagY, Math.toRadians(-12)))),
-
                         new WaitCommand(600), // Wait .6s
                         new ArmCommand(
                                 shoulder,
@@ -198,33 +193,5 @@ public class AutoBlueBackstagePark extends CommandOpMode {
                         )
                 )
         );
-    }
-
-    private void initTfod() {
-        // Create the TensorFlow processor by using a builder.
-        tfod = new TfodProcessor.Builder()
-                .setModelAssetName(TFOD_MODEL_ASSET)
-                // The following default settings are available to un-comment and edit as needed to
-                // set parameters for custom models.
-                .setModelLabels(LABELS)
-                //.setIsModelTensorFlow2(true)
-                //.setIsModelQuantized(true)
-                //.setModelInputSize(300)
-                .setModelAspectRatio(16.0 / 9.0)
-                .build();
-
-        VisionPortal.Builder builder = new VisionPortal.Builder();
-
-        // Set the camera (webcam vs. built-in RC phone camera).
-        if (USE_WEBCAM) {
-            builder.setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"));
-        } else {
-            builder.setCamera(BuiltinCameraDirection.BACK);
-        }
-
-        builder.addProcessor(tfod);
-        visionPortal = builder.build();
-
-        tfod.setMinResultConfidence(0.85f);
     }
 }

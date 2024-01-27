@@ -51,6 +51,7 @@ public class VisionSubsystem extends SubsystemBase {
                 .setModelAspectRatio(16.0 / 9.0)
                 .build();
         tfodProcessor.setMinResultConfidence(0.85f);
+        tfodProcessor.setClippingMargins(0, 100, 120, 0);
         tfodProcessor.setZoom(1.0);
 
         visionPortal = new VisionPortal.Builder()
