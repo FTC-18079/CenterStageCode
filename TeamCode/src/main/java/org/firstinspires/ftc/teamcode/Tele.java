@@ -78,7 +78,6 @@ public class Tele extends CommandOpMode {
     private static final String[] LABELS = {
             "redObject"
     };
-    private int targetTag;
     //Lights
     private RevBlinkinLedDriver led;
 
@@ -99,10 +98,8 @@ public class Tele extends CommandOpMode {
         // Get pose estimate from auto & determine alliance
         if (PoseStorage.pattern == CP1_SHOT) {
             collectPose = new Vector2d(-55, -55); // Blue Alliance
-            targetTag = 7;
         } else {
             collectPose = new Vector2d(-55, 55); // Red Alliance TODO: Change y to 55
-            targetTag = 10;
         }
         drive.setPoseEstimate(PoseStorage.currentPose);
         drive.update();
@@ -118,6 +115,7 @@ public class Tele extends CommandOpMode {
         stow = new StowSubsystem(hardwareMap, "stow");
 
         visionSubsystem = new VisionSubsystem(hardwareMap, "Webcam 1", TFOD_MODEL_ASSET, LABELS, telemetry);
+        visionSubsystem.disableTfod();
         visionSubsystem.enableAprilTag();
 
 //        m_telemetry = new TelemetrySS(telemetry);
@@ -160,7 +158,7 @@ public class Tele extends CommandOpMode {
         stowUp = new Stow(stow);
         stowDown = new Down(stow);
 
-        visionUpdatePose = new VisionUpdatePose(visionSubsystem, drive, () -> targetTag);
+        visionUpdatePose = new VisionUpdatePose(visionSubsystem, drive);
 
         headingResetButton = (new GamepadButton(driverOp, GamepadKeys.Button.Y))
                 .whenPressed(resetHeading);
@@ -198,11 +196,11 @@ public class Tele extends CommandOpMode {
         lb.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
         rb.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
 
-//        register(visionSubsystem);
+        register(visionSubsystem);
         register(drive);
         register(lift);
         register(shoulder);
-//        visionSubsystem.setDefaultCommand(visionUpdatePose);
+        visionSubsystem.setDefaultCommand(visionUpdatePose);
         drive.setDefaultCommand(driveCommand);
         lift.setDefaultCommand(liftCommand);
         shoulder.setDefaultCommand(shoulderCommand);
