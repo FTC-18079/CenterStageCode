@@ -65,9 +65,9 @@ public class DriveConstants {
      * small and gradually increase them later after everything is working. All distance units are
      * inches.
      */
-    public static double MAX_VEL = 40; // inches/s     61.84 theoretical max velocity
-    public static double MAX_ACCEL = 30; // in/s^2
-    public static double MAX_ANG_VEL = Math.toRadians(210); // degrees/s, ABSOLUTE MAX: 265
+    public static double MAX_VEL = 45; // inches/s     61.84 theoretical max velocity
+    public static double MAX_ACCEL = 40; // in/s^2
+    public static double MAX_ANG_VEL = Math.toRadians(250); // degrees/s, ABSOLUTE MAX: 265
     public static double MAX_ANG_ACCEL = Math.toRadians(180); // degress/s^2
 
     /*
