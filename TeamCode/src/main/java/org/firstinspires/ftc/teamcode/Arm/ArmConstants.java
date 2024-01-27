@@ -4,8 +4,8 @@ public class ArmConstants {
     public static final double ROBOT_WIDTH = 420.0; //mm
     public static final double ROBOT_LENGTH = 440.0; //mm
 
-    public static final int LIFT_VELOCITY = 2450;
-    public static final int LIFT_VEL_TO_STOW = 2600;
+    public static final int LIFT_VELOCITY = 3000;
+    public static final int LIFT_VEL_TO_STOW = 3100;
     public static final int SHOULDER_VELOCITY = 2300;
 
     public static final int LIFT_LIMIT_TOP = -5750;
@@ -14,22 +14,22 @@ public class ArmConstants {
 //    Rest/collect pos
     public static final int SHOULDER_POS_REST = 0;
     public static final int LIFT_POS_REST = 0;
-    public static final double STOW_POS_REST = 0.7;
+    public static final double STOW_POS_REST = 0.725;
 
 //    Low score pos
     public static final int SHOULDER_POS_LOW = 431;
     public static final int LIFT_POS_LOW = -580;
-    public static final double STOW_POS_LOW = 0.15;
+    public static final double STOW_POS_LOW = 0.55;
 
 //    Mid score pos
 //    public static final int SHOULDER_POS_MID = 2093;
     public static final int SHOULDER_POS_MID = 635;
 //    public static final int LIFT_POS_MID = -2684;
     public static final int LIFT_POS_MID = -2022;
-    public static final double STOW_POS_MID = 0.1;
+    public static final double STOW_POS_MID = 0.6;
 
 //    Climb pos
     public static final int SHOULDER_POS_CLIMB = 1450;
     public static final int LIFT_POS_CLIMB = -4060;
-    public static final double STOW_POS_CLIMB = 0.25;
+    public static final double STOW_POS_CLIMB = 0.75;
 }
