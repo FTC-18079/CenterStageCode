@@ -18,9 +18,9 @@ public class ClawSubsystem extends SubsystemBase {
 
     public void moveClawOne() {
         double pos = getClawOnePos();
-        if (pos == 0.5) {
+        if (pos == 1.0) {
             claw1.setPosition(0.0);
-        } else claw1.setPosition(0.5);
+        } else claw1.setPosition(1.0);
     }
     public void moveClawTwo() {
         double pos = getClawTwoPos();
