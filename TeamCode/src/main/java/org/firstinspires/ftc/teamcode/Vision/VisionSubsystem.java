@@ -31,6 +31,7 @@ public class VisionSubsystem extends SubsystemBase {
     private Recognition tfodRecognition;
     private boolean targetTagFound = false;
     private boolean targetTfodFound = false;
+    public final CameraStreamProcessor stream = new CameraStreamProcessor();
 
     public VisionSubsystem(HardwareMap hMap, String name, String tFodAsset, String[] tfodLabels, Telemetry tele) {
         camera = hMap.get(WebcamName.class, name);
@@ -59,6 +60,7 @@ public class VisionSubsystem extends SubsystemBase {
                 .setAutoStopLiveView(true)
                 .addProcessor(aprilTagProcessor)
                 .addProcessor(tfodProcessor)
+                .addProcessor(stream)
                 .build();
 
         disableAprilTag();
