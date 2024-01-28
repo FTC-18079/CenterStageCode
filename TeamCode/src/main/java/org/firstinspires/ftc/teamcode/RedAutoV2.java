@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
@@ -11,6 +12,8 @@ import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
+
+import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.teamcode.Arm.ArmCommand;
 import org.firstinspires.ftc.teamcode.Arm.ArmConstants;
@@ -30,7 +33,9 @@ import org.firstinspires.ftc.teamcode.RRCommands.TurnCommand;
 import org.firstinspires.ftc.teamcode.Roadrunner.PoseStorage;
 import org.firstinspires.ftc.teamcode.Roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.Roadrunner.trajectorysequence.TrajectorySequence;
+import org.firstinspires.ftc.teamcode.Vision.CameraStreamProcessor;
 import org.firstinspires.ftc.teamcode.Vision.VisionSubsystem;
+import org.firstinspires.ftc.vision.VisionPortal;
 
 import java.util.List;
 
@@ -96,6 +101,8 @@ public class RedAutoV2 extends CommandOpMode {
         PoseStorage.currentPose = driveTrain.getPoseEstimate();
         PoseStorage.hasAutoRun = false;
 
+        FtcDashboard.getInstance().startCameraStream(visionSubsystem.stream, 30);
+
         waitForStart();
         if (isStopRequested()) return;
 
@@ -152,7 +159,7 @@ public class RedAutoV2 extends CommandOpMode {
                         new InstantCommand(stowUp), // Bring stow up
                         new WaitCommand(500), // Wait .5s
                         new TurnCommand(driveTrain, Math.toRadians(turnAmount * -1)),
-                        new ArmCommand(
+                        /*new ArmCommand(
                                 shoulder,
                                 lift,
                                 stow,
@@ -160,7 +167,7 @@ public class RedAutoV2 extends CommandOpMode {
                                 () -> ArmConstants.LIFT_POS_LOW,
                                 () -> ArmConstants.STOW_POS_LOW,
                                 telemetry
-                        ),
+                        ),*/
                         new TrajectoryRunner(driveTrain, traj2), // Drive to backboard while brining arm up to score
                         new InstantCommand(moveClawTwo), // Open claw to score on backboard
 
@@ -168,7 +175,7 @@ public class RedAutoV2 extends CommandOpMode {
 //                        new InstantCommand(() -> driveTrain.setPoseEstimate(new Pose2d(50, aprilTagY, Math.toRadians(12)))),
 
                         new WaitCommand(600), // Wait 0.6s
-                        new ArmCommand(
+                        /*new ArmCommand(
                                 shoulder,
                                 lift,
                                 stow,
@@ -176,7 +183,7 @@ public class RedAutoV2 extends CommandOpMode {
                                 () -> ArmConstants.LIFT_POS_REST,
                                 () -> ArmConstants.STOW_POS_REST,
                                 telemetry
-                        ),
+                        ),*/
                         new ParallelRaceGroup(
                                 new TrajectoryRunner(driveTrain, traj3),
                                 new WaitCommand(6000)
