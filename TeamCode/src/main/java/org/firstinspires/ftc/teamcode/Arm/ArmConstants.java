@@ -8,7 +8,7 @@ public class ArmConstants {
     public static final int LIFT_VEL_TO_STOW = 3100;
     public static final int SHOULDER_VELOCITY = 2300;
 
-    public static final int LIFT_LIMIT_TOP = -5750;
+    public static final int LIFT_LIMIT_TOP = -5000;
     public static final int LIFT_LIMIT_BOTTOM = 0;
 
 //    Rest/collect pos

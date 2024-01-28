@@ -1,20 +1,17 @@
 package org.firstinspires.ftc.teamcode.Vision;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.CommandBase;
 
 import org.firstinspires.ftc.teamcode.Chassis.MecanumDrive;
 
-import java.util.function.IntSupplier;
-
 public class VisionUpdatePose extends CommandBase {
     private VisionSubsystem vision;
     private MecanumDrive drive;
-    private IntSupplier targetTag;
 
-    public VisionUpdatePose(VisionSubsystem vision, MecanumDrive drive, IntSupplier targetTag) {
+    public VisionUpdatePose(VisionSubsystem vision, MecanumDrive drive) {
         this.vision = vision;
         this.drive = drive;
-        this.targetTag = targetTag;
         addRequirements(this.vision);
     }
 
@@ -25,11 +22,32 @@ public class VisionUpdatePose extends CommandBase {
 
     @Override
     public void execute() {
-        vision.updatePoseAprilTag(targetTag.getAsInt(), drive);
+        int quadrant = getQuadrant(drive.getPoseEstimate());
+        int targetTag = 0;
+
+        if (quadrant == 1) targetTag = 2;
+        else if (quadrant == 2) targetTag = 5;
+        else if (quadrant == 3) targetTag = 7;
+        else if (quadrant == 4) targetTag = 10;
+
+        vision.updatePoseAprilTag(targetTag, drive);
     }
 
     @Override
     public void end(boolean interrupted) {
         vision.disableAprilTag();
+    }
+
+    public int getQuadrant(Pose2d pose) {
+        int quadrant = 0;
+        boolean xPositive = pose.getX() >= 0;
+        boolean yPositive = pose.getY() >= 0;
+
+        if (xPositive && yPositive) return 1;
+        else if (xPositive && !yPositive) return 2;
+        else if (!xPositive && !yPositive) return 3;
+        else if (!xPositive && yPositive) return 4;
+
+        return quadrant;
     }
 }

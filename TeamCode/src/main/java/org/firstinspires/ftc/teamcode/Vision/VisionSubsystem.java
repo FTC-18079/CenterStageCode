@@ -33,9 +33,9 @@ public class VisionSubsystem extends SubsystemBase {
     private boolean targetTfodFound = false;
     public final CameraStreamProcessor stream = new CameraStreamProcessor();
 
-    public VisionSubsystem(HardwareMap hMap, String name, String tFodAsset, String[] tfodLabels, Telemetry tele) {
+    public VisionSubsystem(HardwareMap hMap, String name, String tfodAsset, String[] tfodLabels, Telemetry tele) {
         camera = hMap.get(WebcamName.class, name);
-        this.tfodAsset = tFodAsset;
+        this.tfodAsset = tfodAsset;
         this.tfodLabels = tfodLabels;
         this.tele = tele;
 
@@ -44,14 +44,19 @@ public class VisionSubsystem extends SubsystemBase {
                 .setDrawCubeProjection(true)
                 .setOutputUnits(DistanceUnit.INCH, AngleUnit.RADIANS)
                 .build();
+        // Decimation = 1 ..  Detect 2" Tag from 10 feet away at 10 Frames per second
+        // Decimation = 2 ..  Detect 2" Tag from 6  feet away at 22 Frames per second
+        // Decimation = 3 ..  Detect 2" Tag from 4  feet away at 30 Frames Per Second
+        // Decimation = 3 ..  Detect 5" Tag from 10 feet away at 30 Frames Per Second
         aprilTagProcessor.setDecimation(3);
 
         tfodProcessor = new TfodProcessor.Builder()
-                .setModelAssetName(tfodAsset)
-                .setModelLabels(tfodLabels)
+                .setModelAssetName(this.tfodAsset)
+                .setModelLabels(this.tfodLabels)
                 .setModelAspectRatio(16.0 / 9.0)
                 .build();
         tfodProcessor.setMinResultConfidence(0.85f);
+        tfodProcessor.setClippingMargins(0, 100, 120, 0);
         tfodProcessor.setZoom(1.0);
 
         visionPortal = new VisionPortal.Builder()
@@ -87,23 +92,52 @@ public class VisionSubsystem extends SubsystemBase {
         return aprilTagDetection;
     }
 
+    // TODO: Find a fix for why updating pose from big tags behaves strangely
     public void updatePoseAprilTag(int targetTagId, MecanumDrive drive) {
         AprilTagDetection aprilTag = getAprilTagDetection(targetTagId);
+        tele.addData("Target tag", targetTagId);
+        tele.addData("Tag found", aprilTag != null);
 
         if (aprilTag != null) {
+            Pose2d tagPose = getTagPose(targetTagId);
+
             double range = aprilTag.ftcPose.range;
             double angle = aprilTag.ftcPose.yaw;
 
-            double x = -70 + (range * Math.cos(angle) + 6.0);
-            double y = (targetTagId == 7 ? -36.5 : +36.5) + (range * Math.sin(angle) - 4.33);
+            double xTranslation = (range * Math.cos(angle) + 6.0);
+            double yTranslation = (range * Math.sin(angle) - 4.33);
+            double angleRot = tagPose.getX() < 0 ? 180 : 0;
 
-            Pose2d newRobotPose = new Pose2d(x, y, -angle);
+            double x = xTranslation * ((tagPose.getX() < 0) ? 1 : -1) + tagPose.getX();
+            double y = yTranslation + tagPose.getY();
 
-            if (range <= 48 && Math.abs(angle) < 40.0) {
+            Pose2d newRobotPose = new Pose2d(x, y, -angle + Math.toRadians(angleRot));
+
+            if (range <= 36 && Math.abs(angle) < 40.0 && updateTelemetry(drive.getPoseEstimate())) {
                 drive.setPoseEstimate(newRobotPose);
-                drive.update();
             }
         }
+    }
+
+    public boolean updateTelemetry(Pose2d pose) {
+        double heading = Math.toRadians(pose.getHeading());
+        if (Math.abs(heading - 180) <= 30) {
+            return true;
+        } else if (heading <= 35) {
+            return true;
+        } else if (Math.abs(heading - 360) <= 35) {
+            return true;
+        } else return false;
+    }
+
+    public Pose2d getTagPose(int targetTag) {
+        Pose2d pose = new Pose2d();
+        if (targetTag == 2) pose = new Pose2d(60, 35);
+        else if(targetTag == 5) pose = new Pose2d(60, -35);
+        else if(targetTag == 7) pose = new Pose2d(-70, -40.75);
+        else if(targetTag == 10) pose = new Pose2d(-70, 40.75);
+
+        return pose;
     }
 
     public Recognition getTfodDetection() {
