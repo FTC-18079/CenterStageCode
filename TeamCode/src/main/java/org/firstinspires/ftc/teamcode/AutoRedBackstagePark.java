@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
@@ -96,6 +97,8 @@ public class AutoRedBackstagePark extends CommandOpMode {
         PoseStorage.pattern = RevBlinkinLedDriver.BlinkinPattern.CP2_SHOT;
         PoseStorage.currentPose = driveTrain.getPoseEstimate();
         PoseStorage.hasAutoRun = false;
+
+        FtcDashboard.getInstance().startCameraStream(vision.stream, 15);
 
         waitForStart();
         if (isStopRequested()) return;

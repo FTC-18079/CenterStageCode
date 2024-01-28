@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import static com.qualcomm.hardware.rev.RevBlinkinLedDriver.BlinkinPattern.CP1_SHOT;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.button.Button;
@@ -117,6 +118,7 @@ public class Tele extends CommandOpMode {
         visionSubsystem = new VisionSubsystem(hardwareMap, "Webcam 1", TFOD_MODEL_ASSET, LABELS, telemetry);
         visionSubsystem.disableTfod();
         visionSubsystem.enableAprilTag();
+        FtcDashboard.getInstance().startCameraStream(visionSubsystem.stream, 15);
 
 //        m_telemetry = new TelemetrySS(telemetry);
 

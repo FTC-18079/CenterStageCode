@@ -98,6 +98,8 @@ public class AutoBlueBackstagePark extends CommandOpMode {
         PoseStorage.currentPose = driveTrain.getPoseEstimate();
         PoseStorage.hasAutoRun = false;
 
+        FtcDashboard.getInstance().startCameraStream(vision.stream, 15);
+
         waitForStart();
         if (isStopRequested()) return;
 
