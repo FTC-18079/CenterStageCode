@@ -43,7 +43,7 @@ import java.util.List;
 @Autonomous(name = "Red Auto V2", group = "Tests")
 public class RedAutoV2 extends CommandOpMode {
     private static final boolean USE_WEBCAM = true;
-    private static final String TFOD_MODEL_ASSET = "redObject_v1.tflite";
+    private static final String TFOD_MODEL_ASSET = "redObject_v2.tflite";
     private static final String[] LABELS = {
             "redObject"
     };

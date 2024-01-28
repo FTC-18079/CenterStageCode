@@ -100,7 +100,7 @@ public class Tele extends CommandOpMode {
         if (PoseStorage.pattern == CP1_SHOT) {
             collectPose = new Vector2d(-55, -55); // Blue Alliance
         } else {
-            collectPose = new Vector2d(-55, 55); // Red Alliance TODO: Change y to 55
+            collectPose = new Vector2d(-55, -8.5); // Red Alliance TODO: Y is 55 at comp, -8.5 at home
         }
         drive.setPoseEstimate(PoseStorage.currentPose);
         drive.update();
