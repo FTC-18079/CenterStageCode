@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.Arm.Lift;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -9,11 +11,16 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Arm.ArmConstants;
 
+@Config
 public class LiftSubsystem extends SubsystemBase {
     private final DcMotorEx lift;
     private final TouchSensor touch;
     private final Telemetry tele;
     private int targetPos;
+    public static double kP = 5.0;
+    public static double kI = 0.0;
+    public static double kD = 0.1;
+    private final PIDController pidController = new PIDController(kP, kI, kD);
 
     public LiftSubsystem(final HardwareMap hMap, String name, String sensor, Telemetry tele) {
         lift = hMap.get(DcMotorEx.class, name);
@@ -57,7 +64,8 @@ public class LiftSubsystem extends SubsystemBase {
         targetPos = target;
         lift.setTargetPosition(targetPos);
         lift.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
-        lift.setVelocity(vel);
+        pidController.setSetPoint(target);
+        lift.setVelocity(pidController.calculate(getEncoderValue()));
 
         tele.addData("Lift Encoder", getEncoderValue());
     }
