@@ -9,15 +9,12 @@ import com.arcrobotics.ftclib.command.button.Button;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
-import com.arcrobotics.ftclib.hardware.motors.Motor;
-import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Arm.ArmCommand;
 import org.firstinspires.ftc.teamcode.Arm.ArmConstants;
 import org.firstinspires.ftc.teamcode.Arm.Lift.StopLift;
-import org.firstinspires.ftc.teamcode.Chassis.AutoDump;
 import org.firstinspires.ftc.teamcode.Chassis.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Arm.Lift.LiftCommand;
 import org.firstinspires.ftc.teamcode.Arm.Lift.LiftSubsystem;
@@ -47,11 +44,9 @@ import org.firstinspires.ftc.teamcode.Vision.VisionUpdatePose;
 public class Tele extends CommandOpMode {
     static final double WHEEL_DIAMETER = 96; //millimeters
     //Chassis
-    private MotorEx lf, rf, lb, rb;
     private MecanumDrive drive;
     private TeleOpDriveCommand driveCommand;
     private ResetHeading resetHeading;
-    private AutoDump autoDump;
     private VisionTargetingCommand visionTargeting;
     //Claw
     private ClawSubsystem claw;
@@ -94,10 +89,6 @@ public class Tele extends CommandOpMode {
 
     @Override
     public void initialize() {
-        lf = new MotorEx(hardwareMap, "leftFront");
-        rf = new MotorEx(hardwareMap, "rightFront");
-        lb = new MotorEx(hardwareMap, "leftBack");
-        rb = new MotorEx(hardwareMap, "rightBack");
         drive = new MecanumDrive(hardwareMap, telemetry, true);
 
         // Get pose estimate from auto & determine alliance
@@ -137,7 +128,9 @@ public class Tele extends CommandOpMode {
                 () -> driverOp.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER),
                 collectPose,
                 () -> driverOp.getButton(GamepadKeys.Button.LEFT_BUMPER),
-                () -> driverOp.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER)
+                () -> driverOp.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER),
+                () -> driverOp.getButton(GamepadKeys.Button.RIGHT_BUMPER),
+                visionSubsystem
         );
         resetHeading = new ResetHeading(drive);
 //        visionTargeting = new VisionTargetingCommand(
@@ -204,11 +197,6 @@ public class Tele extends CommandOpMode {
                 .whenPressed(closeClawTwo, true)
                 .whenReleased(new ArmCommand(shoulder, lift, stow,
                         () -> ArmConstants.SHOULDER_POS_REST, () -> ArmConstants.LIFT_POS_REST, () -> ArmConstants.STOW_POS_REST, telemetry), true);
-
-        lf.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-        rf.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-        lb.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-        rb.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
 
         register(visionSubsystem);
         register(drive);

@@ -48,7 +48,9 @@ public class VisionTargetingCommand extends CommandBase {
                 brakePower.getAsDouble(),
                 new Vector2d(),
                 false,
-                0
+                0,
+                false,
+                vision.getAprilTagDetection(0)
         );
         drive.update();
     }
