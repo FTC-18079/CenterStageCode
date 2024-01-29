@@ -38,7 +38,7 @@ import java.util.List;
 
 @Autonomous(name = "Blue Backstage - Park", group = "Blue Autos")
 public class AutoBlueBackstagePark extends CommandOpMode {
-    private static final String TFOD_MODEL_ASSET = "blueObject_v1.tflite";
+    private static final String TFOD_MODEL_ASSET = "blueObject_v2.tflite";
     private static final String[] LABELS = {
             "blueObject"
     };

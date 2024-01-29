@@ -35,7 +35,7 @@ import java.util.List;
 
 @Autonomous(name = "Blue Wing Side", group = "Blue Autos")
 public class AutoBlueWing extends CommandOpMode {
-    private static final String TFOD_MODEL_ASSET = "blueObject_v1.tflite";
+    private static final String TFOD_MODEL_ASSET = "blueObject_v2.tflite";
     private static final String[] LABELS = {
             "blueObject"
     };
