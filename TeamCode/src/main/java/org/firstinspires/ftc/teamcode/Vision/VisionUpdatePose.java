@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.Vision;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.CommandBase;
 
-import org.firstinspires.ftc.teamcode.Chassis.MecanumDrive;
+import org.firstinspires.ftc.teamcode.Shooter.Chassis.MecanumDrive;
 
 public class VisionUpdatePose extends CommandBase {
     private VisionSubsystem vision;
