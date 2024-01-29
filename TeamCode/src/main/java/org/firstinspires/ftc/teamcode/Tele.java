@@ -17,15 +17,15 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.Arm.ArmCommand;
 import org.firstinspires.ftc.teamcode.Arm.ArmConstants;
 import org.firstinspires.ftc.teamcode.Arm.Lift.StopLift;
-import org.firstinspires.ftc.teamcode.Shooter.Chassis.AutoDump;
-import org.firstinspires.ftc.teamcode.Shooter.Chassis.MecanumDrive;
+import org.firstinspires.ftc.teamcode.Chassis.AutoDump;
+import org.firstinspires.ftc.teamcode.Chassis.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Arm.Lift.LiftCommand;
 import org.firstinspires.ftc.teamcode.Arm.Lift.LiftSubsystem;
 import org.firstinspires.ftc.teamcode.Arm.Shoulder.ResetEncoder;
 import org.firstinspires.ftc.teamcode.Arm.Shoulder.ShoulderCommand;
 import org.firstinspires.ftc.teamcode.Arm.Shoulder.ShoulderSubsystem;
-import org.firstinspires.ftc.teamcode.Shooter.Chassis.TeleOpDriveCommand;
-import org.firstinspires.ftc.teamcode.Shooter.Chassis.ResetHeading;
+import org.firstinspires.ftc.teamcode.Chassis.TeleOpDriveCommand;
+import org.firstinspires.ftc.teamcode.Chassis.ResetHeading;
 import org.firstinspires.ftc.teamcode.Manip.Claw.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.Manip.Claw.CloseClawTwo;
 import org.firstinspires.ftc.teamcode.Manip.Claw.MoveClawOne;
@@ -40,6 +40,7 @@ import org.firstinspires.ftc.teamcode.Shooter.ShooterServoCommand;
 import org.firstinspires.ftc.teamcode.Shooter.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.Shooter.StopShooter;
 import org.firstinspires.ftc.teamcode.Vision.VisionSubsystem;
+import org.firstinspires.ftc.teamcode.Vision.VisionTargetingCommand;
 import org.firstinspires.ftc.teamcode.Vision.VisionUpdatePose;
 
 @TeleOp(name = "TeleOp", group = "OpModes")
@@ -51,6 +52,7 @@ public class Tele extends CommandOpMode {
     private TeleOpDriveCommand driveCommand;
     private ResetHeading resetHeading;
     private AutoDump autoDump;
+    private VisionTargetingCommand visionTargeting;
     //Claw
     private ClawSubsystem claw;
     private MoveClawOne moveClawOne;
@@ -138,7 +140,14 @@ public class Tele extends CommandOpMode {
                 () -> driverOp.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER)
         );
         resetHeading = new ResetHeading(drive);
-        autoDump = new AutoDump(drive, visionSubsystem, () -> PoseStorage.dumpingTag);
+//        visionTargeting = new VisionTargetingCommand(
+//                drive,
+//                visionSubsystem,
+//                () -> -driverOp.getLeftY(),
+//                () -> driverOp.getLeftX(),
+//                () -> driverOp.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER)
+//        );
+//        autoDump = new AutoDump(drive, visionSubsystem, () -> PoseStorage.dumpingTag);
 
         liftCommand = new LiftCommand(
                 lift,
@@ -169,8 +178,6 @@ public class Tele extends CommandOpMode {
                 .whenPressed(resetHeading);
         shooterButton = (new GamepadButton(driverOp, GamepadKeys.Button.B))
                 .whenReleased(new ShooterCommand(shooter, () -> 0.55, telemetry),true);
-        dumpButton = (new GamepadButton(driverOp, GamepadKeys.Button.RIGHT_BUMPER))
-                .whileHeld(autoDump);
 
         clawOneButton = (new GamepadButton(manipOp, GamepadKeys.Button.LEFT_BUMPER))
                 .whenPressed(moveClawOne, true);

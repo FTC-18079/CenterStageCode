@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Shooter.Chassis;
+package org.firstinspires.ftc.teamcode.Chassis;
 
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.arcrobotics.ftclib.command.CommandBase;

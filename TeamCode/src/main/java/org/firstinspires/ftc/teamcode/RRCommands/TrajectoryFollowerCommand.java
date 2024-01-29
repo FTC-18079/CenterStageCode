@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.RRCommands;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.arcrobotics.ftclib.command.CommandBase;
 
-import org.firstinspires.ftc.teamcode.Shooter.Chassis.MecanumDrive;
+import org.firstinspires.ftc.teamcode.Chassis.MecanumDrive;
 
 public class TrajectoryFollowerCommand extends CommandBase {
     private final MecanumDrive drive;
