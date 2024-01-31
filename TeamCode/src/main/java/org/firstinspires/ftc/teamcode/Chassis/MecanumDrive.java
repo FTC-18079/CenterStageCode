@@ -18,6 +18,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Roadrunner.PoseStorage;
 import org.firstinspires.ftc.teamcode.Roadrunner.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.Roadrunner.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.util.List;
 
@@ -27,6 +28,7 @@ public class MecanumDrive extends SubsystemBase {
     private final boolean fieldCentric;
     public PIDFController headingController = new PIDFController(new PIDCoefficients(4.0, 0.0, 0.3));
     private final double orientation;
+    public static double DESIRED_DISTANCE = 7.5;
 
     public MecanumDrive(HardwareMap hardwareMap, Telemetry telemetry, boolean isFieldCentric) {
         this.drive = new SampleMecanumDrive(hardwareMap, telemetry);
@@ -56,6 +58,10 @@ public class MecanumDrive extends SubsystemBase {
         drive.updatePoseEstimate();
     }
 
+    public void drive(Pose2d pose) {
+        drive.setWeightedDrivePower(pose);
+    }
+
     public void drive(double leftY, double leftX, double rightX, double brakePower) {
         double brake = 1.0 - brakePower * 0.8;
 
@@ -64,19 +70,18 @@ public class MecanumDrive extends SubsystemBase {
         Vector2d input = new Vector2d(
                 -leftY * brake,
                 -leftX * brake
-        ).rotated(fieldCentric ? -poseEstimate.getHeading() : 0);
+        );
 
-        drive.setWeightedDrivePower(
+        drive(
                 new Pose2d(
                         input.getX(),
                         input.getY(),
                         -rightX * brake
                 )
         );
-        m_telemetry.addData("Brake", brakePower);
     }
 
-    public void driveCollect(double leftY, double leftX, double rightX, double brakePower, Vector2d targetPos, boolean collecting, double fwd) {
+    public void driveCollect(double leftY, double leftX, double rightX, double brakePower, Vector2d targetPos, boolean collecting, double fwd, boolean dumping, AprilTagDetection tag) {
         double collectFwd = fwd * 0.60;
         boolean isToCollect = fwd > 0.05;
         Pose2d poseEstimate = getPoseEstimate();
@@ -89,7 +94,21 @@ public class MecanumDrive extends SubsystemBase {
                 -leftX * brake
         );
 
-        if (isToCollect && collecting) {
+        if (dumping && tag != null) {
+            double rangeError = (tag.ftcPose.range - DESIRED_DISTANCE);
+            double headingError = tag.ftcPose.bearing;
+            double yawError = tag.ftcPose.yaw;
+
+            double forward  = Range.clip(rangeError * 0.02, -0.5, 0.5);
+            double turn   = Range.clip(headingError * 0.01, -0.3, 0.3) ;
+            double strafe = Range.clip(-yawError * 0.015, -0.5, 0.5);
+
+            driveDirection = new Pose2d(
+                    forward,
+                    strafe,
+                    turn
+            );
+        } else if (isToCollect && collecting) {
             Vector2d direction = new Vector2d(
                     collectFwd,
                     0
@@ -130,7 +149,7 @@ public class MecanumDrive extends SubsystemBase {
             );
         }
 
-        drive.setWeightedDrivePower(driveDirection);
+        drive(driveDirection);
         headingController.update(poseEstimate.getHeading());
     }
 

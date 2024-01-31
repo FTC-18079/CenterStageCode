@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.Vision;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -105,11 +104,11 @@ public class VisionSubsystem extends SubsystemBase {
             double angle = aprilTag.ftcPose.yaw;
 
             double xTranslation = (range * Math.cos(angle) + 6.0);
-            double yTranslation = (range * Math.sin(angle) - 4.33);
+            double yTranslation = 4.33 * (tagPose.getX() < 0 ? 1 : -1);
             double angleRot = tagPose.getX() < 0 ? 180 : 0;
 
             double x = xTranslation * ((tagPose.getX() < 0) ? 1 : -1) + tagPose.getX();
-            double y = yTranslation + tagPose.getY();
+            double y = (range * Math.sin(angle) + yTranslation) + tagPose.getY();
 
             Pose2d newRobotPose = new Pose2d(x, y, -angle + Math.toRadians(angleRot));
 

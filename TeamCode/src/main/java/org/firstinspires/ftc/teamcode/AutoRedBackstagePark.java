@@ -38,7 +38,7 @@ import java.util.List;
 
 @Autonomous(name = "Red Backstage - Park", group = "Red Autos")
 public class AutoRedBackstagePark extends CommandOpMode {
-    private static final String TFOD_MODEL_ASSET = "redObject_v1.tflite";
+    private static final String TFOD_MODEL_ASSET = "redObject_v2.tflite";
     private static final String[] LABELS = {
             "redObject"
     };
@@ -196,6 +196,7 @@ public class AutoRedBackstagePark extends CommandOpMode {
                                         driveTrain.getPoseEstimate().getHeading() + Math.toRadians(6)
                                 )),
                                 new InstantCommand(() -> PoseStorage.hasAutoRun = true),
+                                new InstantCommand(() -> PoseStorage.dumpingTag = 4),
                                 new InstantCommand(() -> PoseStorage.pattern = RevBlinkinLedDriver.BlinkinPattern.CP2_SHOT),
                                 new InstantCommand(() -> telemetry.addData("PoseStorage saved", PoseStorage.hasAutoRun)),
                                 new InstantCommand(() -> telemetry.addData("Pose", PoseStorage.currentPose)),

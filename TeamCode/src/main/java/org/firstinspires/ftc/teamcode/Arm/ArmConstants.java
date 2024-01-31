@@ -32,4 +32,9 @@ public class ArmConstants {
     public static final int SHOULDER_POS_CLIMB = 1450;
     public static final int LIFT_POS_CLIMB = -4060;
     public static final double STOW_POS_CLIMB = 0.75;
+
+//    Dump pos
+    public static final int SHOULDER_POS_DUMP = 523;
+    public static final int LIFT_POS_DUMP = -2170;
+    public static final double STOW_POS_DUMP = 0.5;
 }

@@ -9,8 +9,6 @@ import com.arcrobotics.ftclib.command.button.Button;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
-import com.arcrobotics.ftclib.hardware.motors.Motor;
-import com.arcrobotics.ftclib.hardware.motors.MotorEx;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -39,16 +37,17 @@ import org.firstinspires.ftc.teamcode.Shooter.ShooterServoCommand;
 import org.firstinspires.ftc.teamcode.Shooter.ShooterSubsystem;
 import org.firstinspires.ftc.teamcode.Shooter.StopShooter;
 import org.firstinspires.ftc.teamcode.Vision.VisionSubsystem;
+import org.firstinspires.ftc.teamcode.Vision.VisionTargetingCommand;
 import org.firstinspires.ftc.teamcode.Vision.VisionUpdatePose;
 
 @TeleOp(name = "TeleOp", group = "OpModes")
 public class Tele extends CommandOpMode {
     static final double WHEEL_DIAMETER = 96; //millimeters
     //Chassis
-    private MotorEx lf, rf, lb, rb;
     private MecanumDrive drive;
     private TeleOpDriveCommand driveCommand;
     private ResetHeading resetHeading;
+    private VisionTargetingCommand visionTargeting;
     //Claw
     private ClawSubsystem claw;
     private MoveClawOne moveClawOne;
@@ -83,24 +82,20 @@ public class Tele extends CommandOpMode {
     private RevBlinkinLedDriver led;
 
     private Button headingResetButton, liftResetButton, shoulderResetButton, armClimbButton, armMidButton, armLowButton, armRestButton,
-            clawOneButton, clawTwoButton, stowButton, shooterButton, blueShooterButton, liftStopButton;
+            clawOneButton, clawTwoButton, stowButton, shooterButton, blueShooterButton, liftStopButton, dumpButton;
 
     private Vector2d collectPose = new Vector2d();
     private GamepadEx driverOp, manipOp;
 
     @Override
     public void initialize() {
-        lf = new MotorEx(hardwareMap, "leftFront");
-        rf = new MotorEx(hardwareMap, "rightFront");
-        lb = new MotorEx(hardwareMap, "leftBack");
-        rb = new MotorEx(hardwareMap, "rightBack");
         drive = new MecanumDrive(hardwareMap, telemetry, true);
 
         // Get pose estimate from auto & determine alliance
         if (PoseStorage.pattern == CP1_SHOT) {
             collectPose = new Vector2d(-55, -55); // Blue Alliance
         } else {
-            collectPose = new Vector2d(-55, 55); // Red Alliance TODO: Change y to 55
+            collectPose = new Vector2d(-55, -8.5); // Red Alliance TODO: Y is 55 at comp, -8.5 at home
         }
         drive.setPoseEstimate(PoseStorage.currentPose);
         drive.update();
@@ -133,9 +128,19 @@ public class Tele extends CommandOpMode {
                 () -> driverOp.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER),
                 collectPose,
                 () -> driverOp.getButton(GamepadKeys.Button.LEFT_BUMPER),
-                () -> driverOp.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER)
+                () -> driverOp.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER),
+                () -> driverOp.getButton(GamepadKeys.Button.RIGHT_BUMPER),
+                visionSubsystem
         );
         resetHeading = new ResetHeading(drive);
+//        visionTargeting = new VisionTargetingCommand(
+//                drive,
+//                visionSubsystem,
+//                () -> -driverOp.getLeftY(),
+//                () -> driverOp.getLeftX(),
+//                () -> driverOp.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER)
+//        );
+//        autoDump = new AutoDump(drive, visionSubsystem, () -> PoseStorage.dumpingTag);
 
         liftCommand = new LiftCommand(
                 lift,
@@ -192,11 +197,6 @@ public class Tele extends CommandOpMode {
                 .whenPressed(closeClawTwo, true)
                 .whenReleased(new ArmCommand(shoulder, lift, stow,
                         () -> ArmConstants.SHOULDER_POS_REST, () -> ArmConstants.LIFT_POS_REST, () -> ArmConstants.STOW_POS_REST, telemetry), true);
-
-        lf.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-        rf.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-        lb.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
-        rb.setZeroPowerBehavior(Motor.ZeroPowerBehavior.BRAKE);
 
         register(visionSubsystem);
         register(drive);
