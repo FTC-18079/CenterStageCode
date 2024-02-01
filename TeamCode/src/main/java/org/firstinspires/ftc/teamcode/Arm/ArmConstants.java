@@ -37,4 +37,6 @@ public class ArmConstants {
     public static final int SHOULDER_POS_DUMP = 523;
     public static final int LIFT_POS_DUMP = -2170;
     public static final double STOW_POS_DUMP = 0.5;
+
+    public static final double STOW_POS_STOW = 0.2;
 }
