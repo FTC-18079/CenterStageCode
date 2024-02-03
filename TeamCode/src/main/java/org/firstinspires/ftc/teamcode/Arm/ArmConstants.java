@@ -17,7 +17,7 @@ public class ArmConstants {
     public static final double STOW_POS_REST = 0.725;
 
 //    Low score pos
-    public static final int SHOULDER_POS_LOW = 431;
+    public static final int SHOULDER_POS_LOW = 277;
     public static final int LIFT_POS_LOW = -580;
     public static final double STOW_POS_LOW = 0.55;
 

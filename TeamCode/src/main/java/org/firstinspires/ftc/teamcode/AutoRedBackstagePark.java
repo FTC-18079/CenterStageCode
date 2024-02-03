@@ -108,15 +108,15 @@ public class AutoRedBackstagePark extends CommandOpMode {
             elementPos = recognition.getRight() + recognition.getLeft() / 2;
             if (elementPos < 275) {
                 // Left
-                turnAmount = 62.0;
+                turnAmount = 55.0;
                 fwd = 20;
-                aprilTagY = -20.5;
+                aprilTagY = -21.5;
             }
             else if (elementPos >= 275) {
                 // Middle
-                turnAmount = -15.0;
-                fwd = 26;
-                aprilTagY = -28.75;
+                turnAmount = -20.0;
+                fwd = 25;
+                aprilTagY = -30.0; //-28.75
             }
             else {
                 // Right
@@ -137,12 +137,16 @@ public class AutoRedBackstagePark extends CommandOpMode {
 
         TrajectorySequence traj2 = driveTrain.trajectorySequenceBuilder(traj1.end())
                 .back(fwd - 13)
-                .splineToSplineHeading(new Pose2d(50.2, aprilTagY, Math.toRadians(0)), Math.toRadians(20))
+                .splineToSplineHeading(new Pose2d(49.0, aprilTagY, Math.toRadians(0)), Math.toRadians(20))
                 .build();
 
         TrajectorySequence traj3 = driveTrain.trajectorySequenceBuilder(traj2.end())
+                .back(5)
+                .build();
+
+        TrajectorySequence traj4 = driveTrain.trajectorySequenceBuilder(traj3.end())
                 .lineToLinearHeading(new Pose2d(45, -58, Math.toRadians(0)))
-                .forward(16)
+                .forward(15.5)
                 .strafeRight(2)
                 .build();
 
@@ -167,23 +171,26 @@ public class AutoRedBackstagePark extends CommandOpMode {
                                 telemetry
                         ),
                         new TrajectoryRunner(driveTrain, traj2), // Drive to backboard while brining arm up to score
-                        new InstantCommand(moveClawTwo), // Open claw to score on backboard
+                        new InstantCommand(moveClawTwo), // Open claw to score on backboard,
+                        new WaitCommand(500), // Wait 0.5s
 
                         // TODO: SUPER SKETCHY, this would be replaced for updating estimate by using apriltags
 //                        new InstantCommand(() -> driveTrain.setPoseEstimate(new Pose2d(50, aprilTagY, Math.toRadians(12)))),
 
-                        new WaitCommand(600), // Wait 0.6s
+                        new TrajectoryRunner(driveTrain, traj3),
                         new ArmCommand(
                                 shoulder,
                                 lift,
                                 stow,
                                 () -> ArmConstants.SHOULDER_POS_REST,
                                 () -> ArmConstants.LIFT_POS_REST,
-                                () -> ArmConstants.STOW_POS_REST,
+                                () -> ArmConstants.STOW_POS_STOW,
                                 telemetry
                         ),
+                        new WaitCommand(100),
+                        new InstantCommand(moveClawTwo), //close claw two
                         new ParallelRaceGroup(
-                                new TrajectoryRunner(driveTrain, traj3),
+                                new TrajectoryRunner(driveTrain, traj4),
                                 new WaitCommand(6000)
                         ),
                         new InstantCommand(() -> shoulder.stopVelocity()),
