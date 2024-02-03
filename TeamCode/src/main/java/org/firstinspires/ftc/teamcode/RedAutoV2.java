@@ -21,6 +21,7 @@ import org.firstinspires.ftc.teamcode.Arm.Lift.LiftSubsystem;
 import org.firstinspires.ftc.teamcode.Arm.Lift.LiftToPos;
 import org.firstinspires.ftc.teamcode.Arm.Shoulder.ShoulderSubsystem;
 import org.firstinspires.ftc.teamcode.Arm.Shoulder.ShoulderToPos;
+import org.firstinspires.ftc.teamcode.Chassis.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Manip.Claw.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.Manip.Claw.MoveClawOne;
 import org.firstinspires.ftc.teamcode.Manip.Claw.MoveClawTwo;
@@ -35,6 +36,7 @@ import org.firstinspires.ftc.teamcode.Roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.Roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.Vision.CameraStreamProcessor;
 import org.firstinspires.ftc.teamcode.Vision.VisionSubsystem;
+import org.firstinspires.ftc.teamcode.Vision.VisionUpdatePose;
 import org.firstinspires.ftc.vision.VisionPortal;
 
 import java.util.List;
@@ -51,7 +53,9 @@ public class RedAutoV2 extends CommandOpMode {
     private double turnAmount;
     private double fwd;
     VisionSubsystem visionSubsystem;
-
+    VisionUpdatePose visionUpdatePose;
+    MecanumDrive driveTrain;
+//    SampleMecanumDrive driveTrain;
     StowSubsystem stow;
     ClawSubsystem claw;
     ShoulderSubsystem shoulder;
@@ -67,6 +71,10 @@ public class RedAutoV2 extends CommandOpMode {
     @Override
     public void initialize() {
         // Subsystems
+        driveTrain = new MecanumDrive(hardwareMap, telemetry, false);
+//        driveTrain = new SampleMecanumDrive(hardwareMap, telemetry);
+        Pose2d startPose = new Pose2d(12, -63.339, Math.toRadians(90));
+
         visionSubsystem = new VisionSubsystem(hardwareMap, "Webcam 1", TFOD_MODEL_ASSET, LABELS, telemetry);
         stow = new StowSubsystem(hardwareMap, "stow");
         claw = new ClawSubsystem(hardwareMap, "clawOne", "clawTwo");
@@ -80,6 +88,7 @@ public class RedAutoV2 extends CommandOpMode {
         stowDown = new Down(stow);
         moveClawOne = new MoveClawOne(claw);
         moveClawTwo = new MoveClawTwo(claw);
+        visionUpdatePose = new VisionUpdatePose(visionSubsystem, driveTrain);
 
         visionSubsystem.enableTfod();
         visionSubsystem.disableAprilTag();
@@ -89,11 +98,7 @@ public class RedAutoV2 extends CommandOpMode {
         sleep(200);
         stow.stow();
 
-        SampleMecanumDrive driveTrain = new SampleMecanumDrive(hardwareMap, telemetry);
-        Pose2d startPose = new Pose2d(12, -63.339, Math.toRadians(90));
-
         driveTrain.setPoseEstimate(startPose);
-        driveTrain.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         led.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP2_SHOT);
 
@@ -134,6 +139,9 @@ public class RedAutoV2 extends CommandOpMode {
             aprilTagY = -38.0;
         }
 
+        visionSubsystem.disableTfod();
+        visionSubsystem.enableAprilTag();
+
         TrajectorySequence traj1 = driveTrain.trajectorySequenceBuilder(startPose)
                 .forward(fwd)
                 .build();
@@ -147,6 +155,9 @@ public class RedAutoV2 extends CommandOpMode {
                 .lineToLinearHeading(new Pose2d(45, -58, Math.toRadians(0)))
                 .forward(9)
                 .build();
+
+        register(visionSubsystem);
+        visionSubsystem.setDefaultCommand(visionUpdatePose);
 
         CommandScheduler.getInstance().schedule(
                 new SequentialCommandGroup(
@@ -189,7 +200,7 @@ public class RedAutoV2 extends CommandOpMode {
                                 new WaitCommand(6000)
                         ),
                         new InstantCommand(() -> shoulder.stopVelocity()),
-                        new InstantCommand(() -> driveTrain.setWeightedDrivePower(new Pose2d())),
+                        new InstantCommand(() -> driveTrain.drive(new Pose2d())),
 
                         // Update pose storage and telemetry
                         new SequentialCommandGroup(

@@ -18,6 +18,8 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Roadrunner.PoseStorage;
 import org.firstinspires.ftc.teamcode.Roadrunner.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.Roadrunner.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.Roadrunner.trajectorysequence.TrajectorySequence;
+import org.firstinspires.ftc.teamcode.Roadrunner.trajectorysequence.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
 import java.util.List;
@@ -192,7 +194,7 @@ public class MecanumDrive extends SubsystemBase {
     }
 
     public void turn(double radians) {
-        drive.turnAsync(radians);
+        drive.turn(radians);
     }
 
     public List<Double> getWheelVelocities() {
@@ -209,5 +211,13 @@ public class MecanumDrive extends SubsystemBase {
 
     public Localizer getLocalizer() {
         return drive.getLocalizer();
+    }
+
+    public TrajectorySequenceBuilder trajectorySequenceBuilder(Pose2d startPose) {
+        return drive.trajectorySequenceBuilder(startPose);
+    }
+
+    public void followTrajectorySequence(TrajectorySequence trajectorySequence) {
+        drive.followTrajectorySequence(trajectorySequence);
     }
 }
