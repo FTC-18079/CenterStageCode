@@ -196,7 +196,7 @@ public class Tele extends CommandOpMode {
         armRestButton = (new GamepadButton(manipOp, GamepadKeys.Button.DPAD_DOWN))
                 .whenPressed(closeClawTwo, true)
                 .whenReleased(new ArmCommand(shoulder, lift, stow,
-                        () -> ArmConstants.SHOULDER_POS_REST, () -> ArmConstants.LIFT_POS_REST, () -> ArmConstants.STOW_POS_REST, telemetry), true);
+                        () -> ArmConstants.SHOULDER_POS_REST, () -> ArmConstants.LIFT_POS_REST, () -> ArmConstants.STOW_POS_STOW, telemetry), true);
 
         register(visionSubsystem);
         register(drive);

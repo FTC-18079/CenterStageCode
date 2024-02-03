@@ -2,14 +2,15 @@ package org.firstinspires.ftc.teamcode.RRCommands;
 
 import com.arcrobotics.ftclib.command.CommandBase;
 
+import org.firstinspires.ftc.teamcode.Chassis.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Roadrunner.drive.SampleMecanumDrive;
 
 public class TurnCommand extends CommandBase implements Runnable {
 
-    private final SampleMecanumDrive drive;
+    private final MecanumDrive drive;
     private final double angle;
 
-    public TurnCommand(SampleMecanumDrive drive, double angle) {
+    public TurnCommand(MecanumDrive drive, double angle) {
         this.drive = drive;
         this.angle = angle;
     }

@@ -19,6 +19,7 @@ import org.firstinspires.ftc.teamcode.Arm.ArmCommand;
 import org.firstinspires.ftc.teamcode.Arm.ArmConstants;
 import org.firstinspires.ftc.teamcode.Arm.Lift.LiftSubsystem;
 import org.firstinspires.ftc.teamcode.Arm.Shoulder.ShoulderSubsystem;
+import org.firstinspires.ftc.teamcode.Chassis.MecanumDrive;
 import org.firstinspires.ftc.teamcode.Manip.Claw.ClawSubsystem;
 import org.firstinspires.ftc.teamcode.Manip.Claw.MoveClawOne;
 import org.firstinspires.ftc.teamcode.Manip.Claw.MoveClawTwo;
@@ -31,6 +32,7 @@ import org.firstinspires.ftc.teamcode.Roadrunner.PoseStorage;
 import org.firstinspires.ftc.teamcode.Roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.Roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.Vision.VisionSubsystem;
+import org.firstinspires.ftc.teamcode.Vision.VisionUpdatePose;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 
@@ -49,6 +51,8 @@ public class AutoBlueBackstagePark extends CommandOpMode {
     private double aprilTagY;
 
     VisionSubsystem vision;
+    VisionUpdatePose visionUpdatePose;
+    MecanumDrive driveTrain;
     StowSubsystem stow;
     ClawSubsystem claw;
     ShoulderSubsystem shoulder;
@@ -64,6 +68,7 @@ public class AutoBlueBackstagePark extends CommandOpMode {
     @Override
     public void initialize() {
         // Subsystems
+        driveTrain = new MecanumDrive(hardwareMap, telemetry, false);
         vision = new VisionSubsystem(hardwareMap, "Webcam 1", TFOD_MODEL_ASSET, LABELS, telemetry);
         stow = new StowSubsystem(hardwareMap, "stow");
         claw = new ClawSubsystem(hardwareMap, "clawOne", "clawTwo");
@@ -77,6 +82,7 @@ public class AutoBlueBackstagePark extends CommandOpMode {
         stowDown = new Down(stow);
         moveClawOne = new MoveClawOne(claw);
         moveClawTwo = new MoveClawTwo(claw);
+        visionUpdatePose = new VisionUpdatePose(vision, driveTrain);
 
         vision.enableTfod();
         vision.disableAprilTag();
@@ -86,11 +92,9 @@ public class AutoBlueBackstagePark extends CommandOpMode {
         sleep(200);
         stow.stow();
 
-        SampleMecanumDrive driveTrain = new SampleMecanumDrive(hardwareMap, telemetry);
         Pose2d startPose = new Pose2d(12, 63.339, Math.toRadians(-90));
 
         driveTrain.setPoseEstimate(startPose);
-        driveTrain.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         led.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP1_SHOT);
 
@@ -131,19 +135,30 @@ public class AutoBlueBackstagePark extends CommandOpMode {
             aprilTagY = 30.0;
         }
 
+        vision.disableTfod();
+        vision.enableAprilTag();
+
         TrajectorySequence traj1 = driveTrain.trajectorySequenceBuilder(startPose)
                 .forward(fwd)
                 .build();
 
         TrajectorySequence traj2 = driveTrain.trajectorySequenceBuilder(traj1.end())
                 .back(fwd - 13)
-                .splineToSplineHeading(new Pose2d(50.5, aprilTagY, Math.toRadians(0)), Math.toRadians(-20))
+                .splineToSplineHeading(new Pose2d(49.0, aprilTagY, Math.toRadians(0)), Math.toRadians(-20))
                 .build();
 
         TrajectorySequence traj3 = driveTrain.trajectorySequenceBuilder(traj2.end())
-                .lineToLinearHeading(new Pose2d(45, 58, Math.toRadians(0)))
-                .forward(9)
+                .back(5)
                 .build();
+
+        TrajectorySequence traj4 = driveTrain.trajectorySequenceBuilder(traj3.end())
+                .lineToLinearHeading(new Pose2d(45, 58, Math.toRadians(0)))
+                .forward(13.5)
+                .strafeLeft(2)
+                .build();
+
+        register(vision);
+        vision.setDefaultCommand(visionUpdatePose);
 
         CommandScheduler.getInstance().schedule(
                 new SequentialCommandGroup(
@@ -160,15 +175,15 @@ public class AutoBlueBackstagePark extends CommandOpMode {
                                 shoulder,
                                 lift,
                                 stow,
-                                () -> ArmConstants.SHOULDER_POS_LOW,
+                                () -> 277,
                                 () -> ArmConstants.LIFT_POS_LOW,
                                 () -> ArmConstants.STOW_POS_LOW,
                                 telemetry
                         ),
                         new TrajectoryRunner(driveTrain, traj2), // Drive to backboard while brining arm up to score
                         new InstantCommand(moveClawTwo), //Open claw to score on backboard
-
-                        new WaitCommand(600), // Wait .6s
+                        new WaitCommand(500), // Wait .5s
+                        new TrajectoryRunner(driveTrain, traj3),
                         new ArmCommand(
                                 shoulder,
                                 lift,
@@ -178,12 +193,13 @@ public class AutoBlueBackstagePark extends CommandOpMode {
                                 () -> ArmConstants.STOW_POS_REST,
                                 telemetry
                         ),
+                        new InstantCommand(moveClawTwo), // Close claw two
                         new ParallelRaceGroup(
-                                new TrajectoryRunner(driveTrain, traj3),
+                                new TrajectoryRunner(driveTrain, traj4),
                                 new WaitCommand(6000)
                         ),
                         new InstantCommand(() -> shoulder.stopVelocity()),
-                        new InstantCommand(() -> driveTrain.setWeightedDrivePower(new Pose2d())),
+                        new InstantCommand(() -> driveTrain.drive(new Pose2d())),
 
                         // Update pose storage and telemetry
                         new SequentialCommandGroup(

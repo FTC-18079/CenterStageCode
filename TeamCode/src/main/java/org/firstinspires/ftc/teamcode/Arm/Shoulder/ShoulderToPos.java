@@ -29,8 +29,7 @@ public class ShoulderToPos extends CommandBase implements Runnable {
     public void initialize() {
         timer.start();
         shoulder.moveToPos(
-                position.getAsInt(),
-                velocity.getAsDouble()
+                position.getAsInt()
         );
     }
 
