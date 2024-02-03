@@ -132,7 +132,7 @@ public class AutoRedWingCycle extends CommandOpMode {
 
         TrajectorySequence traj2 = driveTrain.trajectorySequenceBuilder(traj1.end())
                 .back(7)
-                .splineToConstantHeading(new Vector2d(-57, -59), Math.toRadians(90))
+                .splineToConstantHeading(new Vector2d(-56, -59), Math.toRadians(90))
                 .forward(7)
                 .build();
 
@@ -151,7 +151,7 @@ public class AutoRedWingCycle extends CommandOpMode {
                         new WaitCommand(500), // Wait .5s
                         new TurnCommand(driveTrain, Math.toRadians(turnAmount * -1)),
                         new TrajectoryRunner(driveTrain, traj2),
-                        new TurnCommand(driveTrain, Math.toRadians(10)),
+                        new TurnCommand(driveTrain, Math.toRadians(20)),
 //                        new ArmCommand(
 //
 //                        ),
