@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.teamcode.Arm.ArmCommand;
+import org.firstinspires.ftc.teamcode.Arm.ArmConstants;
 import org.firstinspires.ftc.teamcode.Arm.Lift.LiftSubsystem;
 import org.firstinspires.ftc.teamcode.Arm.Shoulder.ShoulderSubsystem;
 import org.firstinspires.ftc.teamcode.Chassis.MecanumDrive;
@@ -131,8 +132,8 @@ public class AutoRedWingCycle extends CommandOpMode {
                 .build();
 
         TrajectorySequence traj2 = driveTrain.trajectorySequenceBuilder(traj1.end())
-                .back(7)
-                .splineToConstantHeading(new Vector2d(-56, -59), Math.toRadians(90))
+                .back(fwd - 14)
+                .splineToConstantHeading(new Vector2d(-56, -58), Math.toRadians(180))
                 .forward(7)
                 .build();
 
@@ -151,10 +152,17 @@ public class AutoRedWingCycle extends CommandOpMode {
                         new WaitCommand(500), // Wait .5s
                         new TurnCommand(driveTrain, Math.toRadians(turnAmount * -1)),
                         new TrajectoryRunner(driveTrain, traj2),
-                        new TurnCommand(driveTrain, Math.toRadians(20)),
-//                        new ArmCommand(
-//
-//                        ),
+                        new TurnCommand(driveTrain, Math.toRadians(15)),
+                        new ArmCommand(
+                                shoulder,
+                                lift,
+                                stow,
+                                () -> ArmConstants.SHOULDER_POS_LOW,
+                                () -> ArmConstants.LIFT_POS_REST,
+                                () -> ArmConstants.STOW_POS_REST,
+                                telemetry
+                        ),
+                        new InstantCommand(stowDown),
 
                         new SequentialCommandGroup(
                                 new InstantCommand(() -> PoseStorage.currentPose = driveTrain.getPoseEstimate()),

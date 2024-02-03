@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Arm.Shoulder;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.arcrobotics.ftclib.controller.PIDController;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -9,14 +10,16 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+
+@Config
 public class ShoulderSubsystem extends SubsystemBase {
     private final DcMotorEx shoulder1, shoulder2;
     private final TouchSensor sensor;
     private final Telemetry tele;
     private int targetPos;
-    public static double kP = 5.0;
+    public static double kP = 4.0;
     public static double kI = 0.0;
-    public static double kD = 0.1;
+    public static double kD = 0.5;
     private final PIDController pidController = new PIDController(kP, kI, kD);
 
     public ShoulderSubsystem(final HardwareMap hMap, String motor1, String motor2, String sensor, Telemetry tele) {
@@ -48,7 +51,7 @@ public class ShoulderSubsystem extends SubsystemBase {
         tele.addData("Shoulder Encoder:", getEncoderValue());
     }
 
-    public void moveToPos(int target, double vel) {
+    public void moveToPos(int target) {
         targetPos = target;
         shoulder1.setTargetPosition(targetPos);
         shoulder2.setTargetPosition(targetPos);
@@ -59,6 +62,19 @@ public class ShoulderSubsystem extends SubsystemBase {
         double output = pidController.calculate(getEncoderValue());
         shoulder1.setVelocity(output);
         shoulder2.setVelocity(output);
+    }
+
+    public void moveToPos(int target, double vel) {
+        targetPos = target;
+        double damp;
+        shoulder1.setTargetPosition(targetPos);
+        shoulder2.setTargetPosition(targetPos);
+        if (targetPos < getEncoderValue()) damp = 0.75;
+        else damp = 1.0;
+        shoulder1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        shoulder2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        shoulder1.setVelocity(vel * damp);
+        shoulder2.setVelocity(vel * damp);
     }
 
     public boolean isRunning() {

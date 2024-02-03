@@ -153,7 +153,7 @@ public class AutoBlueBackstagePark extends CommandOpMode {
 
         TrajectorySequence traj4 = driveTrain.trajectorySequenceBuilder(traj3.end())
                 .lineToLinearHeading(new Pose2d(45, 58, Math.toRadians(0)))
-                .forward(15.5)
+                .forward(13.5)
                 .strafeLeft(2)
                 .build();
 
@@ -175,7 +175,7 @@ public class AutoBlueBackstagePark extends CommandOpMode {
                                 shoulder,
                                 lift,
                                 stow,
-                                () -> ArmConstants.SHOULDER_POS_LOW,
+                                () -> 277,
                                 () -> ArmConstants.LIFT_POS_LOW,
                                 () -> ArmConstants.STOW_POS_LOW,
                                 telemetry
