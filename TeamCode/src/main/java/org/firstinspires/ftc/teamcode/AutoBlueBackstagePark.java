@@ -144,12 +144,17 @@ public class AutoBlueBackstagePark extends CommandOpMode {
 
         TrajectorySequence traj2 = driveTrain.trajectorySequenceBuilder(traj1.end())
                 .back(fwd - 13)
-                .splineToSplineHeading(new Pose2d(50.5, aprilTagY, Math.toRadians(0)), Math.toRadians(-20))
+                .splineToSplineHeading(new Pose2d(49.0, aprilTagY, Math.toRadians(0)), Math.toRadians(-20))
                 .build();
 
         TrajectorySequence traj3 = driveTrain.trajectorySequenceBuilder(traj2.end())
+                .back(5)
+                .build();
+
+        TrajectorySequence traj4 = driveTrain.trajectorySequenceBuilder(traj3.end())
                 .lineToLinearHeading(new Pose2d(45, 58, Math.toRadians(0)))
-                .forward(9)
+                .forward(15.5)
+                .strafeLeft(2)
                 .build();
 
         register(vision);
@@ -177,8 +182,8 @@ public class AutoBlueBackstagePark extends CommandOpMode {
                         ),
                         new TrajectoryRunner(driveTrain, traj2), // Drive to backboard while brining arm up to score
                         new InstantCommand(moveClawTwo), //Open claw to score on backboard
-
-                        new WaitCommand(600), // Wait .6s
+                        new WaitCommand(500), // Wait .5s
+                        new TrajectoryRunner(driveTrain, traj3),
                         new ArmCommand(
                                 shoulder,
                                 lift,
@@ -188,8 +193,9 @@ public class AutoBlueBackstagePark extends CommandOpMode {
                                 () -> ArmConstants.STOW_POS_REST,
                                 telemetry
                         ),
+                        new InstantCommand(moveClawTwo), // Close claw two
                         new ParallelRaceGroup(
-                                new TrajectoryRunner(driveTrain, traj3),
+                                new TrajectoryRunner(driveTrain, traj4),
                                 new WaitCommand(6000)
                         ),
                         new InstantCommand(() -> shoulder.stopVelocity()),

@@ -181,10 +181,6 @@ public class AutoRedBackstagePark extends CommandOpMode {
                         new TrajectoryRunner(driveTrain, traj2), // Drive to backboard while brining arm up to score
                         new InstantCommand(moveClawTwo), // Open claw to score on backboard,
                         new WaitCommand(500), // Wait 0.5s
-
-                        // TODO: SUPER SKETCHY, this would be replaced for updating estimate by using apriltags
-//                        new InstantCommand(() -> driveTrain.setPoseEstimate(new Pose2d(50, aprilTagY, Math.toRadians(12)))),
-
                         new TrajectoryRunner(driveTrain, traj3),
                         new ArmCommand(
                                 shoulder,
@@ -195,8 +191,7 @@ public class AutoRedBackstagePark extends CommandOpMode {
                                 () -> ArmConstants.STOW_POS_STOW,
                                 telemetry
                         ),
-                        new WaitCommand(100),
-                        new InstantCommand(moveClawTwo), //close claw two
+                        new InstantCommand(moveClawTwo), // Close claw two
                         new ParallelRaceGroup(
                                 new TrajectoryRunner(driveTrain, traj4),
                                 new WaitCommand(6000)

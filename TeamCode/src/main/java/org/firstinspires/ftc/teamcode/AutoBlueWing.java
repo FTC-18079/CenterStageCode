@@ -109,27 +109,27 @@ public class AutoBlueWing extends CommandOpMode {
             elementPos = recognition.getRight() + recognition.getLeft() / 2;
             if (elementPos < 275) {
                 // Left
-                turnAmount = 62.0;
+                turnAmount = 60.0;
                 fwd = 20;
-                aprilTagY = -20.5;
+                aprilTagY = 44.0;
             }
             else if (elementPos >= 275) {
                 // Middle
-                turnAmount = -15.0;
+                turnAmount = 15.0;
                 fwd = 26;
-                aprilTagY = -28.5;
+                aprilTagY = 38.5;
             }
             else {
                 // Right
-                turnAmount = -45.0;
+                turnAmount = -60.0;
                 fwd = 20;
-                aprilTagY = -38.0;
+                aprilTagY = 30.0;
             }
         } else {
             // Right
-            turnAmount = -45.0;
+            turnAmount = -60.0;
             fwd = 20;
-            aprilTagY = -38.0;
+            aprilTagY = 30.0;
         }
 
         vision.disableTfod();

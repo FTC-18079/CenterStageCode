@@ -109,15 +109,15 @@ public class AutoRedWing extends CommandOpMode {
             elementPos = recognition.getRight() + recognition.getLeft() / 2;
             if (elementPos < 275) {
                 // Left
-                turnAmount = 62.0;
+                turnAmount = 55.0;
                 fwd = 20;
-                aprilTagY = -20.5;
+                aprilTagY = -21.5;
             }
             else if (elementPos >= 275) {
                 // Middle
-                turnAmount = -15.0;
-                fwd = 26;
-                aprilTagY = -28.75;
+                turnAmount = -20.0;
+                fwd = 25;
+                aprilTagY = -30.0; //-28.75
             }
             else {
                 // Right
