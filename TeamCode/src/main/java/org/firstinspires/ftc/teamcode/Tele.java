@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode;
 import static com.qualcomm.hardware.rev.RevBlinkinLedDriver.BlinkinPattern.CP1_SHOT;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.button.Button;
@@ -40,6 +41,7 @@ import org.firstinspires.ftc.teamcode.Vision.VisionSubsystem;
 import org.firstinspires.ftc.teamcode.Vision.VisionTargetingCommand;
 import org.firstinspires.ftc.teamcode.Vision.VisionUpdatePose;
 
+@Config
 @TeleOp(name = "TeleOp", group = "OpModes")
 public class Tele extends CommandOpMode {
     static final double WHEEL_DIAMETER = 96; //millimeters
@@ -78,6 +80,7 @@ public class Tele extends CommandOpMode {
     private static final String[] LABELS = {
             "redObject"
     };
+    public static double SHOOTER_POWER = 0.43;
     //Lights
     private RevBlinkinLedDriver led;
 
@@ -113,7 +116,7 @@ public class Tele extends CommandOpMode {
         visionSubsystem = new VisionSubsystem(hardwareMap, "Webcam 1", TFOD_MODEL_ASSET, LABELS, telemetry);
         visionSubsystem.disableTfod();
         visionSubsystem.enableAprilTag();
-        FtcDashboard.getInstance().startCameraStream(visionSubsystem.stream, 15);
+//        FtcDashboard.getInstance().startCameraStream(visionSubsystem.stream, 15);
 
 //        m_telemetry = new TelemetrySS(telemetry);
 
@@ -170,7 +173,7 @@ public class Tele extends CommandOpMode {
         headingResetButton = (new GamepadButton(driverOp, GamepadKeys.Button.Y))
                 .whenPressed(resetHeading);
         shooterButton = (new GamepadButton(driverOp, GamepadKeys.Button.B))
-                .whenReleased(new ShooterCommand(shooter, () -> 0.55, telemetry),true);
+                .whenReleased(new ShooterCommand(shooter, () -> SHOOTER_POWER, telemetry),true);
 
         clawOneButton = (new GamepadButton(manipOp, GamepadKeys.Button.LEFT_BUMPER))
                 .whenPressed(moveClawOne, true);

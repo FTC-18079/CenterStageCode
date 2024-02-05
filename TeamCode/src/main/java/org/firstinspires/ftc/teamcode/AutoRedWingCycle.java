@@ -10,6 +10,7 @@ import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.teamcode.Arm.ArmCommand;
@@ -30,6 +31,7 @@ import org.firstinspires.ftc.teamcode.Roadrunner.trajectorysequence.TrajectorySe
 import org.firstinspires.ftc.teamcode.Vision.VisionSubsystem;
 import org.firstinspires.ftc.teamcode.Vision.VisionUpdatePose;
 
+@Disabled
 @Autonomous(name = "Red Wing Side Cycle", group = "Red Autos")
 public class AutoRedWingCycle extends CommandOpMode {
     private static final String TFOD_MODEL_ASSET = "redObject_v2.tflite";

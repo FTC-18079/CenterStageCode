@@ -102,7 +102,7 @@ public class AutoBlueBackstagePark extends CommandOpMode {
         PoseStorage.currentPose = driveTrain.getPoseEstimate();
         PoseStorage.hasAutoRun = false;
 
-        FtcDashboard.getInstance().startCameraStream(vision.stream, 15);
+//        FtcDashboard.getInstance().startCameraStream(vision.stream, 15);
 
         waitForStart();
         if (isStopRequested()) return;
@@ -190,10 +190,10 @@ public class AutoBlueBackstagePark extends CommandOpMode {
                                 stow,
                                 () -> ArmConstants.SHOULDER_POS_REST,
                                 () -> ArmConstants.LIFT_POS_REST,
-                                () -> ArmConstants.STOW_POS_REST,
+                                () -> ArmConstants.STOW_POS_STOW,
                                 telemetry
                         ),
-                        new InstantCommand(moveClawTwo), // Close claw two
+                        new InstantCommand(moveClawOne), // Close claw one
                         new ParallelRaceGroup(
                                 new TrajectoryRunner(driveTrain, traj4),
                                 new WaitCommand(6000)
