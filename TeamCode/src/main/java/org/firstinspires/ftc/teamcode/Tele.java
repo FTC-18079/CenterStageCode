@@ -87,6 +87,10 @@ public class Tele extends CommandOpMode {
     private Vector2d collectPose = new Vector2d();
     private GamepadEx driverOp, manipOp;
 
+    // For outreach
+    boolean isFast = false;
+    double speedCap = 0.5;
+
     @Override
     public void initialize() {
         drive = new MecanumDrive(hardwareMap, telemetry, true);
@@ -122,9 +126,9 @@ public class Tele extends CommandOpMode {
 
         driveCommand = new TeleOpDriveCommand(
                 drive,
-                () -> -driverOp.getLeftY(),
-                () -> driverOp.getLeftX(),
-                () -> driverOp.getRightX(),
+                () -> -driverOp.getLeftY() * speedCap,
+                () -> driverOp.getLeftX() * speedCap,
+                () -> driverOp.getRightX() * speedCap,
                 () -> driverOp.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER),
                 collectPose,
                 () -> driverOp.getButton(GamepadKeys.Button.LEFT_BUMPER),
@@ -207,5 +211,28 @@ public class Tele extends CommandOpMode {
         lift.setDefaultCommand(liftCommand);
         shoulder.setDefaultCommand(shoulderCommand);
         led.setPattern(PoseStorage.pattern);
+    }
+
+    @Override
+    public void runOpMode() throws InterruptedException {
+        while (opModeInInit() && !gamepad1.options) {
+            if (gamepad1.left_bumper) isFast = true;
+            else if (gamepad1.right_bumper) isFast = false;
+
+            telemetry.addData("Status", "Auto config. Press left bumper for speed, right for slow.");
+            telemetry.update();
+        }
+
+        speedCap = isFast ? 1.0 : 0.5;
+
+        initialize();
+
+        waitForStart();
+
+        // run the scheduler
+        while (!isStopRequested() && opModeIsActive()) {
+            run();
+        }
+        reset();
     }
 }
