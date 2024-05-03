@@ -198,11 +198,11 @@ public class Tele extends CommandOpMode {
                 .whenReleased(new ArmCommand(shoulder, lift, stow,
                         () -> ArmConstants.SHOULDER_POS_REST, () -> ArmConstants.LIFT_POS_REST, () -> ArmConstants.STOW_POS_STOW, telemetry), true);
 
-        register(visionSubsystem);
+        // register(visionSubsystem);
         register(drive);
         register(lift);
         register(shoulder);
-        visionSubsystem.setDefaultCommand(visionUpdatePose);
+        // visionSubsystem.setDefaultCommand(visionUpdatePose);
         drive.setDefaultCommand(driveCommand);
         lift.setDefaultCommand(liftCommand);
         shoulder.setDefaultCommand(shoulderCommand);
