@@ -83,6 +83,21 @@ public class MecanumDrive extends SubsystemBase {
         );
     }
 
+    public void driveFieldCentric(double leftY, double leftX, double rightX) {
+        Vector2d input = new Vector2d(
+                -leftY,
+                -leftX
+        );
+        Pose2d poseEstimate = getPoseEstimate();
+        input = input.rotated(-poseEstimate.getHeading());
+
+        drive(new Pose2d(
+                input.getX(),
+                input.getY(),
+                -rightX
+        ));
+    }
+
     public void driveCollect(double leftY, double leftX, double rightX, double brakePower, Vector2d targetPos, boolean collecting, double fwd, boolean dumping, AprilTagDetection tag) {
         double collectFwd = fwd * 0.60;
         boolean isToCollect = fwd > 0.05;

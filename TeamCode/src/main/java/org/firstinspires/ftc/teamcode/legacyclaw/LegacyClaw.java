@@ -1,15 +1,20 @@
 package org.firstinspires.ftc.teamcode.legacyclaw;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+@Config
 public class LegacyClaw extends SubsystemBase {
     boolean clawOneActive;
     Servo stow;
     Servo wrist;
     Servo claw1;
     Servo claw2;
+
+    public static double stowPos = 0.45;
+    public static double downPos = 0.90;
 
     public LegacyClaw(HardwareMap hMap) {
         stow = hMap.get(Servo.class, "stow");
@@ -22,21 +27,30 @@ public class LegacyClaw extends SubsystemBase {
 
     public void grab() {
         if (clawOneActive) claw1.setPosition(0);
-        else claw2.setPosition(1);
+        else claw2.setPosition(0);
     }
 
     public void release() {
         if (clawOneActive) claw1.setPosition(1);
-        else claw2.setPosition(0);
+        else claw2.setPosition(1);
 
+    }
+
+    public void toggleStow() {
+        if (stow.getPosition() == downPos) stowUp();
+        else stowDown();
     }
 
     public void stowDown() {
-        stow.setPosition(1);
+        stow.setPosition(downPos);
     }
 
     public void stowUp() {
-        stow.setPosition(0);
+        stow.setPosition(stowPos);
+    }
+
+    public void setStow(double pos) {
+        stow.setPosition(pos);
     }
 
     public void rotate() {

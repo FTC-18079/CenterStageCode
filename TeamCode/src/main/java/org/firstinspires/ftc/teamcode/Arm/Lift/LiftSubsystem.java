@@ -20,6 +20,7 @@ public class LiftSubsystem extends SubsystemBase {
     public static double kP = 5.0;
     public static double kI = 0.0;
     public static double kD = 0.1;
+    boolean inClimb;
     private final PIDController pidController = new PIDController(kP, kI, kD);
 
     public LiftSubsystem(final HardwareMap hMap, String name, String sensor, Telemetry tele) {
@@ -30,6 +31,7 @@ public class LiftSubsystem extends SubsystemBase {
         lift.setDirection(DcMotorEx.Direction.REVERSE);
         lift.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         lift.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        inClimb = false;
     }
 
     public void drive(double input, boolean limitEnabled, boolean limitBypass) {
@@ -54,6 +56,10 @@ public class LiftSubsystem extends SubsystemBase {
         }
 
         tele.addData("Lift Encoder", getEncoderValue());
+    }
+
+    public void setClimbing(boolean climbing) {
+        inClimb = climbing;
     }
 
     public void stop() {
@@ -93,5 +99,9 @@ public class LiftSubsystem extends SubsystemBase {
     public void resetLimit() {
         lift.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         if (!isRunning()) lift.setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+    }
+
+    public boolean isInClimb() {
+        return inClimb;
     }
 }

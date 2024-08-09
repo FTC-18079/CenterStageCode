@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.command.CommandScheduler;
+import com.arcrobotics.ftclib.command.ConditionalCommand;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.Robot;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
@@ -17,9 +18,11 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Arm.ArmCommand;
 import org.firstinspires.ftc.teamcode.Arm.ArmConstants;
+import org.firstinspires.ftc.teamcode.Arm.Lift.LiftCommand;
 import org.firstinspires.ftc.teamcode.Arm.Lift.LiftSubsystem;
 import org.firstinspires.ftc.teamcode.Arm.Lift.LiftToPos;
 import org.firstinspires.ftc.teamcode.Arm.Lift.StopLift;
+import org.firstinspires.ftc.teamcode.Arm.Shoulder.ShoulderCommand;
 import org.firstinspires.ftc.teamcode.Arm.Shoulder.ShoulderSubsystem;
 import org.firstinspires.ftc.teamcode.Arm.Shoulder.ShoulderToPos;
 import org.firstinspires.ftc.teamcode.Chassis.MecanumDrive;
@@ -43,6 +46,8 @@ public class RobotCore extends Robot {
     VisionSubsystem vision;
     // Commands
     NewDriveCommand driveCommand;
+    LiftCommand liftCommand;
+    ShoulderCommand shoulderCommand;
 
     public RobotCore(HardwareMap hardwareMap, Telemetry telemetry, Gamepad gamepad1, Pose2d initialPose) {
         this.telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -69,9 +74,9 @@ public class RobotCore extends Robot {
     private void setDriveControls() {
         driveCommand = new NewDriveCommand(
                 chassis,
-                () -> -driveController.getLeftY() * 0.5,
-                () -> driveController.getLeftX() * 0.5,
-                () -> driveController.getRightX() * 0.5
+                () -> responseCurve(-driveController.getLeftY() * 0.7, 2),
+                () -> responseCurve(driveController.getLeftX() * 0.7, 2),
+                () -> responseCurve(driveController.getRightX() * 0.7, 2)
         );
         driveController.getGamepadButton(GamepadKeys.Button.Y)
                 .whenPressed(new ResetHeading(chassis));
@@ -82,11 +87,13 @@ public class RobotCore extends Robot {
         driveController.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
                 .whenPressed(new SequentialCommandGroup(
                         new InstantCommand(claw::stowUp),
-                        new WaitCommand(700),
+                        new WaitCommand(200),
                         new InstantCommand(claw::rotate),
-                        new WaitCommand(700),
+                        new WaitCommand(300),
                         new InstantCommand(claw::stowDown)
                 ));
+        driveController.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
+                .whenPressed(claw::stowDown);
 
         driveController.getGamepadButton(GamepadKeys.Button.A)
                 .whenPressed(new InstantCommand(claw::grab));
@@ -96,18 +103,35 @@ public class RobotCore extends Robot {
         driveController.getGamepadButton(GamepadKeys.Button.X)
                 .whenPressed(new StopLift(lift), true);
 
-        driveController.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
-                .whenPressed(new ShoulderToPos(pivot, () -> ArmConstants.SHOULDER_POS_CLIMB, () -> ArmConstants.SHOULDER_VELOCITY, telemetry), true)
-                .whenPressed(new LiftToPos(lift, () -> ArmConstants.LIFT_POS_CLIMB, () -> ArmConstants.LIFT_VELOCITY, telemetry), true);
+        driveController.getGamepadButton(GamepadKeys.Button.DPAD_UP)
+                .whenPressed(new ShoulderToPos(pivot, () -> 1000, () -> ArmConstants.SHOULDER_VELOCITY, telemetry), true)
+                .whenPressed(new LiftToPos(lift, () -> ArmConstants.LIFT_POS_CLIMB, () -> ArmConstants.LIFT_VELOCITY, telemetry), true)
+                .whenPressed(new InstantCommand(claw::stowDown))
+                .whenPressed(new InstantCommand(() -> lift.setClimbing(true)));
         driveController.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
                 .whenPressed(new ShoulderToPos(pivot, () -> ArmConstants.SHOULDER_POS_LOW, () -> ArmConstants.SHOULDER_VELOCITY, telemetry), true)
-                .whenPressed(new LiftToPos(lift, () -> ArmConstants.LIFT_POS_LOW, () -> ArmConstants.LIFT_VELOCITY, telemetry), true);
-        driveController.getGamepadButton(GamepadKeys.Button.DPAD_UP)
-                .whenPressed(new ShoulderToPos(pivot, () -> ArmConstants.SHOULDER_POS_MID, () -> ArmConstants.SHOULDER_VELOCITY, telemetry), true)
-                .whenPressed(new LiftToPos(lift, () -> ArmConstants.LIFT_POS_MID, () -> ArmConstants.LIFT_VELOCITY, telemetry), true);
+                .whenPressed(new LiftToPos(lift, () -> -1700, () -> ArmConstants.LIFT_VELOCITY, telemetry), true)
+                .whenPressed(new InstantCommand(() -> claw.setStow(0.7)))
+                .whenPressed(new InstantCommand(() -> lift.setClimbing(false)));
         driveController.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
                 .whenPressed(new ShoulderToPos(pivot, () -> ArmConstants.SHOULDER_POS_REST, () -> ArmConstants.SHOULDER_VELOCITY, telemetry), true)
-                .whenPressed(new LiftToPos(lift, () -> ArmConstants.LIFT_POS_REST, () -> ArmConstants.LIFT_VELOCITY, telemetry), true);
+                .whenPressed(new LiftToPos(lift, () -> ArmConstants.LIFT_POS_REST, () -> ArmConstants.LIFT_VELOCITY, telemetry), true)
+                .whenPressed(claw::stowUp)
+                .whenPressed(new InstantCommand(() -> lift.setClimbing(false)));
+
+        driveController.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
+                .whenPressed(new ConditionalCommand(
+                        new LiftToPos(lift, () -> -300, () -> 1500, telemetry),
+                        new InstantCommand(),
+                        lift::isInClimb
+                ));
+
+        liftCommand = new LiftCommand(lift, () -> 0, () -> true, () -> false);
+        shoulderCommand = new ShoulderCommand(pivot, () -> 0);
+
+        chassis.setDefaultCommand(driveCommand);
+        lift.setDefaultCommand(liftCommand);
+        pivot.setDefaultCommand(shoulderCommand);
     }
 
     public double responseCurve(double value, double power) {

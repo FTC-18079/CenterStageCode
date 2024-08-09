@@ -28,9 +28,6 @@ public class ShoulderToPos extends CommandBase implements Runnable {
     @Override
     public void initialize() {
         timer.start();
-        shoulder.moveToPos(
-                position.getAsInt()
-        );
     }
 
     @Override
@@ -41,6 +38,12 @@ public class ShoulderToPos extends CommandBase implements Runnable {
     @Override
     public void execute() {
         tele.addData("Shoulder Encoder:", shoulder.getEncoderValue());
+        shoulder.moveToPos(position.getAsInt());
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        shoulder.stopVelocity();
     }
 
     @Override

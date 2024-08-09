@@ -14,10 +14,11 @@ public class NewDriveCommand extends CommandBase {
         this.leftY = leftY;
         this.leftX = leftX;
         this.rightX = rightX;
+        addRequirements(chassis);
     }
 
     @Override
     public void execute() {
-        drive.drive(leftY.getAsDouble(), leftX.getAsDouble(), rightX.getAsDouble(), 0);
+        drive.driveFieldCentric(leftY.getAsDouble(), leftX.getAsDouble(), rightX.getAsDouble());
     }
 }
