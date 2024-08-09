@@ -16,15 +16,17 @@ public class LegacyClaw extends SubsystemBase {
         wrist = hMap.get(Servo.class, "wrist");
         claw1 = hMap.get(Servo.class, "clawOne");
         claw2 = hMap.get(Servo.class, "clawTwo");
+
+        clawOneActive = true;
     }
 
     public void grab() {
-        if (clawOneActive) claw1.setPosition(1);
+        if (clawOneActive) claw1.setPosition(0);
         else claw2.setPosition(1);
     }
 
     public void release() {
-        if (clawOneActive) claw1.setPosition(0);
+        if (clawOneActive) claw1.setPosition(1);
         else claw2.setPosition(0);
 
     }
@@ -42,5 +44,6 @@ public class LegacyClaw extends SubsystemBase {
         if (wristPos == 1.0) {
             wrist.setPosition(0.0);
         } else wrist.setPosition(1.0);
+        clawOneActive = ! clawOneActive;
     }
 }

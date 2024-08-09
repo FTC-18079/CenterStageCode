@@ -46,6 +46,8 @@ public class RobotCore extends Robot {
     public RobotCore(HardwareMap hardwareMap, Telemetry telemetry, Gamepad gamepad1, Pose2d initialPose) {
         this.telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
+        driveController = new GamepadEx(gamepad1);
+
         chassis = new MecanumDrive(hardwareMap, telemetry, true);
         lift = new LiftSubsystem(hardwareMap, "lift", "liftTouch", telemetry);
         pivot = new ShoulderSubsystem(hardwareMap, "shoulder1", "shoulder2", "shoulderTouch", telemetry);
@@ -80,9 +82,9 @@ public class RobotCore extends Robot {
         driveController.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
                 .whenPressed(new SequentialCommandGroup(
                         new InstantCommand(claw::stowUp),
-                        new WaitCommand(20),
+                        new WaitCommand(400),
                         new InstantCommand(claw::rotate),
-                        new WaitCommand(100),
+                        new WaitCommand(600),
                         new InstantCommand(claw::stowDown)
                 ));
 
