@@ -26,7 +26,7 @@ public class TeleOpDriveCommand extends CommandBase {
         this.rightX = rightX;
         this.brakePower = brakePower;
         this.targetPos = targetPos;
-        this.collecting = collecting;
+        this.collecting = () -> false; // collecting;
         this.rightTrigger = rightTrigger;
         this.dumping = dumping;
         this.vision = vision;
