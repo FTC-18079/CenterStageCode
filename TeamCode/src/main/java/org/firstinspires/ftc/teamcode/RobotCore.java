@@ -74,9 +74,9 @@ public class RobotCore extends Robot {
     private void setDriveControls() {
         driveCommand = new NewDriveCommand(
                 chassis,
-                () -> responseCurve(-driveController.getLeftY() * 0.7, 2),
-                () -> responseCurve(driveController.getLeftX() * 0.7, 2),
-                () -> responseCurve(driveController.getRightX() * 0.7, 2)
+                () -> responseCurve(-driveController.getLeftY() * 0.6, 2),
+                () -> responseCurve(driveController.getLeftX() * 0.6, 2),
+                () -> responseCurve(driveController.getRightX() * 0.6, 2)
         );
         driveController.getGamepadButton(GamepadKeys.Button.Y)
                 .whenPressed(new ResetHeading(chassis));

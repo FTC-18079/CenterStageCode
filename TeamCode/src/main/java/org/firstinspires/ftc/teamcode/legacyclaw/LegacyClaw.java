@@ -14,7 +14,8 @@ public class LegacyClaw extends SubsystemBase {
     Servo claw2;
 
     public static double stowPos = 0.45;
-    public static double downPos = 0.90;
+    public static double downPos = 0.87;
+    public static double openPos = 0.55;
 
     public LegacyClaw(HardwareMap hMap) {
         stow = hMap.get(Servo.class, "stow");
@@ -31,9 +32,8 @@ public class LegacyClaw extends SubsystemBase {
     }
 
     public void release() {
-        if (clawOneActive) claw1.setPosition(1);
-        else claw2.setPosition(1);
-
+        if (clawOneActive) claw1.setPosition(openPos);
+        else claw2.setPosition(openPos);
     }
 
     public void toggleStow() {
