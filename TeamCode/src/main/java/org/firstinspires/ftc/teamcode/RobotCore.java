@@ -23,6 +23,7 @@ import org.firstinspires.ftc.teamcode.Arm.Lift.StopLift;
 import org.firstinspires.ftc.teamcode.Arm.Shoulder.ShoulderSubsystem;
 import org.firstinspires.ftc.teamcode.Arm.Shoulder.ShoulderToPos;
 import org.firstinspires.ftc.teamcode.Chassis.MecanumDrive;
+import org.firstinspires.ftc.teamcode.Chassis.NewDriveCommand;
 import org.firstinspires.ftc.teamcode.Chassis.ResetHeading;
 import org.firstinspires.ftc.teamcode.Chassis.TeleOpDriveCommand;
 import org.firstinspires.ftc.teamcode.Shooter.ShooterCommand;
@@ -41,7 +42,7 @@ public class RobotCore extends Robot {
     LegacyClaw claw;
     VisionSubsystem vision;
     // Commands
-    TeleOpDriveCommand driveCommand;
+    NewDriveCommand driveCommand;
 
     public RobotCore(HardwareMap hardwareMap, Telemetry telemetry, Gamepad gamepad1, Pose2d initialPose) {
         this.telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -66,12 +67,11 @@ public class RobotCore extends Robot {
     }
 
     private void setDriveControls() {
-        driveCommand = new TeleOpDriveCommand(
+        driveCommand = new NewDriveCommand(
                 chassis,
                 () -> -driveController.getLeftY() * 0.5,
                 () -> driveController.getLeftX() * 0.5,
-                () -> driveController.getRightX() * 0.5,
-                vision
+                () -> driveController.getRightX() * 0.5
         );
         driveController.getGamepadButton(GamepadKeys.Button.Y)
                 .whenPressed(new ResetHeading(chassis));
@@ -82,9 +82,9 @@ public class RobotCore extends Robot {
         driveController.getGamepadButton(GamepadKeys.Button.LEFT_BUMPER)
                 .whenPressed(new SequentialCommandGroup(
                         new InstantCommand(claw::stowUp),
-                        new WaitCommand(400),
+                        new WaitCommand(700),
                         new InstantCommand(claw::rotate),
-                        new WaitCommand(600),
+                        new WaitCommand(700),
                         new InstantCommand(claw::stowDown)
                 ));
 
