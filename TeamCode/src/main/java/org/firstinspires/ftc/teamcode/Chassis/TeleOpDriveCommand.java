@@ -33,6 +33,19 @@ public class TeleOpDriveCommand extends CommandBase {
         addRequirements(drive);
     }
 
+    public TeleOpDriveCommand(MecanumDrive drive, DoubleSupplier leftY, DoubleSupplier leftX, DoubleSupplier rightX, VisionSubsystem vision) {
+        this.drive = drive;
+        this.leftY = leftY;
+        this.leftX = leftX;
+        this.rightX = rightX;
+        brakePower = () -> 0;
+        targetPos = new Vector2d();
+        collecting = () -> false;
+        dumping = () -> false;
+        rightTrigger = () -> 0;
+        this.vision = vision;
+    }
+
     @Override
     public void execute() {
         AprilTagDetection tag = vision.getAprilTagDetection(PoseStorage.dumpingTag);

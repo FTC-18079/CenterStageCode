@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.opmodes;
 
 import static com.qualcomm.hardware.rev.RevBlinkinLedDriver.BlinkinPattern.CP1_SHOT;
 

@@ -1,7 +1,8 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.opmodes;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.command.InstantCommand;
@@ -9,11 +10,10 @@ import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.WaitCommand;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.teamcode.Arm.ArmCommand;
+import org.firstinspires.ftc.teamcode.Arm.ArmConstants;
 import org.firstinspires.ftc.teamcode.Arm.Lift.LiftSubsystem;
 import org.firstinspires.ftc.teamcode.Arm.Shoulder.ShoulderSubsystem;
 import org.firstinspires.ftc.teamcode.Chassis.MecanumDrive;
@@ -26,20 +26,15 @@ import org.firstinspires.ftc.teamcode.Manip.Stow.StowSubsystem;
 import org.firstinspires.ftc.teamcode.RRCommands.TrajectoryRunner;
 import org.firstinspires.ftc.teamcode.RRCommands.TurnCommand;
 import org.firstinspires.ftc.teamcode.Roadrunner.PoseStorage;
-import org.firstinspires.ftc.teamcode.Roadrunner.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.Roadrunner.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.Vision.VisionSubsystem;
 import org.firstinspires.ftc.teamcode.Vision.VisionUpdatePose;
-import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 
-import java.util.List;
-
-@Autonomous(name = "Blue Wing Side", group = "Blue Autos")
-public class AutoBlueWing extends CommandOpMode {
-    private static final String TFOD_MODEL_ASSET = "blueObject_v2.tflite";
+@Autonomous(name = "Red Wing Side Cycle", group = "Red Autos")
+public class AutoRedWingCycle extends CommandOpMode {
+    private static final String TFOD_MODEL_ASSET = "redObject_v2.tflite";
     private static final String[] LABELS = {
-            "blueObject"
+            "redObject"
     };
 
     private float elementPos;
@@ -59,8 +54,6 @@ public class AutoBlueWing extends CommandOpMode {
     MoveClawOne moveClawOne;
     MoveClawTwo moveClawTwo;
     private RevBlinkinLedDriver led;
-
-    private TrajectorySequence traj1, traj2, traj3;
 
     @Override
     public void initialize() {
@@ -89,13 +82,12 @@ public class AutoBlueWing extends CommandOpMode {
         sleep(200);
         stow.stow();
 
-        Pose2d startPose = new Pose2d(-35, 63.339, Math.toRadians(-90));
-
+        Pose2d startPose = new Pose2d(-35, -63.339, Math.toRadians(90));
         driveTrain.setPoseEstimate(startPose);
 
-        led.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP1_SHOT);
+        led.setPattern(RevBlinkinLedDriver.BlinkinPattern.CP2_SHOT);
 
-        PoseStorage.pattern = RevBlinkinLedDriver.BlinkinPattern.CP1_SHOT;
+        PoseStorage.pattern = RevBlinkinLedDriver.BlinkinPattern.CP2_SHOT;
         PoseStorage.currentPose = driveTrain.getPoseEstimate();
         PoseStorage.hasAutoRun = false;
 
@@ -109,34 +101,40 @@ public class AutoBlueWing extends CommandOpMode {
             elementPos = recognition.getRight() + recognition.getLeft() / 2;
             if (elementPos < 275) {
                 // Left
-                turnAmount = 60.0;
+                turnAmount = 55.0;
                 fwd = 20;
-                aprilTagY = 44.0;
+                aprilTagY = -21.5;
             }
             else if (elementPos >= 275) {
                 // Middle
-                turnAmount = 15.0;
-                fwd = 26;
-                aprilTagY = 38.5;
+                turnAmount = -20.0;
+                fwd = 25;
+                aprilTagY = -30.0; //-28.75
             }
             else {
                 // Right
-                turnAmount = -60.0;
+                turnAmount = -50.0;
                 fwd = 20;
-                aprilTagY = 30.0;
+                aprilTagY = -38.0;
             }
         } else {
             // Right
-            turnAmount = -60.0;
+            turnAmount = -50.0;
             fwd = 20;
-            aprilTagY = 30.0;
+            aprilTagY = -38.0;
         }
 
         vision.disableTfod();
-        vision.enableAprilTag();
+//        vision.enableAprilTag();
 
         TrajectorySequence traj1 = driveTrain.trajectorySequenceBuilder(startPose)
                 .forward(fwd)
+                .build();
+
+        TrajectorySequence traj2 = driveTrain.trajectorySequenceBuilder(traj1.end())
+                .back(fwd - 14)
+                .splineToConstantHeading(new Vector2d(-56, -58), Math.toRadians(180))
+                .forward(7)
                 .build();
 
         register(vision);
@@ -144,7 +142,7 @@ public class AutoBlueWing extends CommandOpMode {
 
         CommandScheduler.getInstance().schedule(
                 new SequentialCommandGroup(
-                        new TrajectoryRunner(driveTrain, traj1), // Follow trajectory 1 to spike mark
+                        new TrajectoryRunner(driveTrain, traj1), // Follow trajectory 1
                         new TurnCommand(driveTrain, Math.toRadians(turnAmount)), // Turn to face game element's spike mark
                         new InstantCommand(stowDown), // Bring down stow
                         new WaitCommand(500), // Wait .5s
@@ -153,11 +151,24 @@ public class AutoBlueWing extends CommandOpMode {
                         new InstantCommand(stowUp), // Bring stow up
                         new WaitCommand(500), // Wait .5s
                         new TurnCommand(driveTrain, Math.toRadians(turnAmount * -1)),
+                        new TrajectoryRunner(driveTrain, traj2),
+                        new TurnCommand(driveTrain, Math.toRadians(15)),
+                        new ArmCommand(
+                                shoulder,
+                                lift,
+                                stow,
+                                () -> ArmConstants.SHOULDER_POS_LOW,
+                                () -> ArmConstants.LIFT_POS_REST,
+                                () -> ArmConstants.STOW_POS_REST,
+                                telemetry
+                        ),
+                        new InstantCommand(stowDown),
+
                         new SequentialCommandGroup(
                                 new InstantCommand(() -> PoseStorage.currentPose = driveTrain.getPoseEstimate()),
                                 new InstantCommand(() -> PoseStorage.hasAutoRun = true),
-                                new InstantCommand(() -> PoseStorage.dumpingTag = 1),
-                                new InstantCommand(() -> PoseStorage.pattern = RevBlinkinLedDriver.BlinkinPattern.CP1_SHOT),
+                                new InstantCommand(() -> PoseStorage.dumpingTag = 4),
+                                new InstantCommand(() -> PoseStorage.pattern = RevBlinkinLedDriver.BlinkinPattern.CP2_SHOT),
                                 new InstantCommand(() -> telemetry.addData("PoseStorage saved", PoseStorage.hasAutoRun)),
                                 new InstantCommand(() -> telemetry.addData("Pose", PoseStorage.currentPose)),
                                 new InstantCommand(() -> telemetry.update())
