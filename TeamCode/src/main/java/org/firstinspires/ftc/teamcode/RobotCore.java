@@ -91,7 +91,11 @@ public class RobotCore extends Robot {
                         new InstantCommand(claw::rotate),
                         new WaitCommand(300),
                         new InstantCommand(claw::stowDown)
-                ));
+                ))
+                .whenPressed(new ShoulderToPos(pivot, () -> ArmConstants.SHOULDER_POS_REST, () -> ArmConstants.SHOULDER_VELOCITY, telemetry), true)
+                .whenPressed(new LiftToPos(lift, () -> ArmConstants.LIFT_POS_REST, () -> ArmConstants.LIFT_VELOCITY, telemetry), true)
+                .whenPressed(claw::stowUp)
+                .whenPressed(new InstantCommand(() -> lift.setClimbing(false)));
         driveController.getGamepadButton(GamepadKeys.Button.RIGHT_BUMPER)
                 .whenPressed(claw::stowDown);
 
@@ -103,14 +107,14 @@ public class RobotCore extends Robot {
         driveController.getGamepadButton(GamepadKeys.Button.X)
                 .whenPressed(new StopLift(lift), true);
 
-        driveController.getGamepadButton(GamepadKeys.Button.DPAD_UP)
-                .whenPressed(new ShoulderToPos(pivot, () -> 1000, () -> ArmConstants.SHOULDER_VELOCITY, telemetry), true)
-                .whenPressed(new LiftToPos(lift, () -> ArmConstants.LIFT_POS_CLIMB, () -> ArmConstants.LIFT_VELOCITY, telemetry), true)
-                .whenPressed(new InstantCommand(claw::stowDown))
-                .whenPressed(new InstantCommand(() -> lift.setClimbing(true)));
+//        driveController.getGamepadButton(GamepadKeys.Button.DPAD_UP)
+//                .whenPressed(new ShoulderToPos(pivot, () -> 1000, () -> ArmConstants.SHOULDER_VELOCITY, telemetry), true)
+//                .whenPressed(new LiftToPos(lift, () -> ArmConstants.LIFT_POS_CLIMB, () -> ArmConstants.LIFT_VELOCITY, telemetry), true)
+//                .whenPressed(new InstantCommand(claw::stowDown))
+//                .whenPressed(new InstantCommand(() -> lift.setClimbing(true)));
         driveController.getGamepadButton(GamepadKeys.Button.DPAD_RIGHT)
                 .whenPressed(new ShoulderToPos(pivot, () -> ArmConstants.SHOULDER_POS_LOW, () -> ArmConstants.SHOULDER_VELOCITY, telemetry), true)
-                .whenPressed(new LiftToPos(lift, () -> -1700, () -> ArmConstants.LIFT_VELOCITY, telemetry), true)
+                .whenPressed(new LiftToPos(lift, () -> -1950, () -> ArmConstants.LIFT_VELOCITY, telemetry), true)
                 .whenPressed(new InstantCommand(() -> claw.setStow(0.7)))
                 .whenPressed(new InstantCommand(() -> lift.setClimbing(false)));
         driveController.getGamepadButton(GamepadKeys.Button.DPAD_DOWN)
@@ -119,12 +123,12 @@ public class RobotCore extends Robot {
                 .whenPressed(claw::stowUp)
                 .whenPressed(new InstantCommand(() -> lift.setClimbing(false)));
 
-        driveController.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
-                .whenPressed(new ConditionalCommand(
-                        new LiftToPos(lift, () -> -300, () -> 1500, telemetry),
-                        new InstantCommand(),
-                        lift::isInClimb
-                ));
+//        driveController.getGamepadButton(GamepadKeys.Button.DPAD_LEFT)
+//                .whenPressed(new ConditionalCommand(
+//                        new LiftToPos(lift, () -> -300, () -> 1500, telemetry),
+//                        new InstantCommand(),
+//                        lift::isInClimb
+//                ));
 
         liftCommand = new LiftCommand(lift, () -> 0, () -> true, () -> false);
         shoulderCommand = new ShoulderCommand(pivot, () -> 0);
